@@ -6,7 +6,7 @@
 #include "PrinterServer.h"
 #include "Utils.h"
 
-class ServiceController : public PowerButtonObserver{
+class ServiceController : public PowerButtonObserver, public FanObserver{
 private: 
 	PowerButtonController powerButtonController;
 	DisplayController displayController;
@@ -19,6 +19,7 @@ private:
 	int32_t readTemp();
 	virtual void onShutdown() override;
 	virtual void onShortPress() override;
+	virtual void onFanStateChanged(bool state) override;
 
 public:
 	void run();

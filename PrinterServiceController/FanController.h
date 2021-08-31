@@ -2,6 +2,11 @@
 
 #include <stdint.h> //for uint32_t
 
+class FanObserver {
+public:
+	virtual void onFanStateChanged(bool isOn) = 0;
+};
+
 class FanController
 {
 private:
@@ -17,6 +22,8 @@ private:
 	float kp = 1;							// Proportionalfaktor
 	float ki = 1;							// Integralfaktor
 	static constexpr float MAX_INTEGRATOR = 0; // set to zero because an integrator is useless for a switch
+	FanObserver* observer = nullptr;
+	void notifyObserver();
 
 public:
 	FanController(uint8_t fanPin);
@@ -26,5 +33,6 @@ public:
 
 	float calculateStellValue(float Regelfehler);	// berechnet die Stellgroesse aus dem Regelfehler
 	void fan(float power);				// steuert den Luefter (von 0-100)
+	void setObserver(FanObserver* observer);
 };
 

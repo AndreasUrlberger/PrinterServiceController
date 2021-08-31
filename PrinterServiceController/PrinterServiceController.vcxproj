@@ -47,9 +47,9 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>/usr/local/lib/; /usr/lib/</IncludePath>
-    <LibraryPath>/usr/local/lib/; /usr/lib/</LibraryPath>
-    <SourcePath>/usr/local/lib/; /usr/lib/</SourcePath>
+    <IncludePath>/usr/local/lib/; /usr/lib/; /usr/local/include</IncludePath>
+    <LibraryPath>/usr/local/lib/; /usr/lib/; /usr/local/include</LibraryPath>
+    <SourcePath>/usr/local/lib/; /usr/lib/; /usr/local/include</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>

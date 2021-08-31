@@ -14,6 +14,13 @@ FanController::FanController(uint8_t fanPin)
 	turnOff(); // Otherwise it seems to be on by default
 }
 
+void FanController::notifyObserver()
+{
+	if (observer != nullptr) {
+		observer->onFanStateChanged(fanOn);
+	}
+}
+
 void FanController::tempChanged(int32_t temp) {
 	float temp_ist = static_cast<float>(temp) / 1000.f;
 	//std::cout << "tempChanged: " << temp_ist << std::endl;
@@ -36,11 +43,13 @@ void FanController::tempChanged(int32_t temp) {
 void FanController::turnOff() {
 	digitalWrite(fanPin, HIGH);
 	fanOn = false;
+	notifyObserver();
 }
 
 void FanController::turnOn() {
 	digitalWrite(fanPin, LOW);
 	fanOn = true;
+	notifyObserver();
 }
 
 float FanController::calculateStellValue(float Regelfehler)
@@ -79,4 +88,9 @@ void FanController::fan(float power) //Luefter an/aus
 			//printf("Luefter immer noch aus \n"); // Luefter ausschalten
 		}
 	}
+}
+
+void FanController::setObserver(FanObserver* observer)
+{
+	this->observer = observer;
 }

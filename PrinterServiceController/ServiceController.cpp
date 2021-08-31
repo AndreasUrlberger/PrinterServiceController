@@ -8,6 +8,7 @@
 
 void ServiceController::run()
 {
+	fanController.setObserver(this);
 	powerButtonController.setObserver(this);
 	powerButtonController.start();
 	printerServer.start();
@@ -15,7 +16,6 @@ void ServiceController::run()
 }
 
 int ServiceController::displayTempLoop() {
-	displayController.setIconVisible(true);
 	displayController.setInverted(false);
 
 	while (true) {
@@ -24,6 +24,7 @@ int ServiceController::displayTempLoop() {
 		fanController.tempChanged(have);
 		if (turnOffTime - now > 0 && !shuttingDown) {
 			displayController.drawTemperature(25, have);
+			printerServer.setContent(false, 0.0, 0, 0.0, 0.0, static_cast<double>(have) / 1000, 0.0, "PETG", 0.0);
 		}
 		else {
 			displayController.turnOff();
@@ -62,4 +63,9 @@ void ServiceController::onShortPress() {
 	int have = readTemp();
 	displayController.drawTemperature(25, have);
 	displayController.turnOn();
+}
+
+void ServiceController::onFanStateChanged(bool isOn)
+{
+	displayController.setIconVisible(isOn);
 }

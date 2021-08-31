@@ -92,7 +92,7 @@ void PrinterServer::listenToClient(int socket)
 		message[0] = static_cast<char>(contentLength >> 8); // hi
 		message[1] = static_cast<char>(contentLength & 0xFF); // lo
 
-		for (size_t index = 0; index < contentLength; ++index) {
+		for (int index = 0; index < contentLength; ++index) {
 			char c = *(cContent + index);
 			message[index + 2] = c;
 		}
@@ -117,5 +117,4 @@ PrinterServer::PrinterServer()
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(HOST_PORT);
 	addressLength = sizeof(address);
-	setContent(false, 0.0, 0, 0.0, 0.0, 0.0, 0.0, "PETG", 0.0);
 }
