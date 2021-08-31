@@ -5,9 +5,10 @@
 #include "FanController.h"
 #include "PrinterServer.h"
 #include "Utils.h"
+#include "PrintConfigs.h"
 
-class ServiceController : public PowerButtonObserver, public FanObserver{
-private: 
+class ServiceController : public PowerButtonObserver, public FanObserver {
+private:
 	PowerButtonController powerButtonController;
 	DisplayController displayController;
 	FanController fanController{ 6 };
@@ -20,6 +21,8 @@ private:
 	virtual void onShutdown() override;
 	virtual void onShortPress() override;
 	virtual void onFanStateChanged(bool state) override;
+	std::vector<PrintConfig> printConfigs;
+	PrintConfig* selectedConfig = nullptr;
 
 public:
 	void run();

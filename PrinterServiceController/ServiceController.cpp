@@ -1,13 +1,15 @@
 #include "ServiceController.h"
 #include <fstream>
 #include <sstream>
-#include <wiringPi.h> // only for the delay function
 #include <stdint.h>
-
 #include <iostream>
+
+#define CONFIG_FILE_PATH "/usr/share/printer-service-controller/"
+#define CONFIG_FILE_NAME "print-configs.txt"
 
 void ServiceController::run()
 {
+	PrintConfigs::loadPrintConfigs(CONFIG_FILE_PATH, CONFIG_FILE_NAME, printConfigs);
 	fanController.setObserver(this);
 	powerButtonController.setObserver(this);
 	powerButtonController.start();
@@ -29,7 +31,7 @@ int ServiceController::displayTempLoop() {
 		else {
 			displayController.turnOff();
 		}
-		delay(1'000);
+		Utils::sleep(1'000);
 	}
 
 	return 0;

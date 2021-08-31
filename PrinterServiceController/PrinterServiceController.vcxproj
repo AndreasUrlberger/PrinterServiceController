@@ -53,7 +53,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi</LibraryDependencies>
+      <LibraryDependencies>wiringPi; stdc++fs</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
       <Command>
@@ -75,6 +75,7 @@
     <ClInclude Include="DisplayController.h" />
     <ClInclude Include="FanController.h" />
     <ClInclude Include="PowerButtonController.h" />
+    <ClInclude Include="PrintConfigs.h" />
     <ClInclude Include="PrinterServer.h" />
     <ClInclude Include="ServiceController.h" />
     <ClInclude Include="Utils.h" />
@@ -84,6 +85,7 @@
     <ClCompile Include="FanController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PowerButtonController.cpp" />
+    <ClCompile Include="PrintConfigs.cpp" />
     <ClCompile Include="PrinterServer.cpp" />
     <ClCompile Include="ServiceController.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -93,7 +95,7 @@
       <CppLanguageStandard>c++17</CppLanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-I /usr/local/include -L /usr/local/lib -l ssd1306_i2c  -pthread %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-I /usr/local/include -L /usr/local/lib -l ssd1306_i2c -pthread %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
