@@ -5,10 +5,13 @@
 #include <cstring>
 
 namespace fs = std::filesystem;
-static const char *defaultConfig("25:PETG\n30:PLA\n");
+static const char *defaultConfig("250:PETG\n300:PLA\n");
 
 void PrintConfigs::evaluateLine(std::string line, std::vector<PrintConfig>& configs)
 {
+	if (line.empty())
+		return;
+
 	int endOfTemp = line.find_first_of(':');
 	std::string temp = line.substr(0, endOfTemp);
 	std::string rest = line.substr(endOfTemp + 1);
@@ -21,7 +24,6 @@ void PrintConfigs::evaluateLine(std::string line, std::vector<PrintConfig>& conf
 void PrintConfigs::loadPrintConfigs(std::string directoryPath, std::string filename, std::vector<PrintConfig>& configs)
 {
 	if (!fs::is_directory(directoryPath)) {
-		printf("directoryPath is not a directory\n");
 		if (!fs::create_directory(directoryPath)) {
 			throw std::runtime_error("Config directory does not exist and could not be created");
 			return;
@@ -33,7 +35,6 @@ void PrintConfigs::loadPrintConfigs(std::string directoryPath, std::string filen
 	file.open(path, std::fstream::in);
 	if (!file) {
 		// file apperantly doesnt exist yet, thus we create it
-		printf("file apperantly doesnt exist yet, thus we create it\n");
 		file.open(path, std::fstream::out);
 		if (!file) {
 			throw std::runtime_error("Could not create the config file (" + path + ")");
@@ -41,7 +42,9 @@ void PrintConfigs::loadPrintConfigs(std::string directoryPath, std::string filen
 		}
 		else {
 			file.write(defaultConfig, strlen(defaultConfig));
+			file.close();
 		}
+		file.open(path, std::fstream::in);
 	}
 	
 	if (!file.good()) {
@@ -50,8 +53,20 @@ void PrintConfigs::loadPrintConfigs(std::string directoryPath, std::string filen
 
 	std::string line;
 	while (getline(file, line)) {
-		printf("line: %s\n", line.c_str());
+		evaluateLine(line, configs);
+	}
+	file.close();
+}
 
+void PrintConfigs::savePrintConfigs(std::string directoryPath, std::string filename, std::vector<PrintConfig>& configs)
+{
+	// File and directory must exist at this point
+	std::string path = directoryPath + filename;
+	std::fstream file;
+	file.open(path, std::fstream::trunc | std::fstream::out);
+
+	for (PrintConfig config : configs) {
+		file << config.temperatur << ':' << config.name << std::endl;
 	}
 	file.close();
 }

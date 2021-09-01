@@ -56,6 +56,7 @@ int32_t ServiceController::readTemp() {
 void ServiceController::onShutdown()
 {
 	shuttingDown = true;
+	PrintConfigs::savePrintConfigs(CONFIG_FILE_PATH, CONFIG_FILE_NAME, printConfigs);
 	turnOffTime = 0;
 	displayController.turnOff();
 }
