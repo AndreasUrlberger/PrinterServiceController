@@ -30,13 +30,13 @@ private:
 	uint8_t fontSize = 7;
 	ssd1306_framebuffer_t* fbp;
 	ssd1306_framebuffer_box_t bbox;
-	ssd1306_graphics_options_t opts[1];
+	ssd1306_graphics_options_t opts[2];
 	ssd1306_i2c_t* oled;
 
 	void drawFanIcon(uint8_t xOff, uint8_t yOff);
 
 public:
-	void drawTemperature(int32_t want, int32_t have);
+	void drawTemperature(int32_t want, int32_t have, std::string name);
 
 	DisplayController();
 

@@ -16,6 +16,8 @@ DisplayController::DisplayController(){
 
 	opts[0].type = ssd1306_graphics_options_t::SSD1306_OPT_FONT_FILE;
 	opts[0].value.font_file = "/usr/share/fonts/truetype/calibri/calibri-regular.ttf";
+	opts[1].type = ssd1306_graphics_options_t::SSD1306_OPT_ROTATE_FONT;
+	opts[1].value.rotation_degrees = 180;
 }
 
 DisplayController::~DisplayController()
@@ -65,30 +67,29 @@ void DisplayController::drawFanIcon(uint8_t xOff, uint8_t yOff) {
 		{
 			uint8_t xCord = static_cast<uint8_t>(x + xOff);
 			uint8_t yCord = static_cast<uint8_t>(y + yOff);
-			ssd1306_framebuffer_put_pixel(fbp, xCord, yCord, fan[x][y]);
+			//ssd1306_framebuffer_put_pixel(fbp, xCord, yCord, fan[x][y]); // add rotation
+			ssd1306_framebuffer_put_pixel_rotation(fbp, xCord, yCord, fan[x][y], 180);
 		}
 	}
 }
 
-void DisplayController::drawTemperature(int32_t want, int32_t have)
+void DisplayController::drawTemperature(int32_t want, int32_t have, std::string name)
 {
 	ssd1306_framebuffer_clear(fbp);
 	int haveInt = have / 1000;
 	int haveDec = std::abs(have % 1000) / 100; // one decimal digit
-
-	// draw dot
-	ssd1306_framebuffer_draw_text_extra(fbp, ".", 0, 29, 20, SSD1306_FONT_CUSTOM, fontSize, opts, 1, &bbox);
+	std::string firstLine = std::to_string(haveInt) + "." + std::to_string(haveDec) + "/" + std::to_string(want);
 	// draw have integer
-	ssd1306_framebuffer_draw_text_extra(fbp, std::to_string(haveInt).c_str(), 0, 0, 5, SSD1306_FONT_CUSTOM, fontSize, opts, 1, &bbox);
+	ssd1306_framebuffer_draw_text_extra(fbp, firstLine.c_str(), 0, 127, 37, SSD1306_FONT_CUSTOM, fontSize, opts, 2, &bbox);
 	// rest of first line
-	std::string firstLine = std::to_string(haveDec) + "/" + std::to_string(want) + "°C";
-	ssd1306_framebuffer_draw_text_extra(fbp, firstLine.c_str(), 0, 39, 5, SSD1306_FONT_CUSTOM, fontSize, opts, 1, &bbox);
+	ssd1306_framebuffer_draw_text_extra(fbp, "°", 0, 34, 50, SSD1306_FONT_CUSTOM, fontSize, opts, 2, &bbox);
+	ssd1306_framebuffer_draw_text_extra(fbp, "C", 0, 24, 37, SSD1306_FONT_CUSTOM, fontSize, opts, 2, &bbox);
 
 	// draw PTEG
-	ssd1306_framebuffer_draw_text_extra(fbp, "PETG", 0, 0, 32 + 5, SSD1306_FONT_CUSTOM, fontSize, opts, 1, &bbox);
+	ssd1306_framebuffer_draw_text_extra(fbp, name.c_str(), 0, 127, 5, SSD1306_FONT_CUSTOM, fontSize, opts, 2, &bbox);
 	// draw fan icon
 	if (iconVisible) {
-		drawFanIcon(101, 32 + 5);
+		drawFanIcon(5, 4);
 	}
 
 	ssd1306_i2c_display_update(oled, fbp);

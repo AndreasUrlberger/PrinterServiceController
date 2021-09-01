@@ -27,7 +27,7 @@ private:
 
 public:
 	FanController(uint8_t fanPin);
-	void tempChanged(int32_t temp);
+	void tempChanged(int32_t temp, int32_t wanted);
 	void turnOff();
 	void turnOn();
 

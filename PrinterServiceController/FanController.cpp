@@ -21,8 +21,9 @@ void FanController::notifyObserver()
 	}
 }
 
-void FanController::tempChanged(int32_t temp) {
-	float temp_ist = static_cast<float>(temp) / 1000.f;
+void FanController::tempChanged(int32_t temp, int32_t wanted) {
+	temp_soll = static_cast<float>(wanted);
+	float temp_ist = static_cast<float>(temp) / 1000;
 	//std::cout << "tempChanged: " << temp_ist << std::endl;
 	
 	float regelf = temp_soll - temp_ist;

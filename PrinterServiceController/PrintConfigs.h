@@ -4,8 +4,7 @@
 
 struct PrintConfig {
 	std::string name;
-	// in 10th of a degree
-	int temperatur;
+	int32_t temperatur;
 };
 
 class PrintConfigs

@@ -21,12 +21,14 @@ int ServiceController::displayTempLoop() {
 	displayController.setInverted(false);
 
 	while (true) {
+		PrintConfig config = printConfigs[0];
+		int32_t wantedTemp = config.temperatur;
 		int64_t now = Utils::currentMillis();
 		int32_t have = readTemp();
-		fanController.tempChanged(have);
+		fanController.tempChanged(have, wantedTemp);
 		if (turnOffTime - now > 0 && !shuttingDown) {
-			displayController.drawTemperature(25, have);
-			printerServer.setContent(false, 0.0, 0, 0.0, 0.0, static_cast<double>(have) / 1000, 0.0, "PETG", 0.0);
+			displayController.drawTemperature(wantedTemp, have, config.name);
+			printerServer.setContent(false, 0.0, 0, 0.0, 0.0, static_cast<double>(have) / 1000, 0.0, config.name, 0.0);
 		}
 		else {
 			displayController.turnOff();
@@ -62,9 +64,10 @@ void ServiceController::onShutdown()
 }
 
 void ServiceController::onShortPress() {
+	PrintConfig config = printConfigs[0];
 	turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
 	int have = readTemp();
-	displayController.drawTemperature(25, have);
+	displayController.drawTemperature(config.temperatur, have, config.name);
 	displayController.turnOn();
 }
 
