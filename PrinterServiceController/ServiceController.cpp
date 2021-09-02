@@ -3,6 +3,7 @@
 #include <sstream>
 #include <stdint.h>
 #include <iostream>
+#include <algorithm>
 
 #define CONFIG_FILE_PATH "/usr/share/printer-service-controller/"
 #define CONFIG_FILE_NAME "print-configs.txt"
@@ -13,6 +14,7 @@ void ServiceController::run()
 	fanController.setObserver(this);
 	powerButtonController.setObserver(this);
 	powerButtonController.start();
+	printerServer.setObserver(this);
 	printerServer.start();
 	displayTempLoop();
 }
@@ -23,12 +25,16 @@ int ServiceController::displayTempLoop() {
 	while (true) {
 		PrintConfig config = printConfigs[0];
 		int32_t wantedTemp = config.temperatur;
-		int64_t now = Utils::currentMillis();
+		int64_t now = Utils::currentMillis();   
 		int32_t have = readTemp();
+		state.innerTemp = have;
+		state.profileTemp = config.temperatur;
+		state.profileName = config.name;
+		printerServer.setContent(state);
+		// TODO: read inner and outer temp
 		fanController.tempChanged(have, wantedTemp);
 		if (turnOffTime - now > 0 && !shuttingDown) {
 			displayController.drawTemperature(wantedTemp, have, config.name);
-			printerServer.setContent(false, 0.0, 0, 0.0, 0.0, static_cast<double>(have) / 1000, 0.0, config.name, 0.0);
 		}
 		else {
 			displayController.turnOff();
@@ -74,4 +80,21 @@ void ServiceController::onShortPress() {
 void ServiceController::onFanStateChanged(bool isOn)
 {
 	displayController.setIconVisible(isOn);
+}
+
+void ServiceController::onProfileUpdate(PrintConfig& profile)
+{
+	auto profileComp = [&profile](PrintConfig& element) {return element.name.compare(profile.name); };
+	auto searchResult = std::find_if(printConfigs.begin(), printConfigs.end(), profileComp);
+	if (searchResult == printConfigs.end()) {
+		printConfigs.emplace(printConfigs.begin(), profile);
+	}
+	else {
+		int index = searchResult - printConfigs.begin();
+		printConfigs.at(index) = profile;
+	}
+	// update server
+	state.profileName = profile.name;
+	state.profileTemp = profile.temperatur;
+	printerServer.setContent(state);
 }

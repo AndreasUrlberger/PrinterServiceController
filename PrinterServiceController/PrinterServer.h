@@ -3,11 +3,17 @@
 #include <sys/socket.h>
 #include <netinet/in.h> 
 #include <thread>
+#include "PrintConfigs.h"
 #include <set>
+#include "Utils.h"
 
 #define HOST_IP "localhost"
 #define HOST_PORT 1933
 
+class PServerObserver {
+public:
+	virtual void onProfileUpdate(PrintConfig& profile) = 0;
+};
 
 class PrinterServer {
 private:
@@ -19,20 +25,15 @@ private:
 	// The key is the file descriptor of the client socket and the value is the current deadline of the connection
 	std::set<std::thread> connections;
 	std::string content;
+	PServerObserver* observer = nullptr;
+
+	bool sendState(int socket);
+	bool applyUpdate(int socket);
 
 public:
 	void start();
-	void setContent(
-		bool state,
-		double progress,
-		uint64_t remainingTime,
-		double boardTemp,
-		double nozzleTemp,
-		double innerTemp,
-		double outerTemp,
-		std::string profileName,
-		double wantedTemp
-	);
+	void setObserver(PServerObserver* observer);
+	void setContent(PrinterState& state);
 	void acceptConnections();
 	void listenToClient(int socket);
 	PrinterServer();

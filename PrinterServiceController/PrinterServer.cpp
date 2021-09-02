@@ -1,12 +1,14 @@
 #include "PrinterServer.h"
 #include <stdexcept>
-#include "Utils.h"
 #include <unistd.h> 
 #include <sstream>
 #include <cstring>
 #include <iostream>
 #include <vector>
 #include <string>
+
+constexpr char REQUEST_CODE = 0;
+constexpr char UPDATE_CODE = 1;
 
 
 void staticAcceptActions(PrinterServer* server) {
@@ -17,27 +19,84 @@ void staticListenToClient(PrinterServer* server, int socket) {
 	server->listenToClient(socket);
 }
 
-void PrinterServer::setContent(
-	bool state,
-	double progress,
-	uint64_t remainingTime,
-	double boardTemp,
-	double nozzleTemp,
-	double innerTemp,
-	double outerTemp,
-	std::string profileName,
-	double wantedTemp
-){
+void PrinterServer::setContent(PrinterState& state){
 	std::ostringstream ss;
-	ss << "{power_state: " << (state? "true" : "false")
-		<< ",progress: " << progress 
-		<< ",remaining_time: " << remainingTime
-		<< ",board_temp: " << boardTemp
-		<< ",nozzle_temp: " << nozzleTemp
-		<< ",inner_temp: " << innerTemp
-		<< ",outer_temp: " << outerTemp
-		<< ",temp_profile: {profile: " << profileName << ",want: " << wantedTemp << "}}";
+	ss << "{power_state: " << (state.state? "true" : "false")
+		<< ",progress: " << state.progress 
+		<< ",remaining_time: " << state.remainingTime
+		<< ",board_temp: " << state.boardTemp
+		<< ",nozzle_temp: " << state.nozzleTemp
+		<< ",inner_temp: " << state.innerTemp
+		<< ",outer_temp: " << state.outerTemp
+		<< ",temp_profile: {profile: " << state.profileName << ",want: " << state.profileTemp << "}}";
 	content = ss.str();
+}
+
+bool PrinterServer::sendState(int socket)
+{
+	const char* cContent = content.c_str();
+	int contentLength = content.length();
+	int sendLength = contentLength + 2;
+
+	char message[sendLength];
+	message[0] = static_cast<char>(contentLength >> 8); // hi
+	message[1] = static_cast<char>(contentLength & 0xFF); // lo
+
+	for (int index = 0; index < contentLength; ++index) {
+		char c = *(cContent + index);
+		message[index + 2] = c;
+	}
+
+	int bytesSent = 1;
+	int sendProgress = 0;
+	while (bytesSent > 0 && sendProgress < sendLength) {
+		bytesSent = write(socket, message, sendLength - sendProgress);
+		sendProgress += bytesSent;
+	}
+	
+	// if false, connection has closed
+	return sendProgress == sendLength;
+}
+
+bool PrinterServer::applyUpdate(int socket)
+{
+	// Get content length
+	int bytesReceived = 1;
+	int progress = 0;
+	char lengthBuffer[2];
+	while (bytesReceived > 0 && progress < 2) {
+		bytesReceived = read(socket, lengthBuffer, 2 - progress);
+		progress += bytesReceived;
+	}
+	if (progress != 2) { // connection has failed
+		return false;
+	}
+	int contentLength = static_cast<int>(lengthBuffer[0]) << 8; // high
+	contentLength += static_cast<int>(lengthBuffer[1]); // + low
+
+	// Get profile
+	bytesReceived = 1;
+	progress = 0;
+	char buffer[contentLength];
+	while (bytesReceived > 0 && progress < contentLength) {
+		bytesReceived = read(socket, buffer, contentLength - progress);
+		progress += bytesReceived;
+	}
+	if (progress != contentLength) { // connection has failed
+		return false;
+	}
+
+	std::string input{ buffer };
+	int endOfTemp = input.find_first_of(':');
+	int temp = std::stoi(input.substr(0, endOfTemp));
+	std::string name = input.substr(endOfTemp + 1);
+	if (observer != nullptr) {
+		PrintConfig config;
+		config.name = name;
+		config.temperatur = temp;
+		observer->onProfileUpdate(config);
+	}
+	return true;
 }
 
 void PrinterServer::start()
@@ -68,6 +127,11 @@ void PrinterServer::start()
 	}
 }
 
+void PrinterServer::setObserver(PServerObserver* observer)
+{
+	this->observer = observer;
+}
+
 void PrinterServer::acceptConnections()
 {
 	int new_socket;
@@ -82,29 +146,16 @@ void PrinterServer::acceptConnections()
 
 void PrinterServer::listenToClient(int socket)
 {
-	char* readBuffer[1];
-	while (read(socket, readBuffer, 1) > 0) {
-		const char *cContent = content.c_str();
-		int contentLength = content.length();
-		int sendLength = contentLength + 2;
-
-		char message[sendLength];
-		message[0] = static_cast<char>(contentLength >> 8); // hi
-		message[1] = static_cast<char>(contentLength & 0xFF); // lo
-
-		for (int index = 0; index < contentLength; ++index) {
-			char c = *(cContent + index);
-			message[index + 2] = c;
-		}
-
-		int bytesSent = 1;
-		int sendProgress = 0;
-		while (bytesSent > 0 && sendProgress < sendLength) {
-			bytesSent = write(socket, message, sendLength - sendProgress);
-			sendProgress += bytesSent;
-		}
-		if (sendProgress != sendLength) {
-			// connection closed while sending
+	char readBuffer[1];
+	bool connectionAlive = true;
+	while (read(socket, readBuffer, 1) > 0 && connectionAlive) {
+		switch (readBuffer[0]) {
+		case REQUEST_CODE: connectionAlive = sendState(socket);
+			break;
+		case UPDATE_CODE: connectionAlive = applyUpdate(socket);
+			connectionAlive &= sendState(socket);
+			break;
+		default: 
 			break;
 		}
 	}
