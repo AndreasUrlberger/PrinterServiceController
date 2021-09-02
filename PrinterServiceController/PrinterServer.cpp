@@ -86,10 +86,11 @@ bool PrinterServer::applyUpdate(int socket)
 		return false;
 	}
 
-	std::string input{ buffer };
+	std::string input{ buffer, contentLength };
 	int endOfTemp = input.find_first_of(':');
 	int temp = std::stoi(input.substr(0, endOfTemp));
 	std::string name = input.substr(endOfTemp + 1);
+	printf("namelength: %d", name.length());
 	if (observer != nullptr) {
 		PrintConfig config;
 		config.name = name;
