@@ -78,7 +78,7 @@ void DisplayController::drawTemperature(int32_t want, int32_t have, std::string 
 	ssd1306_framebuffer_clear(fbp);
 	int haveInt = have / 1000;
 	int haveDec = std::abs(have % 1000) / 100; // one decimal digit
-	std::string firstLine = std::to_string(haveInt) + "." + std::to_string(haveDec) + "/" + std::to_string(want);
+	std::string firstLine = std::to_string(haveInt) + "." + std::to_string(haveDec) + "/" + std::to_string(want/1000);
 	// draw have integer
 	ssd1306_framebuffer_draw_text_extra(fbp, firstLine.c_str(), 0, 127, 37, SSD1306_FONT_CUSTOM, fontSize, opts, 2, &bbox);
 	// rest of first line

@@ -7,6 +7,9 @@
 #include "Utils.h"
 #include "PrintConfigs.h"
 
+static constexpr char* INNER_THERMO_NAME = "28-2ca0a72153ff";
+static constexpr char* OUTER_THERMO_NAME = "28-baa0a72915ff";
+
 class ServiceController : public PowerButtonObserver, public FanObserver, public PServerObserver {
 private:
 	PowerButtonController powerButtonController;
@@ -17,7 +20,7 @@ private:
 	int64_t turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
 	bool shuttingDown = false;
 	int displayTempLoop();
-	int32_t readTemp();
+	int32_t readTemp(std::string deviceName);
 	virtual void onShutdown() override;
 	virtual void onShortPress() override;
 	virtual void onFanStateChanged(bool state) override;

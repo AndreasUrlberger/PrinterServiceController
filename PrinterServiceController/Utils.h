@@ -8,10 +8,10 @@ struct PrinterState {
 	bool state;
 	double progress;
 	uint64_t remainingTime;
-	double boardTemp;
-	double nozzleTemp;
-	double innerTemp;
-	double outerTemp;
+	int32_t boardTemp;
+	int32_t nozzleTemp;
+	int32_t innerTemp;
+	int32_t outerTemp;
 	std::string profileName;
 	int32_t profileTemp;
 };

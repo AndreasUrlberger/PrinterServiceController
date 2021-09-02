@@ -10,6 +10,12 @@
 
 void ServiceController::run()
 {
+	state.boardTemp = 0;
+	state.nozzleTemp = 0;
+	state.progress = 0;
+	state.remainingTime = 0;
+	state.state = false;
+
 	PrintConfigs::loadPrintConfigs(CONFIG_FILE_PATH, CONFIG_FILE_NAME, printConfigs);
 	fanController.setObserver(this);
 	powerButtonController.setObserver(this);
@@ -23,32 +29,29 @@ int ServiceController::displayTempLoop() {
 	displayController.setInverted(false);
 
 	while (true) {
+		// TODO: partially remove use of PrintConfig.
 		PrintConfig config = printConfigs[0];
-		int32_t wantedTemp = config.temperatur;
-		int64_t now = Utils::currentMillis();   
-		int32_t have = readTemp();
-		state.innerTemp = have;
+		int64_t now = Utils::currentMillis();
+		state.innerTemp = readTemp(INNER_THERMO_NAME);
+		state.outerTemp = readTemp(OUTER_THERMO_NAME);
 		state.profileTemp = config.temperatur;
 		state.profileName = config.name;
 		printerServer.setContent(state);
-		// TODO: read inner and outer temp
-		fanController.tempChanged(have, wantedTemp);
+		fanController.tempChanged(state.innerTemp, state.profileTemp);
 		if (turnOffTime - now > 0 && !shuttingDown) {
-			displayController.drawTemperature(wantedTemp, have, config.name);
+			displayController.drawTemperature(state.profileTemp, state.innerTemp, config.name);
 		}
 		else {
 			displayController.turnOff();
 		}
 		Utils::sleep(1'000);
 	}
-
 	return 0;
 }
 
-int32_t ServiceController::readTemp() {
+int32_t ServiceController::readTemp(std::string deviceName) {
 	// read file to string
-	std::string device = "28-2ca0a72153ff";
-	std::string path = "/sys/bus/w1/devices/" + device + "/w1_slave";
+	std::string path = "/sys/bus/w1/devices/" + deviceName + "/w1_slave";
 	auto stream = std::ifstream{ path.data() };
 	std::ostringstream sstr;
 	sstr << stream.rdbuf();
@@ -72,7 +75,7 @@ void ServiceController::onShutdown()
 void ServiceController::onShortPress() {
 	PrintConfig config = printConfigs[0];
 	turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
-	int have = readTemp();
+	int have = readTemp(INNER_THERMO_NAME);
 	displayController.drawTemperature(config.temperatur, have, config.name);
 	displayController.turnOn();
 }

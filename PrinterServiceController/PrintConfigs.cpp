@@ -5,7 +5,7 @@
 #include <cstring>
 
 namespace fs = std::filesystem;
-static const char *defaultConfig("25:PETG\n30:PLA\n");
+static const char *defaultConfig("25000:PETG\n30000:PLA\n");
 
 void PrintConfigs::evaluateLine(std::string line, std::vector<PrintConfig>& configs)
 {
