@@ -5,8 +5,8 @@
 #include <iostream>
 #include <algorithm>
 
-#define CONFIG_FILE_PATH "/usr/share/printer-service-controller/"
-#define CONFIG_FILE_NAME "print-configs.txt"
+// practically a function alias since most compilers will directly call PrintConfigs::getPrintConfigs
+constexpr auto printConfigs = PrintConfigs::getPrintConfigs;
 
 void ServiceController::run()
 {
@@ -16,7 +16,6 @@ void ServiceController::run()
 	state.remainingTime = 0;
 	state.state = false;
 
-	PrintConfigs::loadPrintConfigs(CONFIG_FILE_PATH, CONFIG_FILE_NAME, printConfigs);
 	fanController.setObserver(this);
 	powerButtonController.setObserver(this);
 	powerButtonController.start();
@@ -30,7 +29,7 @@ int ServiceController::displayTempLoop() {
 
 	while (true) {
 		// TODO: partially remove use of PrintConfig.
-		PrintConfig config = printConfigs[0];
+		PrintConfig config = printConfigs()[0];
 		int64_t now = Utils::currentMillis();
 		state.innerTemp = readTemp(INNER_THERMO_NAME);
 		state.outerTemp = readTemp(OUTER_THERMO_NAME);
@@ -67,13 +66,13 @@ int32_t ServiceController::readTemp(std::string deviceName) {
 void ServiceController::onShutdown()
 {
 	shuttingDown = true;
-	PrintConfigs::savePrintConfigs(CONFIG_FILE_PATH, CONFIG_FILE_NAME, printConfigs);
+	PrintConfigs::savePrintConfigs();
 	turnOffTime = 0;
 	displayController.turnOff();
 }
 
 void ServiceController::onShortPress() {
-	PrintConfig config = printConfigs[0];
+	PrintConfig config = printConfigs()[0];
 	turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
 	int have = readTemp(INNER_THERMO_NAME);
 	displayController.drawTemperature(config.temperatur, have, config.name);
@@ -88,13 +87,14 @@ void ServiceController::onFanStateChanged(bool isOn)
 void ServiceController::onProfileUpdate(PrintConfig& profile)
 {
 	auto profileComp = [&profile](PrintConfig& element) {return element.name.compare(profile.name); };
-	auto searchResult = std::find_if(printConfigs.begin(), printConfigs.end(), profileComp);
-	if (searchResult == printConfigs.end()) {
-		printConfigs.emplace(printConfigs.begin(), profile);
+	std::vector<PrintConfig> configs = printConfigs();
+	auto searchResult = std::find_if(configs.begin(), configs.end(), profileComp);
+	if (searchResult == configs.end()) {
+		configs.emplace(configs.begin(), profile);
 	}
 	else {
-		int index = searchResult - printConfigs.begin();
-		printConfigs.at(index) = profile;
+		int index = searchResult - configs.begin();
+		configs.at(index) = profile;
 	}
 	// update server
 	state.profileName = profile.name;

@@ -7,8 +7,8 @@
 #include "Utils.h"
 #include "PrintConfigs.h"
 
-static constexpr char* INNER_THERMO_NAME = "28-2ca0a72153ff";
-static constexpr char* OUTER_THERMO_NAME = "28-baa0a72915ff";
+static constexpr auto INNER_THERMO_NAME = "28-2ca0a72153ff";
+static constexpr auto OUTER_THERMO_NAME = "28-baa0a72915ff";
 
 class ServiceController : public PowerButtonObserver, public FanObserver, public PServerObserver {
 private:
@@ -25,7 +25,6 @@ private:
 	virtual void onShortPress() override;
 	virtual void onFanStateChanged(bool state) override;
 	virtual void onProfileUpdate(PrintConfig& profile) override;
-	std::vector<PrintConfig> printConfigs;
 	PrinterState state;
 
 public:

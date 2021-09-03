@@ -9,6 +9,7 @@
 
 constexpr char REQUEST_CODE = 0;
 constexpr char UPDATE_CODE = 1;
+constexpr char REQUEST_CONFIGS_CODE = 2;
 
 
 void staticAcceptActions(PrinterServer* server) {
@@ -86,7 +87,7 @@ bool PrinterServer::applyUpdate(int socket)
 		return false;
 	}
 
-	std::string input{ buffer, contentLength };
+	std::string input{ buffer, static_cast<size_t>(contentLength) };
 	int endOfTemp = input.find_first_of(':');
 	int temp = std::stoi(input.substr(0, endOfTemp));
 	std::string name = input.substr(endOfTemp + 1);
@@ -98,6 +99,36 @@ bool PrinterServer::applyUpdate(int socket)
 		observer->onProfileUpdate(config);
 	}
 	return true;
+}
+
+bool PrinterServer::sendConfigs(int socket) {
+	std::vector<PrintConfig> configs = PrintConfigs::getPrintConfigs();
+	std::ostringstream ss;
+	for (auto config : configs) {
+		ss << config.name << ":" << config.temperatur << "\n";
+	}
+
+	std::string contentStr = ss.str();
+	const char *configsBuffer = contentStr.c_str();
+	int contentLength = strlen(configsBuffer);	
+	
+	return sendComplete(socket, configsBuffer, contentLength);
+}
+
+bool PrinterServer::sendComplete(int socket, const char* contentBuffer, int contentLength) {
+	int sendLength = contentLength + 2;
+	char* buffer = new char[sendLength];
+	memcpy(buffer + 2 * sizeof(char), contentBuffer, contentLength);
+	buffer[0] = static_cast<char>(contentLength >> 8); // hi
+	buffer[1] = static_cast<char>(contentLength & 0xFF); // lo
+	int bytesSent = 1;
+	int sendProgress = 0;
+	while (bytesSent > 0 && sendProgress < sendLength) {
+		bytesSent = write(socket, buffer, sendLength - sendProgress);
+		sendProgress += bytesSent;
+	}
+	free(buffer);
+	return sendProgress == sendLength;
 }
 
 void PrinterServer::start()
@@ -155,6 +186,8 @@ void PrinterServer::listenToClient(int socket)
 			break;
 		case UPDATE_CODE: connectionAlive = applyUpdate(socket);
 			connectionAlive &= sendState(socket);
+			break;
+		case REQUEST_CONFIGS_CODE: connectionAlive = sendConfigs(socket);
 			break;
 		default: 
 			break;

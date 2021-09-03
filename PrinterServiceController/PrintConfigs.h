@@ -10,9 +10,12 @@ struct PrintConfig {
 class PrintConfigs
 {
 private:
+	inline static bool valid;
+	inline static std::vector<PrintConfig> configs;
 	static void evaluateLine(std::string line, std::vector<PrintConfig>& configs);
 public:
-	static void loadPrintConfigs(std::string directoryPath, std::string filename, std::vector<PrintConfig>& configs);
-	static void savePrintConfigs(std::string directoryPath, std::string filename, std::vector<PrintConfig>& configs);
+	static void loadPrintConfigs();
+	static std::vector<PrintConfig>& getPrintConfigs();
+	static void savePrintConfigs();
 };
 

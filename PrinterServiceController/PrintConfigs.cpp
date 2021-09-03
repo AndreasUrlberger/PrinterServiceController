@@ -5,7 +5,10 @@
 #include <cstring>
 
 namespace fs = std::filesystem;
+
 static const char *defaultConfig("25000:PETG\n30000:PLA\n");
+static constexpr auto CONFIG_FILE_PATH = "/usr/share/printer-service-controller/";
+static constexpr auto CONFIG_FILE_NAME = "print-configs.txt";
 
 void PrintConfigs::evaluateLine(std::string line, std::vector<PrintConfig>& configs)
 {
@@ -21,16 +24,16 @@ void PrintConfigs::evaluateLine(std::string line, std::vector<PrintConfig>& conf
 	configs.push_back(config);
 }
 
-void PrintConfigs::loadPrintConfigs(std::string directoryPath, std::string filename, std::vector<PrintConfig>& configs)
+void PrintConfigs::loadPrintConfigs()
 {
-	if (!fs::is_directory(directoryPath)) {
-		if (!fs::create_directory(directoryPath)) {
+	if (!fs::is_directory(CONFIG_FILE_PATH)) {
+		if (!fs::create_directory(CONFIG_FILE_PATH)) {
 			throw std::runtime_error("Config directory does not exist and could not be created");
 			return;
 		}
 	}
 
-	std::string path = directoryPath + filename;
+	std::string path = std::string(CONFIG_FILE_PATH) + std::string(CONFIG_FILE_NAME);
 	std::fstream file;
 	file.open(path, std::fstream::in);
 	if (!file) {
@@ -58,14 +61,23 @@ void PrintConfigs::loadPrintConfigs(std::string directoryPath, std::string filen
 	file.close();
 }
 
-void PrintConfigs::savePrintConfigs(std::string directoryPath, std::string filename, std::vector<PrintConfig>& configs)
+std::vector<PrintConfig>& PrintConfigs::getPrintConfigs()
+{
+	if (!valid) {
+		loadPrintConfigs();
+		valid = true;
+	}
+	return configs;
+}
+
+void PrintConfigs::savePrintConfigs()
 {
 	// File and directory must exist at this point
-	std::string path = directoryPath + filename;
+	std::string path = std::string(CONFIG_FILE_PATH) + std::string(CONFIG_FILE_NAME);
 	std::fstream file;
 	file.open(path, std::fstream::trunc | std::fstream::out);
 
-	for (PrintConfig config : configs) {
+	for (PrintConfig config : getPrintConfigs()) {
 		file << config.temperatur << ':' << config.name << std::endl;
 	}
 	file.close();

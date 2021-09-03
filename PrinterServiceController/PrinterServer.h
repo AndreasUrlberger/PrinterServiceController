@@ -29,6 +29,8 @@ private:
 
 	bool sendState(int socket);
 	bool applyUpdate(int socket);
+	bool sendConfigs(int socket);
+	bool sendComplete(int socket, const char* contentBuffer, int contentLength);
 
 public:
 	void start();
