@@ -12,7 +12,7 @@
 
 class PServerObserver {
 public:
-	virtual void onProfileUpdate(PrintConfig& profile) = 0;
+	virtual bool onProfileUpdate(PrintConfig& profile) = 0;
 };
 
 class PrinterServer {
@@ -24,13 +24,15 @@ private:
 	std::thread* listener = nullptr;
 	// The key is the file descriptor of the client socket and the value is the current deadline of the connection
 	std::set<std::thread> connections;
-	std::string content;
 	PServerObserver* observer = nullptr;
+	uint64_t lastConfigChange = Utils::currentMillis();
+	PrinterState state;
 
-	bool sendState(int socket);
+	bool sendState(int socket, uint64_t& lastUpdate);
 	bool applyUpdate(int socket);
 	bool sendConfigs(int socket);
 	bool sendComplete(int socket, const char* contentBuffer, int contentLength);
+	std::string getContent(bool withConfig);
 
 public:
 	void start();

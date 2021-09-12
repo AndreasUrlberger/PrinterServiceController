@@ -3,7 +3,6 @@
 #include <sstream>
 #include <stdint.h>
 #include <iostream>
-#include <algorithm>
 
 // practically a function alias since most compilers will directly call PrintConfigs::getPrintConfigs
 constexpr auto printConfigs = PrintConfigs::getPrintConfigs;
@@ -84,20 +83,12 @@ void ServiceController::onFanStateChanged(bool isOn)
 	displayController.setIconVisible(isOn);
 }
 
-void ServiceController::onProfileUpdate(PrintConfig& profile)
+bool ServiceController::onProfileUpdate(PrintConfig& profile)
 {
-	auto profileComp = [&profile](PrintConfig& element) {return element.name.compare(profile.name); };
-	std::vector<PrintConfig> configs = printConfigs();
-	auto searchResult = std::find_if(configs.begin(), configs.end(), profileComp);
-	if (searchResult == configs.end()) {
-		configs.emplace(configs.begin(), profile);
-	}
-	else {
-		int index = searchResult - configs.begin();
-		configs.at(index) = profile;
-	}
+	bool hasChanged = PrintConfigs::addConfig(profile);
 	// update server
 	state.profileName = profile.name;
 	state.profileTemp = profile.temperatur;
 	printerServer.setContent(state);
+	return hasChanged;
 }

@@ -9,7 +9,6 @@
 
 constexpr char REQUEST_CODE = 0;
 constexpr char UPDATE_CODE = 1;
-constexpr char REQUEST_CONFIGS_CODE = 2;
 
 
 void staticAcceptActions(PrinterServer* server) {
@@ -20,43 +19,44 @@ void staticListenToClient(PrinterServer* server, int socket) {
 	server->listenToClient(socket);
 }
 
-void PrinterServer::setContent(PrinterState& state){
+void PrinterServer::setContent(PrinterState& printerState) {
+	state = printerState;
+}
+
+std::string PrinterServer::getContent(bool withConfigs) {
 	std::ostringstream ss;
-	ss << "{power_state: " << (state.state? "true" : "false")
-		<< ",progress: " << state.progress 
+	ss << "{power_state: " << (state.state ? "true" : "false")
+		<< ",progress: " << state.progress
 		<< ",remaining_time: " << state.remainingTime
 		<< ",board_temp: " << state.boardTemp
 		<< ",nozzle_temp: " << state.nozzleTemp
 		<< ",inner_temp: " << state.innerTemp
 		<< ",outer_temp: " << state.outerTemp
-		<< ",temp_profile: {profile: " << state.profileName << ",want: " << state.profileTemp << "}}";
-	content = ss.str();
+		<< ",temp_profile: {profile: " << state.profileName << ",want: " << state.profileTemp << "}";
+	if (withConfigs) {
+		std::vector<PrintConfig> configs = PrintConfigs::getPrintConfigs();
+		ss << ",configs: [";
+		for (auto config = configs.begin(); config != configs.end(); config++) {
+			if (config != configs.begin()) ss << ",";
+			ss << "[" << config.base()->name << ", " << config.base()->temperatur << "]";
+		}
+		ss << "]";
+	}
+	ss << "}";
+	return ss.str();
 }
 
-bool PrinterServer::sendState(int socket)
+bool PrinterServer::sendState(int socket, uint64_t& lastUpdate)
 {
+	bool needConfigs = lastUpdate < lastConfigChange;
+	if (needConfigs) {
+		lastUpdate = Utils::currentMillis();
+	}
+	std::string content = getContent(needConfigs);
 	const char* cContent = content.c_str();
 	int contentLength = content.length();
-	int sendLength = contentLength + 2;
 
-	char message[sendLength];
-	message[0] = static_cast<char>(contentLength >> 8); // hi
-	message[1] = static_cast<char>(contentLength & 0xFF); // lo
-
-	for (int index = 0; index < contentLength; ++index) {
-		char c = *(cContent + index);
-		message[index + 2] = c;
-	}
-
-	int bytesSent = 1;
-	int sendProgress = 0;
-	while (bytesSent > 0 && sendProgress < sendLength) {
-		bytesSent = write(socket, message, sendLength - sendProgress);
-		sendProgress += bytesSent;
-	}
-	
-	// if false, connection has closed
-	return sendProgress == sendLength;
+	return sendComplete(socket, cContent, contentLength);
 }
 
 bool PrinterServer::applyUpdate(int socket)
@@ -91,12 +91,14 @@ bool PrinterServer::applyUpdate(int socket)
 	int endOfTemp = input.find_first_of(':');
 	int temp = std::stoi(input.substr(0, endOfTemp));
 	std::string name = input.substr(endOfTemp + 1);
-	printf("namelength: %d", name.length());
 	if (observer != nullptr) {
 		PrintConfig config;
 		config.name = name;
 		config.temperatur = temp;
-		observer->onProfileUpdate(config);
+		bool hasChanged = observer->onProfileUpdate(config);
+		if (hasChanged) {
+			lastConfigChange = Utils::currentMillis();
+		}
 	}
 	return true;
 }
@@ -109,9 +111,9 @@ bool PrinterServer::sendConfigs(int socket) {
 	}
 
 	std::string contentStr = ss.str();
-	const char *configsBuffer = contentStr.c_str();
-	int contentLength = strlen(configsBuffer);	
-	
+	const char* configsBuffer = contentStr.c_str();
+	int contentLength = strlen(configsBuffer);
+
 	return sendComplete(socket, configsBuffer, contentLength);
 }
 
@@ -180,16 +182,15 @@ void PrinterServer::listenToClient(int socket)
 {
 	char readBuffer[1];
 	bool connectionAlive = true;
+	uint64_t lastUpdate = 0;
 	while (read(socket, readBuffer, 1) > 0 && connectionAlive) {
 		switch (readBuffer[0]) {
-		case REQUEST_CODE: connectionAlive = sendState(socket);
+		case REQUEST_CODE: connectionAlive = sendState(socket, lastUpdate);
 			break;
 		case UPDATE_CODE: connectionAlive = applyUpdate(socket);
-			connectionAlive &= sendState(socket);
+			connectionAlive &= sendState(socket, lastUpdate);
 			break;
-		case REQUEST_CONFIGS_CODE: connectionAlive = sendConfigs(socket);
-			break;
-		default: 
+		default:
 			break;
 		}
 	}

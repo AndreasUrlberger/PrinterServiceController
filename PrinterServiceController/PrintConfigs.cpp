@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <stdexcept>
 #include <cstring>
+#include <algorithm>
 
 namespace fs = std::filesystem;
 
@@ -81,6 +82,45 @@ void PrintConfigs::savePrintConfigs()
 		file << config.temperatur << ':' << config.name << std::endl;
 	}
 	file.close();
+}
+
+bool PrintConfigs::addConfig(PrintConfig& profile)
+{
+	bool hasChanged = false;
+	auto profileComp = [&profile](PrintConfig& element) {return element.name.compare(profile.name); };
+	std::vector<PrintConfig>& configs = getPrintConfigs();
+	auto searchResult = std::find_if_not(configs.begin(), configs.end(), profileComp);
+	if (searchResult == configs.end()) {
+		configs.emplace(configs.begin(), profile);
+		hasChanged = true;
+	}
+	else {
+		int index = searchResult - configs.begin();
+		if (index == 0) { // element already at the first place
+			// only changed if the temp has changed
+			hasChanged = configs.at(index).temperatur != profile.temperatur;
+			configs.at(index) = profile;
+		}
+		else {
+			hasChanged = true;
+			// move config to the first place
+			configs.erase(searchResult);
+			configs.emplace(configs.begin(), profile);
+		}
+	}
+	return hasChanged;
+}
+
+bool PrintConfigs::removeConfig(PrintConfig& profile)
+{
+	auto profileComp = [&profile](PrintConfig& element) {return element.name.compare(profile.name); };
+	std::vector<PrintConfig>& configs = getPrintConfigs();
+	auto searchResult = std::find_if(configs.begin(), configs.end(), profileComp);
+	bool containedElement = searchResult != configs.end();
+	if (containedElement) {
+		configs.erase(searchResult);
+	}
+	return containedElement;
 }
 
 

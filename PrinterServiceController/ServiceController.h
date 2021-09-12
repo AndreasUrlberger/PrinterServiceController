@@ -24,7 +24,7 @@ private:
 	virtual void onShutdown() override;
 	virtual void onShortPress() override;
 	virtual void onFanStateChanged(bool state) override;
-	virtual void onProfileUpdate(PrintConfig& profile) override;
+	virtual bool onProfileUpdate(PrintConfig& profile) override;
 	PrinterState state;
 
 public:
