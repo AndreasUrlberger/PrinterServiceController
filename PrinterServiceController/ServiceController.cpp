@@ -6,9 +6,13 @@
 
 // practically a function alias since most compilers will directly call PrintConfigs::getPrintConfigs
 constexpr auto printConfigs = PrintConfigs::getPrintConfigs;
+constexpr int FAN_LED = 21;
 
 void ServiceController::run()
 {
+	wiringPiSetupSys(); // also done in powerButtonController
+	pinMode(FAN_LED, OUTPUT);
+
 	state.boardTemp = 0;
 	state.nozzleTemp = 0;
 	state.progress = 0;
@@ -81,6 +85,11 @@ void ServiceController::onShortPress() {
 void ServiceController::onFanStateChanged(bool isOn)
 {
 	displayController.setIconVisible(isOn);
+	setFanLEDState(isOn);
+}
+
+void ServiceController::setFanLEDState(bool isOn) {
+	digitalWrite(FAN_LED, isOn);
 }
 
 bool ServiceController::onProfileUpdate(PrintConfig& profile)
