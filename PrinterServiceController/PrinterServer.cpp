@@ -9,6 +9,7 @@
 
 constexpr char REQUEST_CODE = 0;
 constexpr char UPDATE_CODE = 1;
+constexpr char REMOVE_CONFIG_CODE = 2;
 
 
 void staticAcceptActions(PrinterServer* server) {
@@ -103,6 +104,47 @@ bool PrinterServer::applyUpdate(int socket)
 	return true;
 }
 
+bool PrinterServer::removeConfig(int socket)
+{
+	// Get content length
+	int bytesReceived = 1;
+	int progress = 0;
+	char lengthBuffer[2];
+	while (bytesReceived > 0 && progress < 2) {
+		bytesReceived = read(socket, lengthBuffer, 2 - progress);
+		progress += bytesReceived;
+	}
+	if (progress != 2) { // connection has failed
+		return false;
+	}
+	int contentLength = static_cast<int>(lengthBuffer[0]) << 8; // high
+	contentLength += static_cast<int>(lengthBuffer[1]); // + low
+
+	// Get profile
+	bytesReceived = 1;
+	progress = 0;
+	char buffer[contentLength];
+	while (bytesReceived > 0 && progress < contentLength) {
+		bytesReceived = read(socket, buffer, contentLength - progress);
+		progress += bytesReceived;
+	}
+	if (progress != contentLength) { // connection has failed
+		return false;
+	}
+
+	std::string name{ buffer, static_cast<size_t>(contentLength) };
+	if (observer != nullptr) {
+		PrintConfig config;
+		config.name = name;
+		config.temperatur = 0;
+		bool hasChanged = PrintConfigs::removeConfig(config);
+		if (hasChanged) {
+			lastConfigChange = Utils::currentMillis();
+		}
+	}
+	return true;
+}
+
 bool PrinterServer::sendConfigs(int socket) {
 	std::vector<PrintConfig> configs = PrintConfigs::getPrintConfigs();
 	std::ostringstream ss;
@@ -188,6 +230,9 @@ void PrinterServer::listenToClient(int socket)
 		case REQUEST_CODE: connectionAlive = sendState(socket, lastUpdate);
 			break;
 		case UPDATE_CODE: connectionAlive = applyUpdate(socket);
+			connectionAlive &= sendState(socket, lastUpdate);
+			break;
+		case REMOVE_CONFIG_CODE: connectionAlive = removeConfig(socket);
 			connectionAlive &= sendState(socket, lastUpdate);
 			break;
 		default:

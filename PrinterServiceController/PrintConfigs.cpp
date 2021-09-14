@@ -115,7 +115,7 @@ bool PrintConfigs::removeConfig(PrintConfig& profile)
 {
 	auto profileComp = [&profile](PrintConfig& element) {return element.name.compare(profile.name); };
 	std::vector<PrintConfig>& configs = getPrintConfigs();
-	auto searchResult = std::find_if(configs.begin(), configs.end(), profileComp);
+	auto searchResult = std::find_if_not(configs.begin(), configs.end(), profileComp);
 	bool containedElement = searchResult != configs.end();
 	if (containedElement) {
 		configs.erase(searchResult);

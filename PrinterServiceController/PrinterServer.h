@@ -30,6 +30,7 @@ private:
 
 	bool sendState(int socket, uint64_t& lastUpdate);
 	bool applyUpdate(int socket);
+	bool removeConfig(int socket);
 	bool sendConfigs(int socket);
 	bool sendComplete(int socket, const char* contentBuffer, int contentLength);
 	std::string getContent(bool withConfig);
