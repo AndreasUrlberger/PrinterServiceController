@@ -74,6 +74,7 @@
   <ItemGroup>
     <ClInclude Include="DisplayController.h" />
     <ClInclude Include="FanController.h" />
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="PowerButtonController.h" />
     <ClInclude Include="PrintConfigs.h" />
     <ClInclude Include="PrinterServer.h" />
@@ -83,6 +84,7 @@
   <ItemGroup>
     <ClCompile Include="DisplayControlller.cpp" />
     <ClCompile Include="FanController.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PowerButtonController.cpp" />
     <ClCompile Include="PrintConfigs.cpp" />

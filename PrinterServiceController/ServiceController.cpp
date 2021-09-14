@@ -3,6 +3,8 @@
 #include <sstream>
 #include <stdint.h>
 #include <iostream>
+#include "Logger.h"
+#include <sstream>
 
 // practically a function alias since most compilers will directly call PrintConfigs::getPrintConfigs
 constexpr auto printConfigs = PrintConfigs::getPrintConfigs;
@@ -12,6 +14,7 @@ void ServiceController::run()
 {
 	wiringPiSetupSys(); // also done in powerButtonController
 	pinMode(FAN_LED, OUTPUT);
+	digitalWrite(FAN_LED, false);
 
 	state.boardTemp = 0;
 	state.nozzleTemp = 0;
@@ -31,13 +34,17 @@ int ServiceController::displayTempLoop() {
 	displayController.setInverted(false);
 
 	while (true) {
-		// TODO: partially remove use of PrintConfig.
 		PrintConfig config = printConfigs()[0];
 		int64_t now = Utils::currentMillis();
 		state.innerTemp = readTemp(INNER_THERMO_NAME);
 		state.outerTemp = readTemp(OUTER_THERMO_NAME);
 		state.profileTemp = config.temperatur;
 		state.profileName = config.name;
+
+		std::ostringstream ss;
+		ss << "inner: " << state.innerTemp << " outer: " << state.outerTemp << " wanted: " << state.profileTemp;
+		Logger::log(ss.str());
+
 		printerServer.setContent(state);
 		fanController.tempChanged(state.innerTemp, state.profileTemp);
 		if (turnOffTime - now > 0 && !shuttingDown) {
@@ -70,6 +77,7 @@ void ServiceController::onShutdown()
 {
 	shuttingDown = true;
 	PrintConfigs::savePrintConfigs();
+	Logger::close();
 	turnOffTime = 0;
 	displayController.turnOff();
 }
@@ -84,6 +92,12 @@ void ServiceController::onShortPress() {
 
 void ServiceController::onFanStateChanged(bool isOn)
 {
+	if (isOn) {
+		Logger::log(std::string{"fanState: on"});
+	}
+	else {
+		Logger::log(std::string{ "fanState: off" });
+	}
 	displayController.setIconVisible(isOn);
 	setFanLEDState(isOn);
 }
