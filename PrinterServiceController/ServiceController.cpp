@@ -31,12 +31,19 @@ int ServiceController::displayTempLoop() {
 	displayController.setInverted(false);
 
 	while (true) {
-		PrintConfig config = printConfigs()[0];
 		int64_t now = Utils::currentMillis();
 		state.innerTemp = readTemp(INNER_THERMO_NAME);
 		state.outerTemp = readTemp(OUTER_THERMO_NAME);
+		PrintConfig config = printConfigs()[0];
 		state.profileTemp = config.temperatur;
 		state.profileName = config.name;
+
+		if (turnOffTime - now > 0 && !shuttingDown) {
+			displayController.drawTemperature(state.profileTemp, state.innerTemp, config.name);
+		}
+		else {
+			displayController.turnOff();
+		}
 
 		std::ostringstream ss;
 		ss << "inner: " << state.innerTemp << " outer: " << state.outerTemp << " wanted: " << state.profileTemp;
@@ -44,12 +51,6 @@ int ServiceController::displayTempLoop() {
 
 		printerServer.setContent(state);
 		fanController.tempChanged(state.innerTemp, state.profileTemp);
-		if (turnOffTime - now > 0 && !shuttingDown) {
-			displayController.drawTemperature(state.profileTemp, state.innerTemp, config.name);
-		}
-		else {
-			displayController.turnOff();
-		}
 		Utils::sleep(1'000);
 	}
 	return 0;
@@ -116,5 +117,10 @@ void ServiceController::onSecondButtonClick(bool longClick)
 	}
 	else {
 		// switch config
+		auto configs = printConfigs();
+		auto nextConfig = configs[configs.size() - 1];
+		PrintConfigs::addConfig(nextConfig);
+		// manually trigger display
+		displayController.drawTemperature(state.profileTemp, state.innerTemp, nextConfig.name);
 	}
 }
