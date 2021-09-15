@@ -6,6 +6,7 @@
 #include "PrinterServer.h"
 #include "Utils.h"
 #include "PrintConfigs.h"
+#include "ButtonController.h"
 
 static constexpr auto INNER_THERMO_NAME = "28-2ca0a72153ff";
 static constexpr auto OUTER_THERMO_NAME = "28-baa0a72915ff";
@@ -16,6 +17,7 @@ private:
 	DisplayController displayController;
 	FanController fanController{ 6 };
 	PrinterServer printerServer;
+	ButtonController buttonController{ [this](bool longClick) {onSecondButtonClick(longClick);} };
 	static constexpr uint64_t SCREEN_ALIVE_TIME = 30'000;
 	int64_t turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
 	bool shuttingDown = false;
@@ -24,8 +26,8 @@ private:
 	virtual void onShutdown() override;
 	virtual void onShortPress() override;
 	virtual void onFanStateChanged(bool state) override;
-	void setFanLEDState(bool isOn);
 	virtual bool onProfileUpdate(PrintConfig& profile) override;
+	void onSecondButtonClick(bool longClick);
 	PrinterState state;
 
 public:

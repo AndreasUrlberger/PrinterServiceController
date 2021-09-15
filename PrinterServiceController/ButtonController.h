@@ -4,15 +4,9 @@
 #include <thread>
 #include <functional>
 
-class PowerButtonObserver {
-public:
-	virtual void onShutdown() = 0;
-	virtual void onShortPress() = 0;
-};
-
-class PowerButtonController {
-private:
-	uint32_t SWITCH = 3;
+class ButtonController
+{
+	uint32_t SWITCH = 5;
 	int64_t shortPressTime = 1000L; // max duration for a short click
 	int64_t minShortPressTime = 50L; // used to avoid double clicks due to a cheap button
 	int64_t longPressTime = 2000L; // min duration for a long click
@@ -20,22 +14,21 @@ private:
 	bool isDown = false;
 	int64_t lastDown = 0;
 	std::thread* pressedThread = nullptr;
-	PowerButtonObserver* observer = nullptr;
+	std::function<void(bool longClick)> callback;
 
 	void longPress();
 
 	void shortPress();
 
 public:
-	inline static PowerButtonController* staticController;
-	
-	void edgeChanging();	
+	inline static ButtonController* staticController;
+
+	void edgeChanging();
 
 	void threadFun(int64_t down);
 
-	PowerButtonController();
+	ButtonController(std::function<void(bool longClick)> callback);
 
 	void start();
-
-	void setObserver(PowerButtonObserver* observer);
 };
+

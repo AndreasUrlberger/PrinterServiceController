@@ -213,7 +213,6 @@ void PrinterServer::acceptConnections()
 	int new_socket;
 	while ((new_socket = accept(socketId, (struct sockaddr*)&address, (socklen_t*)&addressLength)) >= 0)
 	{
-		std::cout << "accepting new connection" << std::endl;
 		std::thread newListener = std::thread(staticListenToClient, this, new_socket);
 		newListener.detach();
 	}
@@ -239,7 +238,6 @@ void PrinterServer::listenToClient(int socket)
 			break;
 		}
 	}
-	std::cout << "connection ended" << std::endl;
 }
 
 PrinterServer::PrinterServer()

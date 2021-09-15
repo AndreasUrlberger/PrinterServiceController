@@ -3,6 +3,7 @@
 #include <string>
 #include <chrono>
 #include <wiringPi.h>
+#include <functional>
 
 struct PrinterState {
 	bool state;
@@ -20,4 +21,7 @@ class Utils {
 public:
 	static uint64_t currentMillis();
 	static void sleep(int millis);
+	static void callLambda(std::function<void()> lambda) {
+		lambda();
+	}
 };

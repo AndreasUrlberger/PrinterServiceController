@@ -5,17 +5,13 @@
 #include <iostream>
 #include "Logger.h"
 #include <sstream>
+#include "Buzzer.h"
 
 // practically a function alias since most compilers will directly call PrintConfigs::getPrintConfigs
 constexpr auto printConfigs = PrintConfigs::getPrintConfigs;
-constexpr int FAN_LED = 21;
 
 void ServiceController::run()
 {
-	wiringPiSetupSys(); // also done in powerButtonController
-	pinMode(FAN_LED, OUTPUT);
-	digitalWrite(FAN_LED, false);
-
 	state.boardTemp = 0;
 	state.nozzleTemp = 0;
 	state.progress = 0;
@@ -25,6 +21,7 @@ void ServiceController::run()
 	fanController.setObserver(this);
 	powerButtonController.setObserver(this);
 	powerButtonController.start();
+	buttonController.start();
 	printerServer.setObserver(this);
 	printerServer.start();
 	displayTempLoop();
@@ -99,11 +96,6 @@ void ServiceController::onFanStateChanged(bool isOn)
 		Logger::log(std::string{ "fanState: off" });
 	}
 	displayController.setIconVisible(isOn);
-	setFanLEDState(isOn);
-}
-
-void ServiceController::setFanLEDState(bool isOn) {
-	digitalWrite(FAN_LED, isOn);
 }
 
 bool ServiceController::onProfileUpdate(PrintConfig& profile)
@@ -114,4 +106,15 @@ bool ServiceController::onProfileUpdate(PrintConfig& profile)
 	state.profileTemp = profile.temperatur;
 	printerServer.setContent(state);
 	return hasChanged;
+}
+
+void ServiceController::onSecondButtonClick(bool longClick)
+{
+	if (longClick) {
+		Buzzer::singleBuzz();
+		fanController.toggleControl();
+	}
+	else {
+		// switch config
+	}
 }

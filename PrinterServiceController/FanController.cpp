@@ -6,18 +6,54 @@
 #include <math.h>
 #include <algorithm>
 
+constexpr int FAN_LED = 21;
+
 FanController::FanController(uint8_t fanPin)
 {
 	this->fanPin = fanPin;
 	wiringPiSetupSys();
 	pinMode(fanPin, OUTPUT);
 	turnOff(); // Otherwise it seems to be on by default
+	//digitalWrite(FAN_LED, false);
 }
 
 void FanController::notifyObserver()
 {
 	if (observer != nullptr) {
 		observer->onFanStateChanged(fanOn);
+	}
+}
+
+void FanController::innerTurnOff()
+{
+	if (controlOn) {
+		turnOff();
+	}
+}
+
+void FanController::innerTurnOn()
+{
+	if (controlOn) {
+		turnOn();
+	}
+}
+
+void FanController::blinkLoop()
+{
+	wiringPiSetupSys(); // just in case
+	pinMode(FAN_LED, OUTPUT);
+
+	bool isLedOn = true;
+	while (true) {
+		switch (ledState) {
+		case 1: digitalWrite(FAN_LED, isLedOn);
+			break;
+		case 2: digitalWrite(FAN_LED, 1);
+			break;
+		default: digitalWrite(FAN_LED, 0);
+		}
+		isLedOn = !isLedOn;
+		Utils::sleep(500);
 	}
 }
 
@@ -28,7 +64,8 @@ void FanController::tempChanged(int32_t temp, int32_t wanted) {
 	float regelf = temp_soll - temp_ist;
 	float stell = calculateStellValue(regelf);
 
-	if (fabs(regelf) > temp_abw)
+	bool tempIsRight = fabs(regelf) <= temp_abw;
+	if (!tempIsRight)
 	{
 		fan(stell);
 	}
@@ -38,6 +75,22 @@ void FanController::tempChanged(int32_t temp, int32_t wanted) {
 	}
 
 	//printf("aktuelle Temperatur: %.1fC, Stellgroesse= %.2f, Integral: %.2f \n", temp_ist, stell, integral);
+
+	// update Fan Led
+	if (controlOn) {
+		if (tempIsRight) {
+			// leuchten
+			ledState = 2;
+		}
+		else {
+			// blinken
+			ledState = 1;
+		}
+	}
+	else {
+		// licht aus
+		ledState = 0;
+	}
 }
 
 void FanController::turnOff() {
@@ -50,6 +103,14 @@ void FanController::turnOn() {
 	digitalWrite(fanPin, LOW);
 	fanOn = true;
 	notifyObserver();
+}
+
+void FanController::toggleControl()
+{
+	controlOn = !controlOn;
+	if (!controlOn && fanOn) {
+		turnOff();
+	}
 }
 
 float FanController::calculateStellValue(float Regelfehler)
@@ -73,7 +134,7 @@ void FanController::fan(float power) //Luefter an/aus
 		else
 		{
 			//printf("Luefter an \n"); // Luefter anschalten
-			turnOn();
+			innerTurnOn();
 			toggle_count++;
 			//printf("Anzahl Schaltvorgaenge: %d \n", toggle_count);
 		}
@@ -82,7 +143,7 @@ void FanController::fan(float power) //Luefter an/aus
 	{
 		if (fanOn) {
 			//printf("Luefter aus \n"); // Luefter ausschalten
-			turnOff();
+			innerTurnOff();
 		}
 		else {
 			//printf("Luefter immer noch aus \n"); // Luefter ausschalten
@@ -93,4 +154,9 @@ void FanController::fan(float power) //Luefter an/aus
 void FanController::setObserver(FanObserver* observer)
 {
 	this->observer = observer;
+}
+
+bool FanController::isControlOn()
+{
+	return controlOn;
 }

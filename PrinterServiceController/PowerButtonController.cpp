@@ -1,8 +1,7 @@
 #include "PowerButtonController.h"
 #include <wiringPi.h>
 #include "Utils.h"
-
-PowerButtonController* PowerButtonController::staticController;
+#include "Buzzer.h"
 
 void interruptWrapper() {
 	if (PowerButtonController::staticController != nullptr) {
@@ -16,24 +15,8 @@ void threadTimerWrapper(uint64_t down) {
 	}
 }
 
-void singleBuzz(uint32_t pin) {
-	digitalWrite(pin, HIGH);
-	delay(333);
-	digitalWrite(pin, LOW);
-}
-
-void doubleBuzz(uint32_t pin) {
-	digitalWrite(pin, HIGH);
-	delay(80);
-	digitalWrite(pin, LOW);
-	delay(30);
-	digitalWrite(pin, HIGH);
-	delay(80);
-	digitalWrite(pin, LOW);
-}
-
 void PowerButtonController::longPress() {
-	std::thread doubleBuzzer = std::thread(doubleBuzz, BUZZER);
+	std::thread doubleBuzzer = std::thread(Buzzer::doubleBuzz);
 	doubleBuzzer.detach();
 	if (observer != nullptr)
 		observer->onShutdown();
@@ -85,12 +68,11 @@ void PowerButtonController::start() {
 	wiringPiSetupSys();
 
 	pinMode(SWITCH, INPUT);
-	pinMode(BUZZER, OUTPUT);
 	pullUpDnControl(SWITCH, PUD_DOWN);
 	wiringPiISR(SWITCH, INT_EDGE_BOTH, interruptWrapper);
 
 	// Buzz to indicate startup
-	std::thread* buzz = new std::thread(singleBuzz, BUZZER);
+	std::thread* buzz = new std::thread(Buzzer::singleBuzz);
 	buzz->detach();
 }
 

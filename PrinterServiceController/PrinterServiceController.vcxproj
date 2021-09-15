@@ -72,6 +72,8 @@
     </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ButtonController.h" />
+    <ClInclude Include="Buzzer.h" />
     <ClInclude Include="DisplayController.h" />
     <ClInclude Include="FanController.h" />
     <ClInclude Include="Logger.h" />
@@ -82,6 +84,8 @@
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ButtonController.cpp" />
+    <ClCompile Include="Buzzer.cpp" />
     <ClCompile Include="DisplayControlller.cpp" />
     <ClCompile Include="FanController.cpp" />
     <ClCompile Include="Logger.cpp" />

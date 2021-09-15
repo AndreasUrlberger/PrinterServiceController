@@ -108,6 +108,9 @@ bool PrintConfigs::addConfig(PrintConfig& profile)
 			configs.emplace(configs.begin(), profile);
 		}
 	}
+	if (hasChanged) {
+		savePrintConfigs();
+	}
 	return hasChanged;
 }
 
@@ -119,6 +122,7 @@ bool PrintConfigs::removeConfig(PrintConfig& profile)
 	bool containedElement = searchResult != configs.end();
 	if (containedElement) {
 		configs.erase(searchResult);
+		savePrintConfigs();
 	}
 	return containedElement;
 }
