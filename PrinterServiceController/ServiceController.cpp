@@ -16,7 +16,7 @@ void ServiceController::run()
 	state.nozzleTemp = 0;
 	state.progress = 0;
 	state.remainingTime = 0;
-	state.state = false;
+	state.state = true;
 
 	fanController.setObserver(this);
 	powerButtonController.setObserver(this);
@@ -78,6 +78,7 @@ void ServiceController::onShutdown()
 	Logger::close();
 	turnOffTime = 0;
 	displayController.turnOff();
+	system("sudo shutdown -h now");
 }
 
 void ServiceController::onShortPress() {

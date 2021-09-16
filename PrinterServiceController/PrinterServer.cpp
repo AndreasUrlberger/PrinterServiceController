@@ -10,6 +10,7 @@
 constexpr char REQUEST_CODE = 0;
 constexpr char UPDATE_CODE = 1;
 constexpr char REMOVE_CONFIG_CODE = 2;
+constexpr char SHUTDOWN_CODE = 3;
 
 
 void staticAcceptActions(PrinterServer* server) {
@@ -234,16 +235,20 @@ void PrinterServer::listenToClient(int socket)
 		case REMOVE_CONFIG_CODE: connectionAlive = removeConfig(socket);
 			connectionAlive &= sendState(socket, lastUpdate);
 			break;
+		case SHUTDOWN_CODE: connectionAlive = false;
+			shutdownHook();
 		default:
 			break;
 		}
 	}
 }
 
-PrinterServer::PrinterServer()
+PrinterServer::PrinterServer(std::function<void(void)> shutdownHook)
 {
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(HOST_PORT);
 	addressLength = sizeof(address);
+
+	this->shutdownHook = shutdownHook;
 }

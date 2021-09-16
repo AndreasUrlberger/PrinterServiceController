@@ -20,7 +20,6 @@ void PowerButtonController::longPress() {
 	doubleBuzzer.detach();
 	if (observer != nullptr)
 		observer->onShutdown();
-	system("sudo shutdown -h now");
 }
 
 void PowerButtonController::shortPress() {

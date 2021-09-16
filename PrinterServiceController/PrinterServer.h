@@ -6,6 +6,7 @@
 #include "PrintConfigs.h"
 #include <set>
 #include "Utils.h"
+#include <functional>
 
 #define HOST_IP "localhost"
 #define HOST_PORT 1933
@@ -27,6 +28,7 @@ private:
 	PServerObserver* observer = nullptr;
 	uint64_t lastConfigChange = Utils::currentMillis();
 	PrinterState state;
+	std::function<void(void)> shutdownHook;
 
 	bool sendState(int socket, uint64_t& lastUpdate);
 	bool applyUpdate(int socket);
@@ -41,5 +43,5 @@ public:
 	void setContent(PrinterState& state);
 	void acceptConnections();
 	void listenToClient(int socket);
-	PrinterServer();
+	PrinterServer(std::function<void(void)> shutdownHook);
 };
