@@ -29,7 +29,7 @@ private:
 	ButtonController buttonController{ 
 		[this](bool longClick) {onSecondButtonClick(longClick);} 
 	};
-	static constexpr uint64_t SCREEN_ALIVE_TIME = 30'000;
+	static constexpr uint64_t SCREEN_ALIVE_TIME = 5'000;
 	int64_t turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
 	bool shuttingDown = false;
 	int displayTempLoop();

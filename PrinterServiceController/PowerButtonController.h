@@ -8,7 +8,7 @@ class PowerButtonController {
 private:
 	uint32_t SWITCH = 3;
 	int64_t shortPressTime = 1000L; // max duration for a short click
-	int64_t minShortPressTime = 50L; // used to avoid double clicks due to a cheap button
+	int64_t minShortPressTime = 30'000L; // normally at 50 // used to avoid double clicks due to a cheap button
 	int64_t longPressTime = 2000L; // min duration for a long click
 
 	bool isDown = false;

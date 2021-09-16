@@ -9,12 +9,6 @@ void interruptWrapper() {
 	}
 }
 
-void threadTimerWrapper(uint64_t down) {
-	if (PowerButtonController::staticController != nullptr) {
-		PowerButtonController::staticController->threadFun(down);
-	}
-}
-
 void PowerButtonController::longPress() {
 	std::thread doubleBuzzer = std::thread(Buzzer::doubleBuzz);
 	doubleBuzzer.detach();
@@ -42,7 +36,7 @@ void PowerButtonController::edgeChanging() {
 		if (pressedThread != nullptr) {
 			delete pressedThread;
 		}
-		pressedThread = new std::thread(threadTimerWrapper, lastDown);
+		pressedThread = new std::thread([this]() {threadFun(lastDown); });
 		pressedThread->detach();
 	}
 	else {
