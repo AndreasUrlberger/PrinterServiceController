@@ -8,8 +8,9 @@
 
 constexpr int FAN_LED = 21;
 
-FanController::FanController(uint8_t fanPin)
+FanController::FanController(uint8_t fanPin, std::function<void(bool)> onFanStateChange)
 {
+	onFanStateChangeHook = onFanStateChange;
 	this->fanPin = fanPin;
 	wiringPiSetupSys();
 	pinMode(fanPin, OUTPUT);
@@ -17,11 +18,9 @@ FanController::FanController(uint8_t fanPin)
 	//digitalWrite(FAN_LED, false);
 }
 
-void FanController::notifyObserver()
+void FanController::notifyChange()
 {
-	if (observer != nullptr) {
-		observer->onFanStateChanged(fanOn);
-	}
+	onFanStateChangeHook(fanOn);
 }
 
 void FanController::innerTurnOff()
@@ -96,13 +95,13 @@ void FanController::tempChanged(int32_t temp, int32_t wanted) {
 void FanController::turnOff() {
 	digitalWrite(fanPin, HIGH);
 	fanOn = false;
-	notifyObserver();
+	notifyChange();
 }
 
 void FanController::turnOn() {
 	digitalWrite(fanPin, LOW);
 	fanOn = true;
-	notifyObserver();
+	notifyChange();
 }
 
 void FanController::toggleControl()
@@ -149,11 +148,6 @@ void FanController::fan(float power) //Luefter an/aus
 			//printf("Luefter immer noch aus \n"); // Luefter ausschalten
 		}
 	}
-}
-
-void FanController::setObserver(FanObserver* observer)
-{
-	this->observer = observer;
 }
 
 bool FanController::isControlOn()

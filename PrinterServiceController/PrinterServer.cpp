@@ -93,14 +93,12 @@ bool PrinterServer::applyUpdate(int socket)
 	int endOfTemp = input.find_first_of(':');
 	int temp = std::stoi(input.substr(0, endOfTemp));
 	std::string name = input.substr(endOfTemp + 1);
-	if (observer != nullptr) {
-		PrintConfig config;
-		config.name = name;
-		config.temperatur = temp;
-		bool hasChanged = observer->onProfileUpdate(config);
-		if (hasChanged) {
-			lastConfigChange = Utils::currentMillis();
-		}
+	PrintConfig config;
+	config.name = name;
+	config.temperatur = temp;
+	bool hasChanged = onProfileUpdateHook(config);
+	if (hasChanged) {
+		lastConfigChange = Utils::currentMillis();
 	}
 	return true;
 }
@@ -134,14 +132,12 @@ bool PrinterServer::removeConfig(int socket)
 	}
 
 	std::string name{ buffer, static_cast<size_t>(contentLength) };
-	if (observer != nullptr) {
-		PrintConfig config;
-		config.name = name;
-		config.temperatur = 0;
-		bool hasChanged = PrintConfigs::removeConfig(config);
-		if (hasChanged) {
-			lastConfigChange = Utils::currentMillis();
-		}
+	PrintConfig config;
+	config.name = name;
+	config.temperatur = 0;
+	bool hasChanged = PrintConfigs::removeConfig(config);
+	if (hasChanged) {
+		lastConfigChange = Utils::currentMillis();
 	}
 	return true;
 }
@@ -204,11 +200,6 @@ void PrinterServer::start()
 	}
 }
 
-void PrinterServer::setObserver(PServerObserver* observer)
-{
-	this->observer = observer;
-}
-
 void PrinterServer::acceptConnections()
 {
 	int new_socket;
@@ -243,7 +234,7 @@ void PrinterServer::listenToClient(int socket)
 	}
 }
 
-PrinterServer::PrinterServer(std::function<void(void)> shutdownHook)
+PrinterServer::PrinterServer(std::function<void(void)> shutdownHook, std::function<bool(PrintConfig&)> onProfileUpdate)
 {
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
@@ -251,4 +242,5 @@ PrinterServer::PrinterServer(std::function<void(void)> shutdownHook)
 	addressLength = sizeof(address);
 
 	this->shutdownHook = shutdownHook;
+	onProfileUpdateHook = onProfileUpdate;
 }

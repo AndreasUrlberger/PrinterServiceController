@@ -4,12 +4,6 @@
 #include <thread>
 #include <functional>
 
-class PowerButtonObserver {
-public:
-	virtual void onShutdown() = 0;
-	virtual void onShortPress() = 0;
-};
-
 class PowerButtonController {
 private:
 	uint32_t SWITCH = 3;
@@ -20,7 +14,8 @@ private:
 	bool isDown = false;
 	int64_t lastDown = 0;
 	std::thread* pressedThread = nullptr;
-	PowerButtonObserver* observer = nullptr;
+	std::function<void(void)> onLongPressHook;
+	std::function<void(void)> onShortPressHook;
 
 	void longPress();
 
@@ -33,9 +28,7 @@ public:
 
 	void threadFun(int64_t down);
 
-	PowerButtonController();
+	PowerButtonController(std::function<void(void)> onLongPress, std::function<void(void)> onShortPress);
 
 	void start();
-
-	void setObserver(PowerButtonObserver* observer);
 };

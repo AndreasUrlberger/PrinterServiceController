@@ -18,14 +18,11 @@ void threadTimerWrapper(uint64_t down) {
 void PowerButtonController::longPress() {
 	std::thread doubleBuzzer = std::thread(Buzzer::doubleBuzz);
 	doubleBuzzer.detach();
-	if (observer != nullptr)
-		observer->onShutdown();
+	onShortPressHook();
 }
 
 void PowerButtonController::shortPress() {
-	if (observer != nullptr) {
-		observer->onShortPress();
-	}
+	onShortPressHook();
 }
 
 void PowerButtonController::threadFun(int64_t down) {
@@ -57,9 +54,10 @@ void PowerButtonController::edgeChanging() {
 	}
 }
 
-PowerButtonController::PowerButtonController()
+PowerButtonController::PowerButtonController(std::function<void(void)> onLongPress, std::function<void(void)> onShortPress)
 {
-	
+	onLongPressHook = onLongPress;
+	onShortPressHook = onShortPress;
 }
 
 void PowerButtonController::start() {
@@ -73,9 +71,4 @@ void PowerButtonController::start() {
 	// Buzz to indicate startup
 	std::thread* buzz = new std::thread(Buzzer::singleBuzz);
 	buzz->detach();
-}
-
-void PowerButtonController::setObserver(PowerButtonObserver* observer)
-{
-	this->observer = observer;
 }

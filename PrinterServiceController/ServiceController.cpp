@@ -18,11 +18,8 @@ void ServiceController::run()
 	state.remainingTime = 0;
 	state.state = true;
 
-	fanController.setObserver(this);
-	powerButtonController.setObserver(this);
 	powerButtonController.start();
 	buttonController.start();
-	printerServer.setObserver(this);
 	printerServer.start();
 	displayTempLoop();
 }
@@ -51,7 +48,7 @@ int ServiceController::displayTempLoop() {
 
 		printerServer.setContent(state);
 		fanController.tempChanged(state.innerTemp, state.profileTemp);
-		Utils::sleep(1'000);
+		Utils::sleep(100);
 	}
 	return 0;
 }

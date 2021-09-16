@@ -11,11 +11,6 @@
 #define HOST_IP "localhost"
 #define HOST_PORT 1933
 
-class PServerObserver {
-public:
-	virtual bool onProfileUpdate(PrintConfig& profile) = 0;
-};
-
 class PrinterServer {
 private:
 	int socketId;
@@ -25,10 +20,10 @@ private:
 	std::thread* listener = nullptr;
 	// The key is the file descriptor of the client socket and the value is the current deadline of the connection
 	std::set<std::thread> connections;
-	PServerObserver* observer = nullptr;
 	uint64_t lastConfigChange = Utils::currentMillis();
 	PrinterState state;
 	std::function<void(void)> shutdownHook;
+	std::function<bool(PrintConfig&)> onProfileUpdateHook;
 
 	bool sendState(int socket, uint64_t& lastUpdate);
 	bool applyUpdate(int socket);
@@ -39,9 +34,8 @@ private:
 
 public:
 	void start();
-	void setObserver(PServerObserver* observer);
 	void setContent(PrinterState& state);
 	void acceptConnections();
 	void listenToClient(int socket);
-	PrinterServer(std::function<void(void)> shutdownHook);
+	PrinterServer(std::function<void(void)> shutdownHook, std::function<bool(PrintConfig&)> onProfileUpdate);
 };
