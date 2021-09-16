@@ -12,7 +12,7 @@ void interruptWrapper() {
 void PowerButtonController::longPress() {
 	std::thread doubleBuzzer = std::thread(Buzzer::doubleBuzz);
 	doubleBuzzer.detach();
-	onShortPressHook();
+	onLongPressHook();
 }
 
 void PowerButtonController::shortPress() {

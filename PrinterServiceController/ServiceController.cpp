@@ -28,19 +28,9 @@ int ServiceController::displayTempLoop() {
 	displayController.setInverted(false);
 
 	while (true) {
-		int64_t now = Utils::currentMillis();
 		state.innerTemp = readTemp(INNER_THERMO_NAME);
 		state.outerTemp = readTemp(OUTER_THERMO_NAME);
-		PrintConfig config = printConfigs()[0];
-		state.profileTemp = config.temperatur;
-		state.profileName = config.name;
-
-		if (turnOffTime - now > 0 && !shuttingDown) {
-			displayController.drawTemperature(state.profileTemp, state.innerTemp, config.name);
-		}
-		else {
-			displayController.turnOff();
-		}
+		updateDisplay();
 
 		std::ostringstream ss;
 		ss << "inner: " << state.innerTemp << " outer: " << state.outerTemp << " wanted: " << state.profileTemp;
@@ -51,6 +41,19 @@ int ServiceController::displayTempLoop() {
 		Utils::sleep(100);
 	}
 	return 0;
+}
+
+void ServiceController::updateDisplay() {
+	PrintConfig config = printConfigs()[0];
+	state.profileTemp = config.temperatur;
+	state.profileName = config.name;
+	int64_t now = Utils::currentMillis();
+	if (turnOffTime - now > 0 && !shuttingDown) {
+		displayController.drawTemperature(state.profileTemp, state.innerTemp, config.name);
+	}
+	else {
+		displayController.turnOff();
+	}
 }
 
 int32_t ServiceController::readTemp(std::string deviceName) {
@@ -79,10 +82,8 @@ void ServiceController::onShutdown()
 }
 
 void ServiceController::onShortPress() {
-	PrintConfig config = printConfigs()[0];
 	turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
-	int have = readTemp(INNER_THERMO_NAME);
-	displayController.drawTemperature(config.temperatur, have, config.name);
+	updateDisplay();
 	displayController.turnOn();
 }
 
@@ -109,6 +110,7 @@ bool ServiceController::onProfileUpdate(PrintConfig& profile)
 
 void ServiceController::onSecondButtonClick(bool longClick)
 {
+	turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
 	if (longClick) {
 		Buzzer::singleBuzz();
 		fanController.toggleControl();
@@ -119,6 +121,7 @@ void ServiceController::onSecondButtonClick(bool longClick)
 		auto nextConfig = configs[configs.size() - 1];
 		PrintConfigs::addConfig(nextConfig);
 		// manually trigger display
-		displayController.drawTemperature(state.profileTemp, state.innerTemp, nextConfig.name);
+		updateDisplay();
 	}
+	displayController.turnOn();
 }

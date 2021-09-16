@@ -9,12 +9,6 @@ void interruptWrapper2() {
 	}
 }
 
-void threadTimerWrapper2(uint64_t down) {
-	if (ButtonController::staticController != nullptr) {
-		ButtonController::staticController->threadFun(down);
-	}
-}
-
 void ButtonController::longPress() {
 	callback(true);
 }
@@ -40,7 +34,7 @@ void ButtonController::edgeChanging() {
 		if (pressedThread != nullptr) {
 			delete pressedThread;
 		}
-		pressedThread = new std::thread(threadTimerWrapper2, lastDown);
+		pressedThread = new std::thread([this]() {threadFun(lastDown); });
 		pressedThread->detach();
 	}
 	else {

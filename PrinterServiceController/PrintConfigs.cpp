@@ -59,6 +59,12 @@ void PrintConfigs::loadPrintConfigs()
 	while (getline(file, line)) {
 		evaluateLine(line, configs);
 	}
+	if (configs.size() == 0) {
+		PrintConfig config;
+		config.name = "PETG";
+		config.temperatur = 25'000;
+		configs.emplace(configs.begin(), config);
+	}
 	file.close();
 }
 
@@ -76,11 +82,15 @@ void PrintConfigs::savePrintConfigs()
 	// File and directory must exist at this point
 	std::string path = std::string(CONFIG_FILE_PATH) + std::string(CONFIG_FILE_NAME);
 	std::fstream file;
-	file.open(path, std::fstream::trunc | std::fstream::out);
+	file.open(path, std::fstream::out);
 
+	std::ostringstream ss;
 	for (PrintConfig config : getPrintConfigs()) {
-		file << config.temperatur << ':' << config.name << std::endl;
+		ss << config.temperatur << ':' << config.name << std::endl;
 	}
+	std::string outputString = ss.str();
+	const char* configsText = outputString.c_str();
+	file.write(configsText, strlen(configsText));
 	file.close();
 }
 
