@@ -12,7 +12,7 @@ DisplayController::DisplayController(){
 	}
 	fbp = ssd1306_framebuffer_create(oled->width, oled->height, oled->err);
 	ssd1306_i2c_display_clear(oled);
-	ssd1306_i2c_run_cmd(oled, SSD1306_I2C_CMD_POWER_ON, 0, 0);
+	turnOn();
 
 	opts[0].type = ssd1306_graphics_options_t::SSD1306_OPT_FONT_FILE;
 	opts[0].value.font_file = "/usr/share/fonts/truetype/calibri/calibri-regular.ttf";
@@ -33,12 +33,20 @@ DisplayController::~DisplayController()
 
 void DisplayController::turnOff()
 {
-	ssd1306_i2c_run_cmd(oled, SSD1306_I2C_CMD_POWER_OFF, 0, 0);
+	if (isOn) {
+		setInverted(!isInverted);
+		ssd1306_i2c_run_cmd(oled, SSD1306_I2C_CMD_POWER_OFF, 0, 0);
+		isOn = false;
+	}
 }
 
 void DisplayController::turnOn()
 {
-	ssd1306_i2c_run_cmd(oled, SSD1306_I2C_CMD_POWER_ON, 0, 0);
+	if (!isOn) {
+		setInverted(!isInverted);
+		ssd1306_i2c_run_cmd(oled, SSD1306_I2C_CMD_POWER_ON, 0, 0);
+		isOn = true;
+	}
 }
 
 bool DisplayController::isIconVisible()
@@ -53,7 +61,8 @@ void DisplayController::setIconVisible(bool visible)
 
 void DisplayController::setInverted(bool inverted)
 {
-	if (inverted) {
+	isInverted = inverted;
+	if (isInverted) {
 		ssd1306_i2c_run_cmd(oled, SSD1306_I2C_CMD_DISP_INVERTED, 0, 0);
 	}
 	else {

@@ -32,6 +32,8 @@ private:
 	ssd1306_framebuffer_box_t bbox;
 	ssd1306_graphics_options_t opts[2];
 	ssd1306_i2c_t* oled;
+	bool isOn = false;
+	bool isInverted = false;
 
 	void drawFanIcon(uint8_t xOff, uint8_t yOff);
 
