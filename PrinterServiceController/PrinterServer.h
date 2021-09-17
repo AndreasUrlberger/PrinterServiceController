@@ -31,6 +31,8 @@ private:
 	bool sendConfigs(int socket);
 	bool sendComplete(int socket, const char* contentBuffer, int contentLength);
 	std::string getContent(bool withConfig);
+	bool getContentLength(int socket, int& outLength);
+	bool receivePacket(int socket, char(&buffer)[], int contentLength);
 
 public:
 	void start();
