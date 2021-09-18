@@ -69,10 +69,9 @@ bool PrinterServer::getContentLength(int socket, int& outLength) {
 	return true;
 }
 
-bool PrinterServer::receivePacket(int socket, char (&buffer)[], int contentLength) {
+bool PrinterServer::receivePacket(int socket, char *buffer, int contentLength) {
 	int bytesReceived = 1;
 	int progress = 0;
-	char buffer[contentLength];
 	while (bytesReceived > 0 && progress < contentLength) {
 		bytesReceived = read(socket, buffer, contentLength - progress);
 		progress += bytesReceived;
@@ -87,8 +86,12 @@ bool PrinterServer::applyUpdate(int socket)
 	if (!getContentLength(socket, contentLength)) {
 		return false;
 	}
+	if (contentLength == 0) {
+		return true;
+	}
 	char buffer[contentLength];
-	if (!receivePacket(socket, buffer, contentLength)) {
+	bool succ = receivePacket(socket, &buffer[0], contentLength);
+	if (!succ) {
 		return false;
 	}
 
@@ -113,8 +116,11 @@ bool PrinterServer::removeConfig(int socket)
 	if (!getContentLength(socket, contentLength)) {
 		return false;
 	}
+	if (contentLength == 0) {
+		return true;
+	}
 	char buffer[contentLength];
-	if (!receivePacket(socket, buffer, contentLength)) {
+	if (!receivePacket(socket, &buffer[0], contentLength)) {
 		return false;
 	}
 
@@ -183,7 +189,7 @@ void PrinterServer::start()
 			throw std::runtime_error("listening failed");
 			return;
 		}
-		connectionReceiver = new std::thread(Utils::callLambda, acceptConnections);
+		connectionReceiver = new std::thread(Utils::callLambda, [this]() {acceptConnections(); });
 	}
 }
 
@@ -215,7 +221,7 @@ void PrinterServer::listenToClient(int socket)
 			break;
 		case SHUTDOWN_CODE: connectionAlive = false;
 			shutdownHook();
-			break();
+			break;
 		default:
 			break;
 		}
