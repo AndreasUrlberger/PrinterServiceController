@@ -29,7 +29,8 @@ int ServiceController::displayTempLoop() {
 
 	while (true) {
 		state.innerTemp = readTemp(INNER_THERMO_NAME);
-		state.outerTemp = readTemp(OUTER_THERMO_NAME);
+		//state.outerTemp = readTemp(OUTER_THERMO_NAME);
+		state.outerTemp = 0;
 		updateDisplay();
 
 		std::ostringstream ss;
