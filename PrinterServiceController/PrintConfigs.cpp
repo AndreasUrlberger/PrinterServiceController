@@ -17,7 +17,9 @@ void PrintConfigs::evaluateLine(std::string line, std::vector<PrintConfig>& conf
 		return;
 
 	int endOfTemp = line.find_first_of(':');
+	printf("evaluateLine: endOfTemp: %d, line: '%s'\n", endOfTemp, line.c_str());
 	std::string temp = line.substr(0, endOfTemp);
+	printf("evaluateLine: endOfTemp + 1: %d, line: '%s'\n", (endOfTemp + 1), line.c_str());
 	std::string rest = line.substr(endOfTemp + 1);
 	PrintConfig config;
 	config.name = rest;

@@ -97,7 +97,9 @@ bool PrinterServer::applyUpdate(int socket)
 
 	std::string input{ buffer, static_cast<size_t>(contentLength) };
 	int endOfTemp = input.find_first_of(':');
+	printf("applyUpdate: endOfTemp: %d, input: '%s'\n", endOfTemp, input.c_str());
 	int temp = std::stoi(input.substr(0, endOfTemp));
+	printf("applyUpdate: endOfTemp + 1: %d, input: '%s'\n", (endOfTemp+1), input.c_str());
 	std::string name = input.substr(endOfTemp + 1);
 	PrintConfig config;
 	config.name = name;
