@@ -17,6 +17,7 @@ void ServiceController::run()
 	state.progress = 0;
 	state.remainingTime = 0;
 	state.state = true;
+	state.tempControl = fanController.isControlOn();
 
 	powerButtonController.start();
 	buttonController.start();
@@ -68,7 +69,6 @@ int32_t ServiceController::readTemp(std::string deviceName) {
 
 	// find temp
 	const int index = input.find("t=") + 2; // start of temperature
-	printf("readTemp: index: %d, input: '%s'\n", index, input.c_str());
 	return index < input.length() ? stoi(input.substr(index)) : 0;
 }
 
@@ -125,4 +125,13 @@ void ServiceController::onSecondButtonClick(bool longClick)
 		updateDisplay();
 	}
 	displayController.turnOn();
+}
+
+void ServiceController::onChangeFanControl(bool isOn)
+{
+	if (fanController.isControlOn() xor isOn) {
+		fanController.toggleControl();
+		state.tempControl = fanController.isControlOn();
+		printerServer.setContent(state);
+	}
 }

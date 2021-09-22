@@ -34,7 +34,6 @@ DisplayController::~DisplayController()
 void DisplayController::turnOff()
 {
 	if (isOn) {
-		setInverted(!isInverted);
 		ssd1306_i2c_run_cmd(oled, SSD1306_I2C_CMD_POWER_OFF, 0, 0);
 		isOn = false;
 	}

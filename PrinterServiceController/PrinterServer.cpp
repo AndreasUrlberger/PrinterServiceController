@@ -11,6 +11,7 @@ constexpr char REQUEST_CODE = 0;
 constexpr char UPDATE_CODE = 1;
 constexpr char REMOVE_CONFIG_CODE = 2;
 constexpr char SHUTDOWN_CODE = 3;
+constexpr char TEMP_CONTROL_CODE = 4;
 
 void PrinterServer::setContent(PrinterState& printerState) {
 	state = printerState;
@@ -19,6 +20,7 @@ void PrinterServer::setContent(PrinterState& printerState) {
 std::string PrinterServer::getContent(bool withConfigs) {
 	std::ostringstream ss;
 	ss << "{power_state: " << (state.state ? "true" : "false")
+		<< ",tempControl: " << (state.tempControl ? "true" : "false")
 		<< ",progress: " << state.progress
 		<< ",remaining_time: " << state.remainingTime
 		<< ",board_temp: " << state.boardTemp
@@ -206,6 +208,18 @@ void PrinterServer::acceptConnections()
 	throw std::runtime_error("accepting a connection failed");
 }
 
+bool PrinterServer::tempControlChange(int socket)
+{
+	char readBuffer[1];
+	if (read(socket, readBuffer, 1) > 0) {
+		tempControlChangeHook(readBuffer[0]);
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 void PrinterServer::listenToClient(int socket)
 {
 	char readBuffer[1];
@@ -224,13 +238,16 @@ void PrinterServer::listenToClient(int socket)
 		case SHUTDOWN_CODE: connectionAlive = false;
 			shutdownHook();
 			break;
+		case TEMP_CONTROL_CODE: connectionAlive = tempControlChange(socket);
+			connectionAlive &= sendState(socket, lastUpdate);
+			break;
 		default:
 			break;
 		}
 	}
 }
 
-PrinterServer::PrinterServer(std::function<void(void)> shutdownHook, std::function<bool(PrintConfig&)> onProfileUpdate)
+PrinterServer::PrinterServer(std::function<void(void)> shutdownHook, std::function<bool(PrintConfig&)> onProfileUpdate, std::function<void(bool)> onTempControlChange)
 {
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
@@ -239,4 +256,5 @@ PrinterServer::PrinterServer(std::function<void(void)> shutdownHook, std::functi
 
 	this->shutdownHook = shutdownHook;
 	onProfileUpdateHook = onProfileUpdate;
+	tempControlChangeHook = onTempControlChange;
 }

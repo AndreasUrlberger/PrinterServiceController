@@ -24,7 +24,8 @@ private:
 	};
 	PrinterServer printerServer{ 
 		[this]() {onShutdown(); },
-		[this](PrintConfig& config) {return onProfileUpdate(config); } 
+		[this](PrintConfig& config) {return onProfileUpdate(config); },
+		[this](bool isOn) {onChangeFanControl(isOn); }
 	};
 	ButtonController buttonController{ 
 		[this](bool longClick) {onSecondButtonClick(longClick);} 
@@ -40,6 +41,7 @@ private:
 	void onFanStateChanged(bool state);
 	bool onProfileUpdate(PrintConfig& profile);
 	void onSecondButtonClick(bool longClick);
+	void onChangeFanControl(bool isOn);
 	PrinterState state;
 
 public:

@@ -7,6 +7,7 @@
 
 struct PrinterState {
 	bool state;
+	bool tempControl;
 	double progress;
 	uint64_t remainingTime;
 	int32_t boardTemp;

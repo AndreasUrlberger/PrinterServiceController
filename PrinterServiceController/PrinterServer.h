@@ -24,6 +24,7 @@ private:
 	PrinterState state;
 	std::function<void(void)> shutdownHook;
 	std::function<bool(PrintConfig&)> onProfileUpdateHook;
+	std::function<void(bool)> tempControlChangeHook;
 
 	bool sendState(int socket, uint64_t& lastUpdate);
 	bool applyUpdate(int socket);
@@ -33,11 +34,12 @@ private:
 	std::string getContent(bool withConfig);
 	bool getContentLength(int socket, int& outLength);
 	bool receivePacket(int socket, char *buffer, int contentLength);
+	bool tempControlChange(int socket);
 
 public:
 	void start();
 	void setContent(PrinterState& state);
 	void acceptConnections();
 	void listenToClient(int socket);
-	PrinterServer(std::function<void(void)> shutdownHook, std::function<bool(PrintConfig&)> onProfileUpdate);
+	PrinterServer(std::function<void(void)> shutdownHook, std::function<bool(PrintConfig&)> onProfileUpdate, std::function<void(bool)> onTempControlChange);
 };
