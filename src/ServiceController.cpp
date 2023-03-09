@@ -68,7 +68,7 @@ int32_t ServiceController::readTemp(std::string deviceName) {
 	std::string input = sstr.str();
 
 	// find temp
-	const int index = input.find("t=") + 2; // start of temperature
+	const size_t index = input.find("t=") + 2; // start of temperature
 	return index < input.length() ? stoi(input.substr(index)) : 0;
 }
 

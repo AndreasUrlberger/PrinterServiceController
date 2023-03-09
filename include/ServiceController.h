@@ -13,6 +13,21 @@ static constexpr auto OUTER_THERMO_NAME = "28-baa0a72915ff";
 
 class ServiceController {
 private:
+	
+	static constexpr uint64_t SCREEN_ALIVE_TIME = 30'000;
+	int64_t turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
+	bool shuttingDown = false;
+	int displayTempLoop();
+	void updateDisplay();
+	int32_t readTemp(std::string deviceName);
+	void onShutdown();
+	void onShortPress();
+	void onFanStateChanged(bool state);
+	bool onProfileUpdate(PrintConfig& profile);
+	void onSecondButtonClick(bool longClick);
+	void onChangeFanControl(bool isOn);
+	PrinterState state;
+
 	PowerButtonController powerButtonController{
 		[this]() {onShutdown(); },
 		[this]() {onShortPress(); }
@@ -30,19 +45,6 @@ private:
 	ButtonController buttonController{ 
 		[this](bool longClick) {onSecondButtonClick(longClick);} 
 	};
-	static constexpr uint64_t SCREEN_ALIVE_TIME = 30'000;
-	int64_t turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
-	bool shuttingDown = false;
-	int displayTempLoop();
-	void updateDisplay();
-	int32_t readTemp(std::string deviceName);
-	void onShutdown();
-	void onShortPress();
-	void onFanStateChanged(bool state);
-	bool onProfileUpdate(PrintConfig& profile);
-	void onSecondButtonClick(bool longClick);
-	void onChangeFanControl(bool isOn);
-	PrinterState state;
 
 public:
 	void run();
