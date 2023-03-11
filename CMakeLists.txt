@@ -1,9 +1,10 @@
 set(CMAKE_TOOLCHAIN_FILE /home/andreas/Documents/PrinterInterface/PrinterServiceController/Toolchain-RaspberryPi.cmake)
+cmake_minimum_required(VERSION 3.0.0)
+
 set(CMAKE_C_STANDARD 20)
 set(CMAKE_CXX_STANDARD 20)
 set(TARGET PrinterServiceController)
 
-cmake_minimum_required(VERSION 3.0.0)
 project(PrinterServiceController VERSION 0.1.0)
 
 include(CTest)
@@ -51,7 +52,7 @@ set_target_properties(ssd1306 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/L
 
 target_link_libraries(${TARGET} wiringPi ssd1306 pthread)
 
-add_definitions(-Wall)
+add_definitions(-Wall -g)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

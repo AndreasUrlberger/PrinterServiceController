@@ -2,7 +2,7 @@
 
 DisplayController::DisplayController(){
 	const char* filename = "/dev/i2c-3";
-	oled = ssd1306_i2c_open(filename, 0x3c, 128, 64, NULL);
+	oled = ssd1306_i2c_open(filename, 0x3c, displayWidth, displayHeight, NULL);
 	if (!oled) {
 		throw std::runtime_error("Could not create the screen");
 	}
@@ -11,11 +11,11 @@ DisplayController::DisplayController(){
 		throw std::runtime_error("Failed to initialize the display. Check if it is connected !");
 	}
 	fbp = ssd1306_framebuffer_create(oled->width, oled->height, oled->err);
-	ssd1306_i2c_display_clear(oled);
+	ssd1306_i2c_display_clear(oled);	
 	turnOn();
 
 	opts[0].type = ssd1306_graphics_options_t::SSD1306_OPT_FONT_FILE;
-	opts[0].value.font_file = "/usr/share/fonts/truetype/calibri/calibri-regular.ttf";
+	opts[0].value.font_file = "/usr/share/fonts/truetype/freefont/FreeMono.ttf";
 	opts[1].type = ssd1306_graphics_options_t::SSD1306_OPT_ROTATE_FONT;
 	opts[1].value.rotation_degrees = 180;
 }
@@ -90,7 +90,7 @@ void DisplayController::drawTemperature(int32_t want, int32_t have, std::string 
 	// draw have integer
 	ssd1306_framebuffer_draw_text_extra(fbp, firstLine.c_str(), 0, 127, 37, SSD1306_FONT_CUSTOM, fontSize, opts, 2, &bbox);
 	// rest of first line
-	ssd1306_framebuffer_draw_text_extra(fbp, "°", 0, 34, 50, SSD1306_FONT_CUSTOM, fontSize, opts, 2, &bbox);
+	ssd1306_framebuffer_draw_text_extra(fbp, "ï¿½", 0, 34, 50, SSD1306_FONT_CUSTOM, fontSize, opts, 2, &bbox);
 	ssd1306_framebuffer_draw_text_extra(fbp, "C", 0, 24, 37, SSD1306_FONT_CUSTOM, fontSize, opts, 2, &bbox);
 
 	// draw PTEG

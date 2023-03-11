@@ -1,9 +1,9 @@
 #include "ServiceController.h"
 #include "Logger.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-	Logger::disableLogging();
+	Logger::enableLogging();
 	ServiceController controller;
 	controller.run();
 }

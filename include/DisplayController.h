@@ -6,6 +6,9 @@
 class DisplayController {
 
 private: 
+	static constexpr uint8_t displayHeight = 32u; // TODO Set back to 64. 
+	static constexpr uint8_t displayWidth = 128u;
+
 	static constexpr bool fan[17][17] = {
 		{false,	false,	false,	false,	false,	false,	false,	true,	true,	true,	true,	false,	false,	false,	false,	false,	false,},
 		{false,	false,	false,	false,	false,	false,	true,	true,	true,	true,	true,	true,	false,	false,	false,	false,	false,},
