@@ -19,7 +19,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wl,-rpath-link,${CMAKE_SYSROOT}/u
 SET(BIN_PREFIX ${tools}/bin/arm-linux-gnueabihf)
 
 SET (CMAKE_C_COMPILER ${BIN_PREFIX}-gcc)
-SET (CMAKE_CXX_COMPILER ${BIN_PREFIX}-g++ )
+SET (CMAKE_CXX_COMPILER ${BIN_PREFIX}-g++)
 SET (CMAKE_LINKER ${BIN_PREFIX}-ld CACHE STRING "Set the cross-compiler tool LD" FORCE)
 SET (CMAKE_AR ${BIN_PREFIX}-ar CACHE STRING "Set the cross-compiler tool AR" FORCE)
 SET (CMAKE_NM {BIN_PREFIX}-nm CACHE STRING "Set the cross-compiler tool NM" FORCE)
