@@ -31,7 +31,6 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
-#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -48,83 +47,62 @@ struct TableStruct_PrinterData_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[5]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[6]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
   static const ::PROTOBUF_NAMESPACE_ID::uint32 offsets[];
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_PrinterData_2eproto;
-namespace printer {
-class ChangeConfig;
-class ChangeConfigDefaultTypeInternal;
-extern ChangeConfigDefaultTypeInternal _ChangeConfig_default_instance_;
-class KeepAlive;
-class KeepAliveDefaultTypeInternal;
-extern KeepAliveDefaultTypeInternal _KeepAlive_default_instance_;
+namespace Printer {
+class AddPrintConfig;
+class AddPrintConfigDefaultTypeInternal;
+extern AddPrintConfigDefaultTypeInternal _AddPrintConfig_default_instance_;
+class ChangeTempControl;
+class ChangeTempControlDefaultTypeInternal;
+extern ChangeTempControlDefaultTypeInternal _ChangeTempControl_default_instance_;
 class PrintConfig;
 class PrintConfigDefaultTypeInternal;
 extern PrintConfigDefaultTypeInternal _PrintConfig_default_instance_;
 class PrinterStatus;
 class PrinterStatusDefaultTypeInternal;
 extern PrinterStatusDefaultTypeInternal _PrinterStatus_default_instance_;
-class RequestStatus;
-class RequestStatusDefaultTypeInternal;
-extern RequestStatusDefaultTypeInternal _RequestStatus_default_instance_;
-}  // namespace printer
+class RemovePrintConfig;
+class RemovePrintConfigDefaultTypeInternal;
+extern RemovePrintConfigDefaultTypeInternal _RemovePrintConfig_default_instance_;
+class StatusRequest;
+class StatusRequestDefaultTypeInternal;
+extern StatusRequestDefaultTypeInternal _StatusRequest_default_instance_;
+}  // namespace Printer
 PROTOBUF_NAMESPACE_OPEN
-template<> ::printer::ChangeConfig* Arena::CreateMaybeMessage<::printer::ChangeConfig>(Arena*);
-template<> ::printer::KeepAlive* Arena::CreateMaybeMessage<::printer::KeepAlive>(Arena*);
-template<> ::printer::PrintConfig* Arena::CreateMaybeMessage<::printer::PrintConfig>(Arena*);
-template<> ::printer::PrinterStatus* Arena::CreateMaybeMessage<::printer::PrinterStatus>(Arena*);
-template<> ::printer::RequestStatus* Arena::CreateMaybeMessage<::printer::RequestStatus>(Arena*);
+template<> ::Printer::AddPrintConfig* Arena::CreateMaybeMessage<::Printer::AddPrintConfig>(Arena*);
+template<> ::Printer::ChangeTempControl* Arena::CreateMaybeMessage<::Printer::ChangeTempControl>(Arena*);
+template<> ::Printer::PrintConfig* Arena::CreateMaybeMessage<::Printer::PrintConfig>(Arena*);
+template<> ::Printer::PrinterStatus* Arena::CreateMaybeMessage<::Printer::PrinterStatus>(Arena*);
+template<> ::Printer::RemovePrintConfig* Arena::CreateMaybeMessage<::Printer::RemovePrintConfig>(Arena*);
+template<> ::Printer::StatusRequest* Arena::CreateMaybeMessage<::Printer::StatusRequest>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
-namespace printer {
+namespace Printer {
 
-enum ChangeConfig_ConfigChangeType : int {
-  ChangeConfig_ConfigChangeType_ADD = 0,
-  ChangeConfig_ConfigChangeType_REMOVE = 1,
-  ChangeConfig_ConfigChangeType_ChangeConfig_ConfigChangeType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
-  ChangeConfig_ConfigChangeType_ChangeConfig_ConfigChangeType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
-};
-bool ChangeConfig_ConfigChangeType_IsValid(int value);
-constexpr ChangeConfig_ConfigChangeType ChangeConfig_ConfigChangeType_ConfigChangeType_MIN = ChangeConfig_ConfigChangeType_ADD;
-constexpr ChangeConfig_ConfigChangeType ChangeConfig_ConfigChangeType_ConfigChangeType_MAX = ChangeConfig_ConfigChangeType_REMOVE;
-constexpr int ChangeConfig_ConfigChangeType_ConfigChangeType_ARRAYSIZE = ChangeConfig_ConfigChangeType_ConfigChangeType_MAX + 1;
-
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ChangeConfig_ConfigChangeType_descriptor();
-template<typename T>
-inline const std::string& ChangeConfig_ConfigChangeType_Name(T enum_t_value) {
-  static_assert(::std::is_same<T, ChangeConfig_ConfigChangeType>::value ||
-    ::std::is_integral<T>::value,
-    "Incorrect type passed to function ChangeConfig_ConfigChangeType_Name.");
-  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
-    ChangeConfig_ConfigChangeType_descriptor(), enum_t_value);
-}
-inline bool ChangeConfig_ConfigChangeType_Parse(
-    const std::string& name, ChangeConfig_ConfigChangeType* value) {
-  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<ChangeConfig_ConfigChangeType>(
-    ChangeConfig_ConfigChangeType_descriptor(), name, value);
-}
 // ===================================================================
 
-class KeepAlive PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:printer.KeepAlive) */ {
+class StatusRequest PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Printer.StatusRequest) */ {
  public:
-  inline KeepAlive() : KeepAlive(nullptr) {};
-  virtual ~KeepAlive();
+  inline StatusRequest() : StatusRequest(nullptr) {};
+  virtual ~StatusRequest();
 
-  KeepAlive(const KeepAlive& from);
-  KeepAlive(KeepAlive&& from) noexcept
-    : KeepAlive() {
+  StatusRequest(const StatusRequest& from);
+  StatusRequest(StatusRequest&& from) noexcept
+    : StatusRequest() {
     *this = ::std::move(from);
   }
 
-  inline KeepAlive& operator=(const KeepAlive& from) {
+  inline StatusRequest& operator=(const StatusRequest& from) {
     CopyFrom(from);
     return *this;
   }
-  inline KeepAlive& operator=(KeepAlive&& from) noexcept {
+  inline StatusRequest& operator=(StatusRequest&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -142,20 +120,20 @@ class KeepAlive PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const KeepAlive& default_instance();
+  static const StatusRequest& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const KeepAlive* internal_default_instance() {
-    return reinterpret_cast<const KeepAlive*>(
-               &_KeepAlive_default_instance_);
+  static inline const StatusRequest* internal_default_instance() {
+    return reinterpret_cast<const StatusRequest*>(
+               &_StatusRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     0;
 
-  friend void swap(KeepAlive& a, KeepAlive& b) {
+  friend void swap(StatusRequest& a, StatusRequest& b) {
     a.Swap(&b);
   }
-  inline void Swap(KeepAlive* other) {
+  inline void Swap(StatusRequest* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -163,7 +141,7 @@ class KeepAlive PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(KeepAlive* other) {
+  void UnsafeArenaSwap(StatusRequest* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -171,17 +149,17 @@ class KeepAlive PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline KeepAlive* New() const final {
-    return CreateMaybeMessage<KeepAlive>(nullptr);
+  inline StatusRequest* New() const final {
+    return CreateMaybeMessage<StatusRequest>(nullptr);
   }
 
-  KeepAlive* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<KeepAlive>(arena);
+  StatusRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<StatusRequest>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const KeepAlive& from);
-  void MergeFrom(const KeepAlive& from);
+  void CopyFrom(const StatusRequest& from);
+  void MergeFrom(const StatusRequest& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -195,13 +173,13 @@ class KeepAlive PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(KeepAlive* other);
+  void InternalSwap(StatusRequest* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "printer.KeepAlive";
+    return "Printer.StatusRequest";
   }
   protected:
-  explicit KeepAlive(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit StatusRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -221,32 +199,461 @@ class KeepAlive PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kKeepAliveFieldNumber = 1,
+    kIncludePrintConfigsFieldNumber = 1,
   };
-  // bool keepAlive = 1;
-  void clear_keepalive();
-  bool keepalive() const;
-  void set_keepalive(bool value);
+  // bool include_print_configs = 1;
+  void clear_include_print_configs();
+  bool include_print_configs() const;
+  void set_include_print_configs(bool value);
   private:
-  bool _internal_keepalive() const;
-  void _internal_set_keepalive(bool value);
+  bool _internal_include_print_configs() const;
+  void _internal_set_include_print_configs(bool value);
   public:
 
-  // @@protoc_insertion_point(class_scope:printer.KeepAlive)
+  // @@protoc_insertion_point(class_scope:Printer.StatusRequest)
  private:
   class _Internal;
 
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  bool keepalive_;
+  bool include_print_configs_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_PrinterData_2eproto;
+};
+// -------------------------------------------------------------------
+
+class AddPrintConfig PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Printer.AddPrintConfig) */ {
+ public:
+  inline AddPrintConfig() : AddPrintConfig(nullptr) {};
+  virtual ~AddPrintConfig();
+
+  AddPrintConfig(const AddPrintConfig& from);
+  AddPrintConfig(AddPrintConfig&& from) noexcept
+    : AddPrintConfig() {
+    *this = ::std::move(from);
+  }
+
+  inline AddPrintConfig& operator=(const AddPrintConfig& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline AddPrintConfig& operator=(AddPrintConfig&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const AddPrintConfig& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const AddPrintConfig* internal_default_instance() {
+    return reinterpret_cast<const AddPrintConfig*>(
+               &_AddPrintConfig_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  friend void swap(AddPrintConfig& a, AddPrintConfig& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(AddPrintConfig* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(AddPrintConfig* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline AddPrintConfig* New() const final {
+    return CreateMaybeMessage<AddPrintConfig>(nullptr);
+  }
+
+  AddPrintConfig* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<AddPrintConfig>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const AddPrintConfig& from);
+  void MergeFrom(const AddPrintConfig& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(AddPrintConfig* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Printer.AddPrintConfig";
+  }
+  protected:
+  explicit AddPrintConfig(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_PrinterData_2eproto);
+    return ::descriptor_table_PrinterData_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kPrintConfigFieldNumber = 1,
+  };
+  // .Printer.PrintConfig print_config = 1;
+  bool has_print_config() const;
+  private:
+  bool _internal_has_print_config() const;
+  public:
+  void clear_print_config();
+  const ::Printer::PrintConfig& print_config() const;
+  ::Printer::PrintConfig* release_print_config();
+  ::Printer::PrintConfig* mutable_print_config();
+  void set_allocated_print_config(::Printer::PrintConfig* print_config);
+  private:
+  const ::Printer::PrintConfig& _internal_print_config() const;
+  ::Printer::PrintConfig* _internal_mutable_print_config();
+  public:
+  void unsafe_arena_set_allocated_print_config(
+      ::Printer::PrintConfig* print_config);
+  ::Printer::PrintConfig* unsafe_arena_release_print_config();
+
+  // @@protoc_insertion_point(class_scope:Printer.AddPrintConfig)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::Printer::PrintConfig* print_config_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_PrinterData_2eproto;
+};
+// -------------------------------------------------------------------
+
+class ChangeTempControl PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Printer.ChangeTempControl) */ {
+ public:
+  inline ChangeTempControl() : ChangeTempControl(nullptr) {};
+  virtual ~ChangeTempControl();
+
+  ChangeTempControl(const ChangeTempControl& from);
+  ChangeTempControl(ChangeTempControl&& from) noexcept
+    : ChangeTempControl() {
+    *this = ::std::move(from);
+  }
+
+  inline ChangeTempControl& operator=(const ChangeTempControl& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline ChangeTempControl& operator=(ChangeTempControl&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const ChangeTempControl& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ChangeTempControl* internal_default_instance() {
+    return reinterpret_cast<const ChangeTempControl*>(
+               &_ChangeTempControl_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(ChangeTempControl& a, ChangeTempControl& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(ChangeTempControl* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(ChangeTempControl* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ChangeTempControl* New() const final {
+    return CreateMaybeMessage<ChangeTempControl>(nullptr);
+  }
+
+  ChangeTempControl* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<ChangeTempControl>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const ChangeTempControl& from);
+  void MergeFrom(const ChangeTempControl& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ChangeTempControl* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Printer.ChangeTempControl";
+  }
+  protected:
+  explicit ChangeTempControl(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_PrinterData_2eproto);
+    return ::descriptor_table_PrinterData_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kIsActiveFieldNumber = 1,
+  };
+  // bool isActive = 1;
+  void clear_isactive();
+  bool isactive() const;
+  void set_isactive(bool value);
+  private:
+  bool _internal_isactive() const;
+  void _internal_set_isactive(bool value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Printer.ChangeTempControl)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  bool isactive_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_PrinterData_2eproto;
+};
+// -------------------------------------------------------------------
+
+class RemovePrintConfig PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Printer.RemovePrintConfig) */ {
+ public:
+  inline RemovePrintConfig() : RemovePrintConfig(nullptr) {};
+  virtual ~RemovePrintConfig();
+
+  RemovePrintConfig(const RemovePrintConfig& from);
+  RemovePrintConfig(RemovePrintConfig&& from) noexcept
+    : RemovePrintConfig() {
+    *this = ::std::move(from);
+  }
+
+  inline RemovePrintConfig& operator=(const RemovePrintConfig& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline RemovePrintConfig& operator=(RemovePrintConfig&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const RemovePrintConfig& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const RemovePrintConfig* internal_default_instance() {
+    return reinterpret_cast<const RemovePrintConfig*>(
+               &_RemovePrintConfig_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  friend void swap(RemovePrintConfig& a, RemovePrintConfig& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(RemovePrintConfig* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(RemovePrintConfig* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline RemovePrintConfig* New() const final {
+    return CreateMaybeMessage<RemovePrintConfig>(nullptr);
+  }
+
+  RemovePrintConfig* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<RemovePrintConfig>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const RemovePrintConfig& from);
+  void MergeFrom(const RemovePrintConfig& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(RemovePrintConfig* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Printer.RemovePrintConfig";
+  }
+  protected:
+  explicit RemovePrintConfig(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_PrinterData_2eproto);
+    return ::descriptor_table_PrinterData_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kPrintConfigFieldNumber = 1,
+  };
+  // .Printer.PrintConfig print_config = 1;
+  bool has_print_config() const;
+  private:
+  bool _internal_has_print_config() const;
+  public:
+  void clear_print_config();
+  const ::Printer::PrintConfig& print_config() const;
+  ::Printer::PrintConfig* release_print_config();
+  ::Printer::PrintConfig* mutable_print_config();
+  void set_allocated_print_config(::Printer::PrintConfig* print_config);
+  private:
+  const ::Printer::PrintConfig& _internal_print_config() const;
+  ::Printer::PrintConfig* _internal_mutable_print_config();
+  public:
+  void unsafe_arena_set_allocated_print_config(
+      ::Printer::PrintConfig* print_config);
+  ::Printer::PrintConfig* unsafe_arena_release_print_config();
+
+  // @@protoc_insertion_point(class_scope:Printer.RemovePrintConfig)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::Printer::PrintConfig* print_config_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_PrinterData_2eproto;
 };
 // -------------------------------------------------------------------
 
 class PrintConfig PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:printer.PrintConfig) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Printer.PrintConfig) */ {
  public:
   inline PrintConfig() : PrintConfig(nullptr) {};
   virtual ~PrintConfig();
@@ -287,7 +694,7 @@ class PrintConfig PROTOBUF_FINAL :
                &_PrintConfig_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    4;
 
   friend void swap(PrintConfig& a, PrintConfig& b) {
     a.Swap(&b);
@@ -335,7 +742,7 @@ class PrintConfig PROTOBUF_FINAL :
   void InternalSwap(PrintConfig* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "printer.PrintConfig";
+    return "Printer.PrintConfig";
   }
   protected:
   explicit PrintConfig(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -395,7 +802,7 @@ class PrintConfig PROTOBUF_FINAL :
   void _internal_set_temperature(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // @@protoc_insertion_point(class_scope:printer.PrintConfig)
+  // @@protoc_insertion_point(class_scope:Printer.PrintConfig)
  private:
   class _Internal;
 
@@ -409,332 +816,8 @@ class PrintConfig PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class ChangeConfig PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:printer.ChangeConfig) */ {
- public:
-  inline ChangeConfig() : ChangeConfig(nullptr) {};
-  virtual ~ChangeConfig();
-
-  ChangeConfig(const ChangeConfig& from);
-  ChangeConfig(ChangeConfig&& from) noexcept
-    : ChangeConfig() {
-    *this = ::std::move(from);
-  }
-
-  inline ChangeConfig& operator=(const ChangeConfig& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline ChangeConfig& operator=(ChangeConfig&& from) noexcept {
-    if (GetArena() == from.GetArena()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return GetMetadataStatic().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return GetMetadataStatic().reflection;
-  }
-  static const ChangeConfig& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ChangeConfig* internal_default_instance() {
-    return reinterpret_cast<const ChangeConfig*>(
-               &_ChangeConfig_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    2;
-
-  friend void swap(ChangeConfig& a, ChangeConfig& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(ChangeConfig* other) {
-    if (other == this) return;
-    if (GetArena() == other->GetArena()) {
-      InternalSwap(other);
-    } else {
-      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(ChangeConfig* other) {
-    if (other == this) return;
-    GOOGLE_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline ChangeConfig* New() const final {
-    return CreateMaybeMessage<ChangeConfig>(nullptr);
-  }
-
-  ChangeConfig* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<ChangeConfig>(arena);
-  }
-  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const ChangeConfig& from);
-  void MergeFrom(const ChangeConfig& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
-      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  inline void SharedCtor();
-  inline void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(ChangeConfig* other);
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "printer.ChangeConfig";
-  }
-  protected:
-  explicit ChangeConfig(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  private:
-  static void ArenaDtor(void* object);
-  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  public:
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-  private:
-  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_PrinterData_2eproto);
-    return ::descriptor_table_PrinterData_2eproto.file_level_metadata[kIndexInFileMessages];
-  }
-
-  public:
-
-  // nested types ----------------------------------------------------
-
-  typedef ChangeConfig_ConfigChangeType ConfigChangeType;
-  static constexpr ConfigChangeType ADD =
-    ChangeConfig_ConfigChangeType_ADD;
-  static constexpr ConfigChangeType REMOVE =
-    ChangeConfig_ConfigChangeType_REMOVE;
-  static inline bool ConfigChangeType_IsValid(int value) {
-    return ChangeConfig_ConfigChangeType_IsValid(value);
-  }
-  static constexpr ConfigChangeType ConfigChangeType_MIN =
-    ChangeConfig_ConfigChangeType_ConfigChangeType_MIN;
-  static constexpr ConfigChangeType ConfigChangeType_MAX =
-    ChangeConfig_ConfigChangeType_ConfigChangeType_MAX;
-  static constexpr int ConfigChangeType_ARRAYSIZE =
-    ChangeConfig_ConfigChangeType_ConfigChangeType_ARRAYSIZE;
-  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
-  ConfigChangeType_descriptor() {
-    return ChangeConfig_ConfigChangeType_descriptor();
-  }
-  template<typename T>
-  static inline const std::string& ConfigChangeType_Name(T enum_t_value) {
-    static_assert(::std::is_same<T, ConfigChangeType>::value ||
-      ::std::is_integral<T>::value,
-      "Incorrect type passed to function ConfigChangeType_Name.");
-    return ChangeConfig_ConfigChangeType_Name(enum_t_value);
-  }
-  static inline bool ConfigChangeType_Parse(const std::string& name,
-      ConfigChangeType* value) {
-    return ChangeConfig_ConfigChangeType_Parse(name, value);
-  }
-
-  // accessors -------------------------------------------------------
-
-  enum : int {
-    kConfigFieldNumber = 2,
-    kChangeTypeFieldNumber = 1,
-  };
-  // .printer.PrintConfig config = 2;
-  bool has_config() const;
-  private:
-  bool _internal_has_config() const;
-  public:
-  void clear_config();
-  const ::printer::PrintConfig& config() const;
-  ::printer::PrintConfig* release_config();
-  ::printer::PrintConfig* mutable_config();
-  void set_allocated_config(::printer::PrintConfig* config);
-  private:
-  const ::printer::PrintConfig& _internal_config() const;
-  ::printer::PrintConfig* _internal_mutable_config();
-  public:
-  void unsafe_arena_set_allocated_config(
-      ::printer::PrintConfig* config);
-  ::printer::PrintConfig* unsafe_arena_release_config();
-
-  // .printer.ChangeConfig.ConfigChangeType changeType = 1;
-  void clear_changetype();
-  ::printer::ChangeConfig_ConfigChangeType changetype() const;
-  void set_changetype(::printer::ChangeConfig_ConfigChangeType value);
-  private:
-  ::printer::ChangeConfig_ConfigChangeType _internal_changetype() const;
-  void _internal_set_changetype(::printer::ChangeConfig_ConfigChangeType value);
-  public:
-
-  // @@protoc_insertion_point(class_scope:printer.ChangeConfig)
- private:
-  class _Internal;
-
-  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
-  typedef void InternalArenaConstructable_;
-  typedef void DestructorSkippable_;
-  ::printer::PrintConfig* config_;
-  int changetype_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_PrinterData_2eproto;
-};
-// -------------------------------------------------------------------
-
-class RequestStatus PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:printer.RequestStatus) */ {
- public:
-  inline RequestStatus() : RequestStatus(nullptr) {};
-  virtual ~RequestStatus();
-
-  RequestStatus(const RequestStatus& from);
-  RequestStatus(RequestStatus&& from) noexcept
-    : RequestStatus() {
-    *this = ::std::move(from);
-  }
-
-  inline RequestStatus& operator=(const RequestStatus& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline RequestStatus& operator=(RequestStatus&& from) noexcept {
-    if (GetArena() == from.GetArena()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return GetMetadataStatic().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return GetMetadataStatic().reflection;
-  }
-  static const RequestStatus& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const RequestStatus* internal_default_instance() {
-    return reinterpret_cast<const RequestStatus*>(
-               &_RequestStatus_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    3;
-
-  friend void swap(RequestStatus& a, RequestStatus& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(RequestStatus* other) {
-    if (other == this) return;
-    if (GetArena() == other->GetArena()) {
-      InternalSwap(other);
-    } else {
-      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(RequestStatus* other) {
-    if (other == this) return;
-    GOOGLE_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline RequestStatus* New() const final {
-    return CreateMaybeMessage<RequestStatus>(nullptr);
-  }
-
-  RequestStatus* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<RequestStatus>(arena);
-  }
-  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const RequestStatus& from);
-  void MergeFrom(const RequestStatus& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
-      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  inline void SharedCtor();
-  inline void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(RequestStatus* other);
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "printer.RequestStatus";
-  }
-  protected:
-  explicit RequestStatus(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  private:
-  static void ArenaDtor(void* object);
-  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  public:
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-  private:
-  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_PrinterData_2eproto);
-    return ::descriptor_table_PrinterData_2eproto.file_level_metadata[kIndexInFileMessages];
-  }
-
-  public:
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  enum : int {
-    kSendConfigsFieldNumber = 1,
-  };
-  // bool sendConfigs = 1;
-  void clear_sendconfigs();
-  bool sendconfigs() const;
-  void set_sendconfigs(bool value);
-  private:
-  bool _internal_sendconfigs() const;
-  void _internal_set_sendconfigs(bool value);
-  public:
-
-  // @@protoc_insertion_point(class_scope:printer.RequestStatus)
- private:
-  class _Internal;
-
-  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
-  typedef void InternalArenaConstructable_;
-  typedef void DestructorSkippable_;
-  bool sendconfigs_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_PrinterData_2eproto;
-};
-// -------------------------------------------------------------------
-
 class PrinterStatus PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:printer.PrinterStatus) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Printer.PrinterStatus) */ {
  public:
   inline PrinterStatus() : PrinterStatus(nullptr) {};
   virtual ~PrinterStatus();
@@ -775,7 +858,7 @@ class PrinterStatus PROTOBUF_FINAL :
                &_PrinterStatus_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(PrinterStatus& a, PrinterStatus& b) {
     a.Swap(&b);
@@ -823,7 +906,7 @@ class PrinterStatus PROTOBUF_FINAL :
   void InternalSwap(PrinterStatus* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "printer.PrinterStatus";
+    return "Printer.PrinterStatus";
   }
   protected:
   explicit PrinterStatus(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -846,78 +929,98 @@ class PrinterStatus PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kPrintConfigsFieldNumber = 5,
+    kPrintConfigsFieldNumber = 6,
+    kCurrentPrintConfigFieldNumber = 5,
     kIsTempControlActiveFieldNumber = 1,
     kTemperatureOutsideFieldNumber = 2,
     kTemperatureInsideTopFieldNumber = 3,
     kTemperatureInsideBottomFieldNumber = 4,
   };
-  // repeated .printer.PrintConfig printConfigs = 5;
-  int printconfigs_size() const;
+  // repeated .Printer.PrintConfig print_configs = 6;
+  int print_configs_size() const;
   private:
-  int _internal_printconfigs_size() const;
+  int _internal_print_configs_size() const;
   public:
-  void clear_printconfigs();
-  ::printer::PrintConfig* mutable_printconfigs(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::printer::PrintConfig >*
-      mutable_printconfigs();
+  void clear_print_configs();
+  ::Printer::PrintConfig* mutable_print_configs(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Printer::PrintConfig >*
+      mutable_print_configs();
   private:
-  const ::printer::PrintConfig& _internal_printconfigs(int index) const;
-  ::printer::PrintConfig* _internal_add_printconfigs();
+  const ::Printer::PrintConfig& _internal_print_configs(int index) const;
+  ::Printer::PrintConfig* _internal_add_print_configs();
   public:
-  const ::printer::PrintConfig& printconfigs(int index) const;
-  ::printer::PrintConfig* add_printconfigs();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::printer::PrintConfig >&
-      printconfigs() const;
+  const ::Printer::PrintConfig& print_configs(int index) const;
+  ::Printer::PrintConfig* add_print_configs();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Printer::PrintConfig >&
+      print_configs() const;
 
-  // bool isTempControlActive = 1;
-  void clear_istempcontrolactive();
-  bool istempcontrolactive() const;
-  void set_istempcontrolactive(bool value);
+  // .Printer.PrintConfig current_print_config = 5;
+  bool has_current_print_config() const;
   private:
-  bool _internal_istempcontrolactive() const;
-  void _internal_set_istempcontrolactive(bool value);
+  bool _internal_has_current_print_config() const;
   public:
-
-  // float temperatureOutside = 2;
-  void clear_temperatureoutside();
-  float temperatureoutside() const;
-  void set_temperatureoutside(float value);
+  void clear_current_print_config();
+  const ::Printer::PrintConfig& current_print_config() const;
+  ::Printer::PrintConfig* release_current_print_config();
+  ::Printer::PrintConfig* mutable_current_print_config();
+  void set_allocated_current_print_config(::Printer::PrintConfig* current_print_config);
   private:
-  float _internal_temperatureoutside() const;
-  void _internal_set_temperatureoutside(float value);
+  const ::Printer::PrintConfig& _internal_current_print_config() const;
+  ::Printer::PrintConfig* _internal_mutable_current_print_config();
   public:
+  void unsafe_arena_set_allocated_current_print_config(
+      ::Printer::PrintConfig* current_print_config);
+  ::Printer::PrintConfig* unsafe_arena_release_current_print_config();
 
-  // float temperatureInsideTop = 3;
-  void clear_temperatureinsidetop();
-  float temperatureinsidetop() const;
-  void set_temperatureinsidetop(float value);
+  // bool is_temp_control_active = 1;
+  void clear_is_temp_control_active();
+  bool is_temp_control_active() const;
+  void set_is_temp_control_active(bool value);
   private:
-  float _internal_temperatureinsidetop() const;
-  void _internal_set_temperatureinsidetop(float value);
-  public:
-
-  // float temperatureInsideBottom = 4;
-  void clear_temperatureinsidebottom();
-  float temperatureinsidebottom() const;
-  void set_temperatureinsidebottom(float value);
-  private:
-  float _internal_temperatureinsidebottom() const;
-  void _internal_set_temperatureinsidebottom(float value);
+  bool _internal_is_temp_control_active() const;
+  void _internal_set_is_temp_control_active(bool value);
   public:
 
-  // @@protoc_insertion_point(class_scope:printer.PrinterStatus)
+  // float temperature_outside = 2;
+  void clear_temperature_outside();
+  float temperature_outside() const;
+  void set_temperature_outside(float value);
+  private:
+  float _internal_temperature_outside() const;
+  void _internal_set_temperature_outside(float value);
+  public:
+
+  // float temperature_inside_top = 3;
+  void clear_temperature_inside_top();
+  float temperature_inside_top() const;
+  void set_temperature_inside_top(float value);
+  private:
+  float _internal_temperature_inside_top() const;
+  void _internal_set_temperature_inside_top(float value);
+  public:
+
+  // float temperature_inside_bottom = 4;
+  void clear_temperature_inside_bottom();
+  float temperature_inside_bottom() const;
+  void set_temperature_inside_bottom(float value);
+  private:
+  float _internal_temperature_inside_bottom() const;
+  void _internal_set_temperature_inside_bottom(float value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Printer.PrinterStatus)
  private:
   class _Internal;
 
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::printer::PrintConfig > printconfigs_;
-  bool istempcontrolactive_;
-  float temperatureoutside_;
-  float temperatureinsidetop_;
-  float temperatureinsidebottom_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Printer::PrintConfig > print_configs_;
+  ::Printer::PrintConfig* current_print_config_;
+  bool is_temp_control_active_;
+  float temperature_outside_;
+  float temperature_inside_top_;
+  float temperature_inside_bottom_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_PrinterData_2eproto;
 };
@@ -930,26 +1033,220 @@ class PrinterStatus PROTOBUF_FINAL :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// KeepAlive
+// StatusRequest
 
-// bool keepAlive = 1;
-inline void KeepAlive::clear_keepalive() {
-  keepalive_ = false;
+// bool include_print_configs = 1;
+inline void StatusRequest::clear_include_print_configs() {
+  include_print_configs_ = false;
 }
-inline bool KeepAlive::_internal_keepalive() const {
-  return keepalive_;
+inline bool StatusRequest::_internal_include_print_configs() const {
+  return include_print_configs_;
 }
-inline bool KeepAlive::keepalive() const {
-  // @@protoc_insertion_point(field_get:printer.KeepAlive.keepAlive)
-  return _internal_keepalive();
+inline bool StatusRequest::include_print_configs() const {
+  // @@protoc_insertion_point(field_get:Printer.StatusRequest.include_print_configs)
+  return _internal_include_print_configs();
 }
-inline void KeepAlive::_internal_set_keepalive(bool value) {
+inline void StatusRequest::_internal_set_include_print_configs(bool value) {
   
-  keepalive_ = value;
+  include_print_configs_ = value;
 }
-inline void KeepAlive::set_keepalive(bool value) {
-  _internal_set_keepalive(value);
-  // @@protoc_insertion_point(field_set:printer.KeepAlive.keepAlive)
+inline void StatusRequest::set_include_print_configs(bool value) {
+  _internal_set_include_print_configs(value);
+  // @@protoc_insertion_point(field_set:Printer.StatusRequest.include_print_configs)
+}
+
+// -------------------------------------------------------------------
+
+// AddPrintConfig
+
+// .Printer.PrintConfig print_config = 1;
+inline bool AddPrintConfig::_internal_has_print_config() const {
+  return this != internal_default_instance() && print_config_ != nullptr;
+}
+inline bool AddPrintConfig::has_print_config() const {
+  return _internal_has_print_config();
+}
+inline void AddPrintConfig::clear_print_config() {
+  if (GetArena() == nullptr && print_config_ != nullptr) {
+    delete print_config_;
+  }
+  print_config_ = nullptr;
+}
+inline const ::Printer::PrintConfig& AddPrintConfig::_internal_print_config() const {
+  const ::Printer::PrintConfig* p = print_config_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::Printer::PrintConfig*>(
+      &::Printer::_PrintConfig_default_instance_);
+}
+inline const ::Printer::PrintConfig& AddPrintConfig::print_config() const {
+  // @@protoc_insertion_point(field_get:Printer.AddPrintConfig.print_config)
+  return _internal_print_config();
+}
+inline void AddPrintConfig::unsafe_arena_set_allocated_print_config(
+    ::Printer::PrintConfig* print_config) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(print_config_);
+  }
+  print_config_ = print_config;
+  if (print_config) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Printer.AddPrintConfig.print_config)
+}
+inline ::Printer::PrintConfig* AddPrintConfig::release_print_config() {
+  auto temp = unsafe_arena_release_print_config();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::Printer::PrintConfig* AddPrintConfig::unsafe_arena_release_print_config() {
+  // @@protoc_insertion_point(field_release:Printer.AddPrintConfig.print_config)
+  
+  ::Printer::PrintConfig* temp = print_config_;
+  print_config_ = nullptr;
+  return temp;
+}
+inline ::Printer::PrintConfig* AddPrintConfig::_internal_mutable_print_config() {
+  
+  if (print_config_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Printer::PrintConfig>(GetArena());
+    print_config_ = p;
+  }
+  return print_config_;
+}
+inline ::Printer::PrintConfig* AddPrintConfig::mutable_print_config() {
+  // @@protoc_insertion_point(field_mutable:Printer.AddPrintConfig.print_config)
+  return _internal_mutable_print_config();
+}
+inline void AddPrintConfig::set_allocated_print_config(::Printer::PrintConfig* print_config) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete print_config_;
+  }
+  if (print_config) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(print_config);
+    if (message_arena != submessage_arena) {
+      print_config = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, print_config, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  print_config_ = print_config;
+  // @@protoc_insertion_point(field_set_allocated:Printer.AddPrintConfig.print_config)
+}
+
+// -------------------------------------------------------------------
+
+// ChangeTempControl
+
+// bool isActive = 1;
+inline void ChangeTempControl::clear_isactive() {
+  isactive_ = false;
+}
+inline bool ChangeTempControl::_internal_isactive() const {
+  return isactive_;
+}
+inline bool ChangeTempControl::isactive() const {
+  // @@protoc_insertion_point(field_get:Printer.ChangeTempControl.isActive)
+  return _internal_isactive();
+}
+inline void ChangeTempControl::_internal_set_isactive(bool value) {
+  
+  isactive_ = value;
+}
+inline void ChangeTempControl::set_isactive(bool value) {
+  _internal_set_isactive(value);
+  // @@protoc_insertion_point(field_set:Printer.ChangeTempControl.isActive)
+}
+
+// -------------------------------------------------------------------
+
+// RemovePrintConfig
+
+// .Printer.PrintConfig print_config = 1;
+inline bool RemovePrintConfig::_internal_has_print_config() const {
+  return this != internal_default_instance() && print_config_ != nullptr;
+}
+inline bool RemovePrintConfig::has_print_config() const {
+  return _internal_has_print_config();
+}
+inline void RemovePrintConfig::clear_print_config() {
+  if (GetArena() == nullptr && print_config_ != nullptr) {
+    delete print_config_;
+  }
+  print_config_ = nullptr;
+}
+inline const ::Printer::PrintConfig& RemovePrintConfig::_internal_print_config() const {
+  const ::Printer::PrintConfig* p = print_config_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::Printer::PrintConfig*>(
+      &::Printer::_PrintConfig_default_instance_);
+}
+inline const ::Printer::PrintConfig& RemovePrintConfig::print_config() const {
+  // @@protoc_insertion_point(field_get:Printer.RemovePrintConfig.print_config)
+  return _internal_print_config();
+}
+inline void RemovePrintConfig::unsafe_arena_set_allocated_print_config(
+    ::Printer::PrintConfig* print_config) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(print_config_);
+  }
+  print_config_ = print_config;
+  if (print_config) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Printer.RemovePrintConfig.print_config)
+}
+inline ::Printer::PrintConfig* RemovePrintConfig::release_print_config() {
+  auto temp = unsafe_arena_release_print_config();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::Printer::PrintConfig* RemovePrintConfig::unsafe_arena_release_print_config() {
+  // @@protoc_insertion_point(field_release:Printer.RemovePrintConfig.print_config)
+  
+  ::Printer::PrintConfig* temp = print_config_;
+  print_config_ = nullptr;
+  return temp;
+}
+inline ::Printer::PrintConfig* RemovePrintConfig::_internal_mutable_print_config() {
+  
+  if (print_config_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Printer::PrintConfig>(GetArena());
+    print_config_ = p;
+  }
+  return print_config_;
+}
+inline ::Printer::PrintConfig* RemovePrintConfig::mutable_print_config() {
+  // @@protoc_insertion_point(field_mutable:Printer.RemovePrintConfig.print_config)
+  return _internal_mutable_print_config();
+}
+inline void RemovePrintConfig::set_allocated_print_config(::Printer::PrintConfig* print_config) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete print_config_;
+  }
+  if (print_config) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(print_config);
+    if (message_arena != submessage_arena) {
+      print_config = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, print_config, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  print_config_ = print_config;
+  // @@protoc_insertion_point(field_set_allocated:Printer.RemovePrintConfig.print_config)
 }
 
 // -------------------------------------------------------------------
@@ -964,7 +1261,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 PrintConfig::_internal_temperature() const
   return temperature_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 PrintConfig::temperature() const {
-  // @@protoc_insertion_point(field_get:printer.PrintConfig.temperature)
+  // @@protoc_insertion_point(field_get:Printer.PrintConfig.temperature)
   return _internal_temperature();
 }
 inline void PrintConfig::_internal_set_temperature(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -973,7 +1270,7 @@ inline void PrintConfig::_internal_set_temperature(::PROTOBUF_NAMESPACE_ID::int3
 }
 inline void PrintConfig::set_temperature(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_temperature(value);
-  // @@protoc_insertion_point(field_set:printer.PrintConfig.temperature)
+  // @@protoc_insertion_point(field_set:Printer.PrintConfig.temperature)
 }
 
 // string name = 2;
@@ -981,15 +1278,15 @@ inline void PrintConfig::clear_name() {
   name_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline const std::string& PrintConfig::name() const {
-  // @@protoc_insertion_point(field_get:printer.PrintConfig.name)
+  // @@protoc_insertion_point(field_get:Printer.PrintConfig.name)
   return _internal_name();
 }
 inline void PrintConfig::set_name(const std::string& value) {
   _internal_set_name(value);
-  // @@protoc_insertion_point(field_set:printer.PrintConfig.name)
+  // @@protoc_insertion_point(field_set:Printer.PrintConfig.name)
 }
 inline std::string* PrintConfig::mutable_name() {
-  // @@protoc_insertion_point(field_mutable:printer.PrintConfig.name)
+  // @@protoc_insertion_point(field_mutable:Printer.PrintConfig.name)
   return _internal_mutable_name();
 }
 inline const std::string& PrintConfig::_internal_name() const {
@@ -1003,28 +1300,28 @@ inline void PrintConfig::set_name(std::string&& value) {
   
   name_.Set(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
-  // @@protoc_insertion_point(field_set_rvalue:printer.PrintConfig.name)
+  // @@protoc_insertion_point(field_set_rvalue:Printer.PrintConfig.name)
 }
 inline void PrintConfig::set_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
               GetArena());
-  // @@protoc_insertion_point(field_set_char:printer.PrintConfig.name)
+  // @@protoc_insertion_point(field_set_char:Printer.PrintConfig.name)
 }
 inline void PrintConfig::set_name(const char* value,
     size_t size) {
   
   name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
       reinterpret_cast<const char*>(value), size), GetArena());
-  // @@protoc_insertion_point(field_set_pointer:printer.PrintConfig.name)
+  // @@protoc_insertion_point(field_set_pointer:Printer.PrintConfig.name)
 }
 inline std::string* PrintConfig::_internal_mutable_name() {
   
   return name_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline std::string* PrintConfig::release_name() {
-  // @@protoc_insertion_point(field_release:printer.PrintConfig.name)
+  // @@protoc_insertion_point(field_release:Printer.PrintConfig.name)
   return name_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 inline void PrintConfig::set_allocated_name(std::string* name) {
@@ -1035,10 +1332,10 @@ inline void PrintConfig::set_allocated_name(std::string* name) {
   }
   name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), name,
       GetArena());
-  // @@protoc_insertion_point(field_set_allocated:printer.PrintConfig.name)
+  // @@protoc_insertion_point(field_set_allocated:Printer.PrintConfig.name)
 }
 inline std::string* PrintConfig::unsafe_arena_release_name() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:printer.PrintConfig.name)
+  // @@protoc_insertion_point(field_unsafe_arena_release:Printer.PrintConfig.name)
   GOOGLE_DCHECK(GetArena() != nullptr);
   
   return name_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
@@ -1054,259 +1351,211 @@ inline void PrintConfig::unsafe_arena_set_allocated_name(
   }
   name_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       name, GetArena());
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:printer.PrintConfig.name)
-}
-
-// -------------------------------------------------------------------
-
-// ChangeConfig
-
-// .printer.ChangeConfig.ConfigChangeType changeType = 1;
-inline void ChangeConfig::clear_changetype() {
-  changetype_ = 0;
-}
-inline ::printer::ChangeConfig_ConfigChangeType ChangeConfig::_internal_changetype() const {
-  return static_cast< ::printer::ChangeConfig_ConfigChangeType >(changetype_);
-}
-inline ::printer::ChangeConfig_ConfigChangeType ChangeConfig::changetype() const {
-  // @@protoc_insertion_point(field_get:printer.ChangeConfig.changeType)
-  return _internal_changetype();
-}
-inline void ChangeConfig::_internal_set_changetype(::printer::ChangeConfig_ConfigChangeType value) {
-  
-  changetype_ = value;
-}
-inline void ChangeConfig::set_changetype(::printer::ChangeConfig_ConfigChangeType value) {
-  _internal_set_changetype(value);
-  // @@protoc_insertion_point(field_set:printer.ChangeConfig.changeType)
-}
-
-// .printer.PrintConfig config = 2;
-inline bool ChangeConfig::_internal_has_config() const {
-  return this != internal_default_instance() && config_ != nullptr;
-}
-inline bool ChangeConfig::has_config() const {
-  return _internal_has_config();
-}
-inline void ChangeConfig::clear_config() {
-  if (GetArena() == nullptr && config_ != nullptr) {
-    delete config_;
-  }
-  config_ = nullptr;
-}
-inline const ::printer::PrintConfig& ChangeConfig::_internal_config() const {
-  const ::printer::PrintConfig* p = config_;
-  return p != nullptr ? *p : *reinterpret_cast<const ::printer::PrintConfig*>(
-      &::printer::_PrintConfig_default_instance_);
-}
-inline const ::printer::PrintConfig& ChangeConfig::config() const {
-  // @@protoc_insertion_point(field_get:printer.ChangeConfig.config)
-  return _internal_config();
-}
-inline void ChangeConfig::unsafe_arena_set_allocated_config(
-    ::printer::PrintConfig* config) {
-  if (GetArena() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(config_);
-  }
-  config_ = config;
-  if (config) {
-    
-  } else {
-    
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:printer.ChangeConfig.config)
-}
-inline ::printer::PrintConfig* ChangeConfig::release_config() {
-  auto temp = unsafe_arena_release_config();
-  if (GetArena() != nullptr) {
-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  }
-  return temp;
-}
-inline ::printer::PrintConfig* ChangeConfig::unsafe_arena_release_config() {
-  // @@protoc_insertion_point(field_release:printer.ChangeConfig.config)
-  
-  ::printer::PrintConfig* temp = config_;
-  config_ = nullptr;
-  return temp;
-}
-inline ::printer::PrintConfig* ChangeConfig::_internal_mutable_config() {
-  
-  if (config_ == nullptr) {
-    auto* p = CreateMaybeMessage<::printer::PrintConfig>(GetArena());
-    config_ = p;
-  }
-  return config_;
-}
-inline ::printer::PrintConfig* ChangeConfig::mutable_config() {
-  // @@protoc_insertion_point(field_mutable:printer.ChangeConfig.config)
-  return _internal_mutable_config();
-}
-inline void ChangeConfig::set_allocated_config(::printer::PrintConfig* config) {
-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
-  if (message_arena == nullptr) {
-    delete config_;
-  }
-  if (config) {
-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(config);
-    if (message_arena != submessage_arena) {
-      config = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, config, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  config_ = config;
-  // @@protoc_insertion_point(field_set_allocated:printer.ChangeConfig.config)
-}
-
-// -------------------------------------------------------------------
-
-// RequestStatus
-
-// bool sendConfigs = 1;
-inline void RequestStatus::clear_sendconfigs() {
-  sendconfigs_ = false;
-}
-inline bool RequestStatus::_internal_sendconfigs() const {
-  return sendconfigs_;
-}
-inline bool RequestStatus::sendconfigs() const {
-  // @@protoc_insertion_point(field_get:printer.RequestStatus.sendConfigs)
-  return _internal_sendconfigs();
-}
-inline void RequestStatus::_internal_set_sendconfigs(bool value) {
-  
-  sendconfigs_ = value;
-}
-inline void RequestStatus::set_sendconfigs(bool value) {
-  _internal_set_sendconfigs(value);
-  // @@protoc_insertion_point(field_set:printer.RequestStatus.sendConfigs)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Printer.PrintConfig.name)
 }
 
 // -------------------------------------------------------------------
 
 // PrinterStatus
 
-// bool isTempControlActive = 1;
-inline void PrinterStatus::clear_istempcontrolactive() {
-  istempcontrolactive_ = false;
+// bool is_temp_control_active = 1;
+inline void PrinterStatus::clear_is_temp_control_active() {
+  is_temp_control_active_ = false;
 }
-inline bool PrinterStatus::_internal_istempcontrolactive() const {
-  return istempcontrolactive_;
+inline bool PrinterStatus::_internal_is_temp_control_active() const {
+  return is_temp_control_active_;
 }
-inline bool PrinterStatus::istempcontrolactive() const {
-  // @@protoc_insertion_point(field_get:printer.PrinterStatus.isTempControlActive)
-  return _internal_istempcontrolactive();
+inline bool PrinterStatus::is_temp_control_active() const {
+  // @@protoc_insertion_point(field_get:Printer.PrinterStatus.is_temp_control_active)
+  return _internal_is_temp_control_active();
 }
-inline void PrinterStatus::_internal_set_istempcontrolactive(bool value) {
+inline void PrinterStatus::_internal_set_is_temp_control_active(bool value) {
   
-  istempcontrolactive_ = value;
+  is_temp_control_active_ = value;
 }
-inline void PrinterStatus::set_istempcontrolactive(bool value) {
-  _internal_set_istempcontrolactive(value);
-  // @@protoc_insertion_point(field_set:printer.PrinterStatus.isTempControlActive)
+inline void PrinterStatus::set_is_temp_control_active(bool value) {
+  _internal_set_is_temp_control_active(value);
+  // @@protoc_insertion_point(field_set:Printer.PrinterStatus.is_temp_control_active)
 }
 
-// float temperatureOutside = 2;
-inline void PrinterStatus::clear_temperatureoutside() {
-  temperatureoutside_ = 0;
+// float temperature_outside = 2;
+inline void PrinterStatus::clear_temperature_outside() {
+  temperature_outside_ = 0;
 }
-inline float PrinterStatus::_internal_temperatureoutside() const {
-  return temperatureoutside_;
+inline float PrinterStatus::_internal_temperature_outside() const {
+  return temperature_outside_;
 }
-inline float PrinterStatus::temperatureoutside() const {
-  // @@protoc_insertion_point(field_get:printer.PrinterStatus.temperatureOutside)
-  return _internal_temperatureoutside();
+inline float PrinterStatus::temperature_outside() const {
+  // @@protoc_insertion_point(field_get:Printer.PrinterStatus.temperature_outside)
+  return _internal_temperature_outside();
 }
-inline void PrinterStatus::_internal_set_temperatureoutside(float value) {
+inline void PrinterStatus::_internal_set_temperature_outside(float value) {
   
-  temperatureoutside_ = value;
+  temperature_outside_ = value;
 }
-inline void PrinterStatus::set_temperatureoutside(float value) {
-  _internal_set_temperatureoutside(value);
-  // @@protoc_insertion_point(field_set:printer.PrinterStatus.temperatureOutside)
+inline void PrinterStatus::set_temperature_outside(float value) {
+  _internal_set_temperature_outside(value);
+  // @@protoc_insertion_point(field_set:Printer.PrinterStatus.temperature_outside)
 }
 
-// float temperatureInsideTop = 3;
-inline void PrinterStatus::clear_temperatureinsidetop() {
-  temperatureinsidetop_ = 0;
+// float temperature_inside_top = 3;
+inline void PrinterStatus::clear_temperature_inside_top() {
+  temperature_inside_top_ = 0;
 }
-inline float PrinterStatus::_internal_temperatureinsidetop() const {
-  return temperatureinsidetop_;
+inline float PrinterStatus::_internal_temperature_inside_top() const {
+  return temperature_inside_top_;
 }
-inline float PrinterStatus::temperatureinsidetop() const {
-  // @@protoc_insertion_point(field_get:printer.PrinterStatus.temperatureInsideTop)
-  return _internal_temperatureinsidetop();
+inline float PrinterStatus::temperature_inside_top() const {
+  // @@protoc_insertion_point(field_get:Printer.PrinterStatus.temperature_inside_top)
+  return _internal_temperature_inside_top();
 }
-inline void PrinterStatus::_internal_set_temperatureinsidetop(float value) {
+inline void PrinterStatus::_internal_set_temperature_inside_top(float value) {
   
-  temperatureinsidetop_ = value;
+  temperature_inside_top_ = value;
 }
-inline void PrinterStatus::set_temperatureinsidetop(float value) {
-  _internal_set_temperatureinsidetop(value);
-  // @@protoc_insertion_point(field_set:printer.PrinterStatus.temperatureInsideTop)
+inline void PrinterStatus::set_temperature_inside_top(float value) {
+  _internal_set_temperature_inside_top(value);
+  // @@protoc_insertion_point(field_set:Printer.PrinterStatus.temperature_inside_top)
 }
 
-// float temperatureInsideBottom = 4;
-inline void PrinterStatus::clear_temperatureinsidebottom() {
-  temperatureinsidebottom_ = 0;
+// float temperature_inside_bottom = 4;
+inline void PrinterStatus::clear_temperature_inside_bottom() {
+  temperature_inside_bottom_ = 0;
 }
-inline float PrinterStatus::_internal_temperatureinsidebottom() const {
-  return temperatureinsidebottom_;
+inline float PrinterStatus::_internal_temperature_inside_bottom() const {
+  return temperature_inside_bottom_;
 }
-inline float PrinterStatus::temperatureinsidebottom() const {
-  // @@protoc_insertion_point(field_get:printer.PrinterStatus.temperatureInsideBottom)
-  return _internal_temperatureinsidebottom();
+inline float PrinterStatus::temperature_inside_bottom() const {
+  // @@protoc_insertion_point(field_get:Printer.PrinterStatus.temperature_inside_bottom)
+  return _internal_temperature_inside_bottom();
 }
-inline void PrinterStatus::_internal_set_temperatureinsidebottom(float value) {
+inline void PrinterStatus::_internal_set_temperature_inside_bottom(float value) {
   
-  temperatureinsidebottom_ = value;
+  temperature_inside_bottom_ = value;
 }
-inline void PrinterStatus::set_temperatureinsidebottom(float value) {
-  _internal_set_temperatureinsidebottom(value);
-  // @@protoc_insertion_point(field_set:printer.PrinterStatus.temperatureInsideBottom)
+inline void PrinterStatus::set_temperature_inside_bottom(float value) {
+  _internal_set_temperature_inside_bottom(value);
+  // @@protoc_insertion_point(field_set:Printer.PrinterStatus.temperature_inside_bottom)
 }
 
-// repeated .printer.PrintConfig printConfigs = 5;
-inline int PrinterStatus::_internal_printconfigs_size() const {
-  return printconfigs_.size();
+// .Printer.PrintConfig current_print_config = 5;
+inline bool PrinterStatus::_internal_has_current_print_config() const {
+  return this != internal_default_instance() && current_print_config_ != nullptr;
 }
-inline int PrinterStatus::printconfigs_size() const {
-  return _internal_printconfigs_size();
+inline bool PrinterStatus::has_current_print_config() const {
+  return _internal_has_current_print_config();
 }
-inline void PrinterStatus::clear_printconfigs() {
-  printconfigs_.Clear();
+inline void PrinterStatus::clear_current_print_config() {
+  if (GetArena() == nullptr && current_print_config_ != nullptr) {
+    delete current_print_config_;
+  }
+  current_print_config_ = nullptr;
 }
-inline ::printer::PrintConfig* PrinterStatus::mutable_printconfigs(int index) {
-  // @@protoc_insertion_point(field_mutable:printer.PrinterStatus.printConfigs)
-  return printconfigs_.Mutable(index);
+inline const ::Printer::PrintConfig& PrinterStatus::_internal_current_print_config() const {
+  const ::Printer::PrintConfig* p = current_print_config_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::Printer::PrintConfig*>(
+      &::Printer::_PrintConfig_default_instance_);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::printer::PrintConfig >*
-PrinterStatus::mutable_printconfigs() {
-  // @@protoc_insertion_point(field_mutable_list:printer.PrinterStatus.printConfigs)
-  return &printconfigs_;
+inline const ::Printer::PrintConfig& PrinterStatus::current_print_config() const {
+  // @@protoc_insertion_point(field_get:Printer.PrinterStatus.current_print_config)
+  return _internal_current_print_config();
 }
-inline const ::printer::PrintConfig& PrinterStatus::_internal_printconfigs(int index) const {
-  return printconfigs_.Get(index);
+inline void PrinterStatus::unsafe_arena_set_allocated_current_print_config(
+    ::Printer::PrintConfig* current_print_config) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(current_print_config_);
+  }
+  current_print_config_ = current_print_config;
+  if (current_print_config) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Printer.PrinterStatus.current_print_config)
 }
-inline const ::printer::PrintConfig& PrinterStatus::printconfigs(int index) const {
-  // @@protoc_insertion_point(field_get:printer.PrinterStatus.printConfigs)
-  return _internal_printconfigs(index);
+inline ::Printer::PrintConfig* PrinterStatus::release_current_print_config() {
+  auto temp = unsafe_arena_release_current_print_config();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
 }
-inline ::printer::PrintConfig* PrinterStatus::_internal_add_printconfigs() {
-  return printconfigs_.Add();
+inline ::Printer::PrintConfig* PrinterStatus::unsafe_arena_release_current_print_config() {
+  // @@protoc_insertion_point(field_release:Printer.PrinterStatus.current_print_config)
+  
+  ::Printer::PrintConfig* temp = current_print_config_;
+  current_print_config_ = nullptr;
+  return temp;
 }
-inline ::printer::PrintConfig* PrinterStatus::add_printconfigs() {
-  // @@protoc_insertion_point(field_add:printer.PrinterStatus.printConfigs)
-  return _internal_add_printconfigs();
+inline ::Printer::PrintConfig* PrinterStatus::_internal_mutable_current_print_config() {
+  
+  if (current_print_config_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Printer::PrintConfig>(GetArena());
+    current_print_config_ = p;
+  }
+  return current_print_config_;
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::printer::PrintConfig >&
-PrinterStatus::printconfigs() const {
-  // @@protoc_insertion_point(field_list:printer.PrinterStatus.printConfigs)
-  return printconfigs_;
+inline ::Printer::PrintConfig* PrinterStatus::mutable_current_print_config() {
+  // @@protoc_insertion_point(field_mutable:Printer.PrinterStatus.current_print_config)
+  return _internal_mutable_current_print_config();
+}
+inline void PrinterStatus::set_allocated_current_print_config(::Printer::PrintConfig* current_print_config) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete current_print_config_;
+  }
+  if (current_print_config) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(current_print_config);
+    if (message_arena != submessage_arena) {
+      current_print_config = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, current_print_config, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  current_print_config_ = current_print_config;
+  // @@protoc_insertion_point(field_set_allocated:Printer.PrinterStatus.current_print_config)
+}
+
+// repeated .Printer.PrintConfig print_configs = 6;
+inline int PrinterStatus::_internal_print_configs_size() const {
+  return print_configs_.size();
+}
+inline int PrinterStatus::print_configs_size() const {
+  return _internal_print_configs_size();
+}
+inline void PrinterStatus::clear_print_configs() {
+  print_configs_.Clear();
+}
+inline ::Printer::PrintConfig* PrinterStatus::mutable_print_configs(int index) {
+  // @@protoc_insertion_point(field_mutable:Printer.PrinterStatus.print_configs)
+  return print_configs_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Printer::PrintConfig >*
+PrinterStatus::mutable_print_configs() {
+  // @@protoc_insertion_point(field_mutable_list:Printer.PrinterStatus.print_configs)
+  return &print_configs_;
+}
+inline const ::Printer::PrintConfig& PrinterStatus::_internal_print_configs(int index) const {
+  return print_configs_.Get(index);
+}
+inline const ::Printer::PrintConfig& PrinterStatus::print_configs(int index) const {
+  // @@protoc_insertion_point(field_get:Printer.PrinterStatus.print_configs)
+  return _internal_print_configs(index);
+}
+inline ::Printer::PrintConfig* PrinterStatus::_internal_add_print_configs() {
+  return print_configs_.Add();
+}
+inline ::Printer::PrintConfig* PrinterStatus::add_print_configs() {
+  // @@protoc_insertion_point(field_add:Printer.PrinterStatus.print_configs)
+  return _internal_add_print_configs();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Printer::PrintConfig >&
+PrinterStatus::print_configs() const {
+  // @@protoc_insertion_point(field_list:Printer.PrinterStatus.print_configs)
+  return print_configs_;
 }
 
 #ifdef __GNUC__
@@ -1320,20 +1569,12 @@ PrinterStatus::printconfigs() const {
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
-}  // namespace printer
-
-PROTOBUF_NAMESPACE_OPEN
-
-template <> struct is_proto_enum< ::printer::ChangeConfig_ConfigChangeType> : ::std::true_type {};
-template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::printer::ChangeConfig_ConfigChangeType>() {
-  return ::printer::ChangeConfig_ConfigChangeType_descriptor();
-}
-
-PROTOBUF_NAMESPACE_CLOSE
+}  // namespace Printer
 
 // @@protoc_insertion_point(global_scope)
 

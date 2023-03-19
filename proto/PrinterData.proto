@@ -1,37 +1,35 @@
 syntax = "proto3";
 
-package printer;
+package Printer;
 
-message KeepAlive{
-  bool keepAlive = 1;
+message StatusRequest{
+  bool include_print_configs = 1;
 }
+
+message AddPrintConfig{
+  PrintConfig print_config = 1;
+}
+
+message ChangeTempControl{
+  bool isActive = 1;
+}
+
+message RemovePrintConfig{
+  PrintConfig print_config = 1;
+} 
 
 message PrintConfig {
   int32 temperature = 1;
   string name = 2;
 }
 
-message ChangeConfig{
-
-  enum ConfigChangeType{
-    ADD = 0;
-    REMOVE = 1;
-  }
-
-  ConfigChangeType changeType = 1;
-  PrintConfig config = 2;
-}
-
-message RequestStatus{
-  bool sendConfigs = 1;
-}
-
 message PrinterStatus{
-  bool isTempControlActive = 1;
-  float temperatureOutside = 2;
-  float temperatureInsideTop = 3;
-  float temperatureInsideBottom = 4;
+  bool is_temp_control_active = 1;
+  float temperature_outside = 2;
+  float temperature_inside_top = 3;
+  float temperature_inside_bottom = 4;
+  PrintConfig current_print_config = 5;
 
-  repeated PrintConfig printConfigs = 5;
+  repeated PrintConfig print_configs = 6;
 }
 

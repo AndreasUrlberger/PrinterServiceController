@@ -15,6 +15,6 @@ expect "password:"
 send -- "$PASSW\r"
 
 expect -re {\.*[$#]}
-send -- "./PrinterServiceController\r"
+send -- "sudo ./PrinterServiceController\r"
 
 interact

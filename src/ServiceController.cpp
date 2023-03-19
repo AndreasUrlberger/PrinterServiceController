@@ -25,12 +25,14 @@ void ServiceController::run()
 	displayTempLoop();
 }
 
-int ServiceController::displayTempLoop() {
+int ServiceController::displayTempLoop()
+{
 	displayController.setInverted(false);
 
-	while (true) {
+	while (true)
+	{
 		state.innerTemp = readTemp(INNER_THERMO_NAME);
-		//state.outerTemp = readTemp(OUTER_THERMO_NAME);
+		// state.outerTemp = readTemp(OUTER_THERMO_NAME);
 		state.outerTemp = 0;
 		updateDisplay();
 
@@ -38,30 +40,34 @@ int ServiceController::displayTempLoop() {
 		ss << "inner: " << state.innerTemp << " outer: " << state.outerTemp << " wanted: " << state.profileTemp;
 		Logger::log(ss.str());
 
-		printerServer.setContent(state);
+		printerServer.updateState(state);
 		fanController.tempChanged(state.innerTemp, state.profileTemp);
 		Utils::sleep(100);
 	}
 	return 0;
 }
 
-void ServiceController::updateDisplay() {
+void ServiceController::updateDisplay()
+{
 	PrintConfig config = printConfigs()[0];
-	state.profileTemp = config.temperatur;
+	state.profileTemp = config.temperature;
 	state.profileName = config.name;
 	int64_t now = Utils::currentMillis();
-	if (turnOffTime - now > 0 && !shuttingDown) {
+	if (turnOffTime - now > 0 && !shuttingDown)
+	{
 		displayController.drawTemperature(state.profileTemp, state.innerTemp, config.name);
 	}
-	else {
+	else
+	{
 		displayController.turnOff();
 	}
 }
 
-int32_t ServiceController::readTemp(std::string deviceName) {
+int32_t ServiceController::readTemp(std::string deviceName)
+{
 	// read file to string
 	std::string path = "/sys/bus/w1/devices/" + deviceName + "/w1_slave";
-	auto stream = std::ifstream{ path.data() };
+	auto stream = std::ifstream{path.data()};
 	std::ostringstream sstr;
 	sstr << stream.rdbuf();
 	stream.close();
@@ -82,7 +88,8 @@ void ServiceController::onShutdown()
 	system("sudo shutdown -h now");
 }
 
-void ServiceController::onShortPress() {
+void ServiceController::onShortPress()
+{
 	turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
 	updateDisplay();
 	displayController.turnOn();
@@ -90,33 +97,37 @@ void ServiceController::onShortPress() {
 
 void ServiceController::onFanStateChanged(bool isOn)
 {
-	if (isOn) {
+	if (isOn)
+	{
 		Logger::log(std::string{"fanState: on"});
 	}
-	else {
-		Logger::log(std::string{ "fanState: off" });
+	else
+	{
+		Logger::log(std::string{"fanState: off"});
 	}
 	displayController.setIconVisible(isOn);
 }
 
-bool ServiceController::onProfileUpdate(PrintConfig& profile)
+bool ServiceController::onProfileUpdate(PrintConfig &profile)
 {
 	bool hasChanged = PrintConfigs::addConfig(profile);
 	// update server
 	state.profileName = profile.name;
-	state.profileTemp = profile.temperatur;
-	printerServer.setContent(state);
+	state.profileTemp = profile.temperature;
+	printerServer.updateState(state);
 	return hasChanged;
 }
 
 void ServiceController::onSecondButtonClick(bool longClick)
 {
 	turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
-	if (longClick) {
+	if (longClick)
+	{
 		Buzzer::singleBuzz();
 		fanController.toggleControl();
 	}
-	else {
+	else
+	{
 		// switch config
 		auto configs = printConfigs();
 		auto nextConfig = configs[configs.size() - 1];
@@ -129,9 +140,10 @@ void ServiceController::onSecondButtonClick(bool longClick)
 
 void ServiceController::onChangeFanControl(bool isOn)
 {
-	if (fanController.isControlOn() xor isOn) {
+	if (fanController.isControlOn() xor isOn)
+	{
 		fanController.toggleControl();
 		state.tempControl = fanController.isControlOn();
-		printerServer.setContent(state);
+		printerServer.updateState(state);
 	}
 }

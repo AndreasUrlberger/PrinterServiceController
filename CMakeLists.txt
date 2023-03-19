@@ -30,18 +30,22 @@ FOREACH(proto ${PROTO_FILES})
 ENDFOREACH(proto)
 
 # Move generated proto headers in header directory.
-file(GLOB GENERATED_HEADERS CONFIGURE_DEPENDS "${PROTOBINDING_PATH}/*.h")
+file(GLOB GENERATED_HEADERS CONFIGURE_DEPENDS ${PROTOBINDING_PATH}/*.h)
 EXECUTE_PROCESS(COMMAND mv ${GENERATED_HEADERS} ${CMAKE_CURRENT_SOURCE_DIR}/include/proto/)
 # Find all generated proto headers and sources to add them to the target.
-file(GLOB PROTO_HEADERS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/proto/)
-file(GLOB PROTO_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/proto/)
+file(GLOB PROTO_HEADERS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/proto/*.h)
+file(GLOB PROTO_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/proto/*.cc)
 
+
+
+file(GLOB U_WEBSOCKETS_FILES CONFIGURE_DEPENDS "include/uWebSockets/*")
 
 include_directories(LibIncludes)
+include_directories(LibIncludes/uWebSockets)
 include_directories(include)
 
 add_subdirectory(src)
-
+add_subdirectory(include)
 
 add_executable(${TARGET})
 target_sources(${TARGET} PRIVATE 
@@ -58,6 +62,7 @@ target_sources(${TARGET} PRIVATE
     ./src/ServiceController.cpp
     ./src/Utils.cpp
     ./src/ProtoMessageHandler.cpp
+    ./src/WsProtoHandler.cpp
 
     ./include/ButtonController.h
     ./include/Buzzer.h
@@ -70,19 +75,18 @@ target_sources(${TARGET} PRIVATE
     ./include/ServiceController.h
     ./include/Utils.h
     ./include/ProtoMessageHandler.h
+    ./include/WsProtoHandler.h
 
     # Include generated proto files
     ${PROTO_HEADERS}
     ${PROTO_SOURCES}
+
+    ${U_WEBSOCKETS_FILES}
 )
 
-
-
-
-# Link against the Protobuf library
-target_link_libraries(${TARGET} ${PROTOBUF_LIBRARIES})
-
-
+set(PROTO_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/proto)
+# Add the include path to the target
+target_include_directories(${TARGET} PUBLIC ${PROTO_INCLUDE_DIR})
 
 link_directories(${CMAKE_SOURCE_DIR}/Libraries)
 
@@ -92,7 +96,7 @@ add_library(ssd1306 SHARED IMPORTED)
 set_target_properties(wiringPi PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/Libraries/libwiringPi.so)
 set_target_properties(ssd1306 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/Libraries/libssd1306_i2c.so)
 
-target_link_libraries(${TARGET} wiringPi ssd1306 pthread)
+target_link_libraries(${TARGET} PRIVATE wiringPi ssd1306 pthread z  ${PROTOBUF_LIBRARIES} "${CMAKE_SOURCE_DIR}/Libraries/uSockets.a")
 
 add_definitions(-Wall -g)
 

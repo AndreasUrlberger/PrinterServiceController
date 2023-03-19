@@ -3,7 +3,8 @@ set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_VERSION 1)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
-set(tools /home/andreas/rpi/tools/cross-pi-gcc-10.3.0-0) # warning change toolchain path here.
+#set(tools /home/andreas/rpi/tools/cross-pi-gcc-10.3.0-0) # warning change toolchain path here.
+set(tools /home/andreas/rpi/tools/cross-pi-gcc-10.2.0-0) # Doesn't really matter as it is still different from the compiler version on the pi.
 # Should probably be project specific.
 set(rootfs_dir $ENV{HOME}/rpi/rootfs)
 
