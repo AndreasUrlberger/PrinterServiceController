@@ -3,6 +3,9 @@
 #include "PrinterData.pb.h"
 #include "PrintConfigs.h"
 #include "uWebSockets/App.h"
+#include "Utils.h"
+
+// TODO Probably have to add thread for WS.
 
 #define HOST_PORT 1933
 
@@ -21,37 +24,35 @@ class WsProtoHandler
 
     struct ClientConnection
     {
-        uint64_t lastUpdate{0u};
+        uint64_t lastUpdate = 0u;
         static constexpr size_t msgDataOffset = 2u;
         static constexpr size_t msgCodeOffset = 1u;
-        uint8_t messageCode{};
         uint8_t buffer[256u];
-        size_t packetLength{};
-        bool connectionBroken{false};
-        int socket{};
-    };
-
-    struct PerSocketData
-    {
-        uint64_t lastUpdate{0u};
-        static constexpr size_t msgDataOffset = 2u;
-        static constexpr size_t msgCodeOffset = 1u;
-        size_t packetLength{};
-        uint8_t messageCode{};
-        uint8_t buffer[256u];
-        bool connectionBroken{false};
+        uWS::WebSocket<false, true, ClientConnection> *ws = nullptr;
     };
 
 private:
-    uWS::App::WebSocketBehavior<PerSocketData> behaviour = uWS::App::WebSocketBehavior<PerSocketData>();
+    uWS::App::WebSocketBehavior<ClientConnection> behaviour = uWS::App::WebSocketBehavior<ClientConnection>();
     uWS::App app = uWS::App();
+    uint64_t lastConfigChange = Utils::currentMillis();
+    PrinterState state;
+    std::function<void(void)> shutdownHook;
+    std::function<bool(PrintConfig &)> onProfileUpdateHook;
+    std::function<void(bool)> tempControlChangeHook;
 
-    void handleIncommingMessage(std::string_view message, uWS::WebSocket<false, true, PerSocketData> *ws);
-    void doStatusRequest(std::string_view message);
+    bool handleIncommingMessage(std::string_view message, uWS::WebSocket<false, true, ClientConnection> *ws);
+    bool statusRequest(ClientConnection &connection, std::string_view const message);
+    bool addPrintConfig(ClientConnection &connection, std::string_view const message);
+    bool removePrintConfig(ClientConnection &connection, std::string_view const message);
+    bool sendStatus(ClientConnection &connection, bool sendPrintConfigs);
+    bool changeTempControl(ClientConnection &connection, std::string_view const message);
+
+    void startWsServer();
 
 public:
     bool start();
+    void updateState(PrinterState &state);
 
-    WsProtoHandler();
+    WsProtoHandler(std::function<void(void)> shutdownHook, std::function<bool(PrintConfig &)> onProfileUpdate, std::function<void(bool)> onTempControlChange);
     ~WsProtoHandler();
 };

@@ -4,7 +4,7 @@
 #include "PowerButtonController.h"
 #include "FanController.h"
 #include "PrinterServer.h"
-#include "ProtoMessageHandler.h"
+#include "WsProtoHandler.h"
 #include "Utils.h"
 #include "PrintConfigs.h"
 #include "ButtonController.h"
@@ -15,7 +15,7 @@ static constexpr auto OUTER_THERMO_NAME = "28-baa0a72915ff";
 class ServiceController
 {
 private:
-	static constexpr uint64_t SCREEN_ALIVE_TIME = 30'000;
+	static constexpr uint64_t SCREEN_ALIVE_TIME = 0'000;
 	int64_t turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
 	bool shuttingDown = false;
 	int displayTempLoop();
@@ -39,7 +39,7 @@ private:
 		6,
 		[this](bool state)
 		{ onFanStateChanged(state); }};
-	ProtoMessageHandler printerServer{
+	WsProtoHandler printerServer{
 		[this]()
 		{ onShutdown(); },
 		[this](PrintConfig &config)

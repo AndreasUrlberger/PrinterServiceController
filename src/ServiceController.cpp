@@ -21,8 +21,15 @@ void ServiceController::run()
 
 	powerButtonController.start();
 	buttonController.start();
+	std::thread *displayTempLoopThread = new std::thread([this]()
+														 { displayTempLoop(); });
+
 	printerServer.start();
-	displayTempLoop();
+	std::cout << "PrinterServerThread ended\n";
+	displayTempLoopThread->join();
+	std::cout << "Joined DisplayTempLoopThread and ends now\n";
+
+	delete displayTempLoopThread;
 }
 
 int ServiceController::displayTempLoop()
