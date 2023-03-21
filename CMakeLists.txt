@@ -62,7 +62,7 @@ target_sources(${TARGET} PRIVATE
     ./src/ServiceController.cpp
     ./src/Utils.cpp
     ./src/ProtoMessageHandler.cpp
-    ./src/WsProtoHandler.cpp
+    ./src/HttpProtoServer.cpp
 
     ./include/ButtonController.h
     ./include/Buzzer.h
@@ -75,7 +75,7 @@ target_sources(${TARGET} PRIVATE
     ./include/ServiceController.h
     ./include/Utils.h
     ./include/ProtoMessageHandler.h
-    ./include/WsProtoHandler.h
+    ./include/HttpProtoServer.h
 
     # Include generated proto files
     ${PROTO_HEADERS}

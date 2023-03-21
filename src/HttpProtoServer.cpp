@@ -1,44 +1,22 @@
-#include "WsProtoHandler.h"
+#include "HttpProtoServer.h"
 
 #include <iostream>
 
-WsProtoHandler::WsProtoHandler(std::function<void(void)> shutdownHook, std::function<bool(PrintConfig &)> onProfileUpdate, std::function<void(bool)> onTempControlChange) {
+HttpProtoServer::HttpProtoServer(std::function<void(void)> shutdownHook, std::function<bool(PrintConfig &)> onProfileUpdate, std::function<void(bool)> onTempControlChange) {
     this->shutdownHook = shutdownHook;
     onProfileUpdateHook = onProfileUpdate;
     tempControlChangeHook = onTempControlChange;
 }
 
-WsProtoHandler::~WsProtoHandler() {}
+HttpProtoServer::~HttpProtoServer() {}
 
-bool WsProtoHandler::start() {
-    startWsServer();
+bool HttpProtoServer::start() {
+    startHttpServer();
     return true;
 }
 
-void WsProtoHandler::startWsServer() {
-    std::cout << "Called startWsServer\n";
-    behaviour.compression = uWS::DISABLED,
-    behaviour.maxPayloadLength = 16 * 1024, behaviour.idleTimeout = 120,
-    behaviour.closeOnBackpressureLimit = false,
-    behaviour.resetIdleTimeoutOnSend = true,
-    behaviour.upgrade = [](uWS::HttpResponse<false> *res, uWS::HttpRequest *req, us_socket_context_t *context) {
-        std::cout << "UPGRADE\n";
-    };
-    behaviour.open = [](auto *ws) {
-        std::cout << "OPEN\n";
-    };
-    behaviour.message = [this](
-                            uWS::WebSocket<false, true, ClientConnection> *ws,
-                            std::string_view message,
-                            uWS::OpCode opCode) {
-        std::cout << "MESSAGE\n";
-    };
-    behaviour.close = [](auto *ws, int code, std::string_view message) {
-        std::cout << "CLOSE\n";
-    };
-    behaviour.subscription = [](uWS::WebSocket<false, true, WsProtoHandler::ClientConnection> *, std::string_view, int, int) {
-        std::cout << "SUBSCRIPTION\n";
-    };
+void HttpProtoServer::startHttpServer() {
+    std::cout << "start http server\n";
 
     app.addServerName("Printer-3D");
     app.listen(HOST_PORT, [](auto *listen_socket) {
@@ -76,15 +54,13 @@ void WsProtoHandler::startWsServer() {
     app.run();
 }
 
-void WsProtoHandler::handleHttpRequest(uWS::HttpResponse<false> *res, uWS::HttpRequest *req, std::function<bool(std::string_view)> parser) {
+void HttpProtoServer::handleHttpRequest(uWS::HttpResponse<false> *res, uWS::HttpRequest *req, std::function<bool(std::string_view)> parser) {
     bool hasAborted = false;
     res->onAborted([&hasAborted]() mutable { hasAborted = true; std::cout << "Aborted\n"; });
 
     res->onData([this, res, hasAborted](std::string_view data, bool isAll) mutable {
         if (hasAborted)
             return;
-
-        std::cout << "Received data: " << data << "\n";
 
         if (isAll) {
             if (!statusRequest(data, res)) {
@@ -100,7 +76,7 @@ void WsProtoHandler::handleHttpRequest(uWS::HttpResponse<false> *res, uWS::HttpR
     });
 }
 
-bool WsProtoHandler::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false> *res) {
+bool HttpProtoServer::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false> *res) {
     Printer::PrinterStatus printerStatus;
     printerStatus.set_is_temp_control_active(state.tempControl);
     printerStatus.set_temperature_outside(state.outerTemp);
@@ -112,7 +88,6 @@ bool WsProtoHandler::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false> 
     printerStatus.set_allocated_current_print_config(currentPrintConfig);
 
     if (sendPrintConfigs) {
-        lastConfigChange = Utils::currentMillis();
         std::vector<PrintConfig> configs = PrintConfigs::getPrintConfigs();
         for (auto config = configs.begin(); config != configs.end(); config++) {
             Printer::PrintConfig *printConfig =
@@ -127,7 +102,7 @@ bool WsProtoHandler::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false> 
     return true;
 }
 
-bool WsProtoHandler::statusRequest(std::string_view data, uWS::HttpResponse<false> *res) {
+bool HttpProtoServer::statusRequest(std::string_view data, uWS::HttpResponse<false> *res) {
     Printer::StatusRequest statusRequest;
     if (!statusRequest.ParseFromArray(data.begin(), data.length())) {
         std::cerr << "ERROR: Failed to parse StatusRequest message from input array\n";
@@ -136,12 +111,10 @@ bool WsProtoHandler::statusRequest(std::string_view data, uWS::HttpResponse<fals
 
     const bool sendPrintConfigs = statusRequest.include_print_configs();
 
-    std::cout << "SendPrintConfigs: " << (sendPrintConfigs ? "yes" : "no") << "\n";
-
     return sendStatus(sendPrintConfigs, res);
 }
 
-bool WsProtoHandler::addPrintConfig(std::string_view data, uWS::HttpResponse<false> *res) {
+bool HttpProtoServer::addPrintConfig(std::string_view data, uWS::HttpResponse<false> *res) {
     PrintConfig config;
 
     // Read in message with protobuff.
@@ -155,17 +128,12 @@ bool WsProtoHandler::addPrintConfig(std::string_view data, uWS::HttpResponse<fal
     config.name = receivedConfig.name();
     config.temperature = receivedConfig.temperature();
 
-    // TODO inspect
-    bool hasChanged = onProfileUpdateHook(config);
-    if (hasChanged) {
-        // Not thread safe --> There could be mistakes.
-        lastConfigChange = Utils::currentMillis();
-    }
+    const bool hasChanged = onProfileUpdateHook(config);
 
     return sendStatus(hasChanged, res);
 }
 
-bool WsProtoHandler::removePrintConfig(std::string_view data, uWS::HttpResponse<false> *res) {
+bool HttpProtoServer::removePrintConfig(std::string_view data, uWS::HttpResponse<false> *res) {
     PrintConfig config;
 
     // Read in message with protobuff.
@@ -179,15 +147,12 @@ bool WsProtoHandler::removePrintConfig(std::string_view data, uWS::HttpResponse<
     config.name = receivedConfig.name();
     config.temperature = receivedConfig.temperature();
 
-    bool hasChanged = PrintConfigs::removeConfig(config);
-    if (hasChanged) {
-        lastConfigChange = Utils::currentMillis();
-    }
+    const bool hasChanged = PrintConfigs::removeConfig(config);
 
     return sendStatus(hasChanged, res);
 }
 
-bool WsProtoHandler::changeTempControl(std::string_view data, uWS::HttpResponse<false> *res) {
+bool HttpProtoServer::changeTempControl(std::string_view data, uWS::HttpResponse<false> *res) {
     // Read in message with protobuff.
     Printer::ChangeTempControl changeTempControl;
     if (!changeTempControl.ParseFromArray(data.begin(), data.length())) {
@@ -201,4 +166,4 @@ bool WsProtoHandler::changeTempControl(std::string_view data, uWS::HttpResponse<
     return sendStatus(false, res);
 }
 
-void WsProtoHandler::updateState(PrinterState &state) { this->state = state; }
+void HttpProtoServer::updateState(PrinterState &state) { this->state = state; }
