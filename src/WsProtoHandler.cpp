@@ -77,10 +77,13 @@ void WsProtoHandler::startWsServer() {
 }
 
 void WsProtoHandler::handleHttpRequest(uWS::HttpResponse<false> *res, uWS::HttpRequest *req, std::function<bool(std::string_view)> parser) {
-    // TODO Should set some abort variable.
-    res->onAborted([]() { std::cout << "Aborted\n"; });
+    bool hasAborted = false;
+    res->onAborted([&hasAborted]() mutable { hasAborted = true; std::cout << "Aborted\n"; });
 
-    res->onData([this, res](std::string_view data, bool isAll) mutable {
+    res->onData([this, res, hasAborted](std::string_view data, bool isAll) mutable {
+        if (hasAborted)
+            return;
+
         std::cout << "Received data: " << data << "\n";
 
         if (isAll) {
