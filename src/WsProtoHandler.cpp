@@ -49,64 +49,45 @@ void WsProtoHandler::startWsServer() {
         }
     });
 
-    // app.get("/statusRequest", [this](uWS::HttpResponse<false> *res, uWS::HttpRequest *req) mutable {
-    //     onStatusRequest(res, req, [this](auto data, auto *res) mutable { return statusRequest(data, res); });
-    // });
-
-    app.get("/statusRequest", [this](uWS::HttpResponse<false> *res, uWS::HttpRequest *req) mutable {
-        // TODO Should set some abort variable.
-        res->onAborted([]() { std::cout << "Aborted\n"; });
-
-        res->onData([this, res](std::string_view data, bool isAll) mutable {
-            std::cout << "Received data: " << data << "\n";
-
-            if (isAll) {
-                std::string outData = statusRequest(data);
-                // std::string outData = "";
-                if (outData.empty()) {
-                    std::cerr << "ERROR: Failed processing the received data\n";
-                    res->writeStatus(std::string("500 Internal Server Error"));
-                    res->end(std::string("{\"code\":500,\"message\":\"Internal Server Error. Something failed processing the given data.\"}"));
-                } else {
-                    std::cout << "Final Outdata: " << outData << "\n";
-                    res->end(outData);
-                }
-            } else {
-                std::cerr << "ERROR: Request data is too long\n";
-                res->writeStatus(std::string("413 Payload Too Large"));
-                res->end(std::string("{\"code\":413,\"message\":\"Payload Too Large\"}"));
-            }
+    app.get("/statusRequest", [this](auto *res, auto *req) mutable {
+        handleHttpRequest(res, req, [this, res](auto data) mutable {
+            return statusRequest(data, res);
         });
     });
 
-    std::cout << "Next step is running the app\n";
+    app.get("/addPrintConfig", [this](auto *res, auto *req) mutable {
+        handleHttpRequest(res, req, [this, res](auto data) mutable {
+            return addPrintConfig(data, res);
+        });
+    });
+
+    app.get("/removePrintConfig", [this](auto *res, auto *req) mutable {
+        handleHttpRequest(res, req, [this, res](auto data) mutable {
+            return removePrintConfig(data, res);
+        });
+    });
+
+    app.get("/changeTempControl", [this](auto *res, auto *req) mutable {
+        handleHttpRequest(res, req, [this, res](auto data) mutable {
+            return changeTempControl(data, res);
+        });
+    });
 
     app.run();
-
-    std::cout << "Ran the app\n";
 }
 
-std::string WsProtoHandler::onStatusRequest(uWS::HttpResponse<false> *res, uWS::HttpRequest *req, std::function<std::string(std::string_view)> parser) {
+void WsProtoHandler::handleHttpRequest(uWS::HttpResponse<false> *res, uWS::HttpRequest *req, std::function<bool(std::string_view)> parser) {
     // TODO Should set some abort variable.
     res->onAborted([]() { std::cout << "Aborted\n"; });
 
-    res->onData([&](std::string_view data, bool isAll) {
+    res->onData([this, res](std::string_view data, bool isAll) mutable {
         std::cout << "Received data: " << data << "\n";
 
-        return;
-
         if (isAll) {
-            // std::string outData = statusRequest(data);
-            std::string outData = "";
-            if (outData.empty()) {
+            if (!statusRequest(data, res)) {
                 std::cerr << "ERROR: Failed processing the received data\n";
-
-                std::cout << "Call writeStatus next\n";
                 res->writeStatus(std::string("500 Internal Server Error"));
-                std::cout << "Call end next\n";
                 res->end(std::string("{\"code\":500,\"message\":\"Internal Server Error. Something failed processing the given data.\"}"));
-            } else {
-                res->end(outData);
             }
         } else {
             std::cerr << "ERROR: Request data is too long\n";
@@ -116,7 +97,7 @@ std::string WsProtoHandler::onStatusRequest(uWS::HttpResponse<false> *res, uWS::
     });
 }
 
-std::string WsProtoHandler::sendStatus(bool sendPrintConfigs) {
+bool WsProtoHandler::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false> *res) {
     Printer::PrinterStatus printerStatus;
     printerStatus.set_is_temp_control_active(state.tempControl);
     printerStatus.set_temperature_outside(state.outerTemp);
@@ -139,35 +120,30 @@ std::string WsProtoHandler::sendStatus(bool sendPrintConfigs) {
     }
 
     const std::string outData = printerStatus.SerializeAsString();
-    return outData;
+    res->end(outData);
+    return true;
 }
 
-std::string WsProtoHandler::statusRequest(std::string_view data) {
-    std::cout << "Data bytes received, length: " << data.length() << " : [";
-    for (size_t index = 0u; index < data.length(); index = index + 1u) {
-        std::cout << static_cast<uint32_t>(data[index]) << ", ";
-    }
-    std::cout << "]\n";
-
+bool WsProtoHandler::statusRequest(std::string_view data, uWS::HttpResponse<false> *res) {
     Printer::StatusRequest statusRequest;
     if (!statusRequest.ParseFromArray(data.begin(), data.length())) {
         std::cerr << "ERROR: Failed to parse StatusRequest message from input array\n";
-        return "";
+        return false;
     }
 
     const bool sendPrintConfigs = statusRequest.include_print_configs();
 
     std::cout << "SendPrintConfigs: " << (sendPrintConfigs ? "yes" : "no") << "\n";
 
-    return sendStatus(sendPrintConfigs);
+    return sendStatus(sendPrintConfigs, res);
 }
 
-bool WsProtoHandler::addPrintConfig(ClientConnection &connection, std::string_view const message) {
+bool WsProtoHandler::addPrintConfig(std::string_view data, uWS::HttpResponse<false> *res) {
     PrintConfig config;
 
     // Read in message with protobuff.
     Printer::AddPrintConfig addPrintConfig;
-    if (!addPrintConfig.ParseFromArray(message.begin(), message.length())) {
+    if (!addPrintConfig.ParseFromArray(data.begin(), data.length())) {
         std::cerr << "ERROR: Failed to parse AddPrintConfig message from input array\n";
         return false;
     }
@@ -183,21 +159,15 @@ bool WsProtoHandler::addPrintConfig(ClientConnection &connection, std::string_vi
         lastConfigChange = Utils::currentMillis();
     }
 
-    // if (sendStatus(connection, hasChanged)) {
-    //     return true;
-    // } else {
-    //     std::cerr << "ERROR: Failed to send status message.\n";
-    //     return false;
-    // }
-    return false;
+    return sendStatus(hasChanged, res);
 }
 
-bool WsProtoHandler::removePrintConfig(ClientConnection &connection, std::string_view const message) {
+bool WsProtoHandler::removePrintConfig(std::string_view data, uWS::HttpResponse<false> *res) {
     PrintConfig config;
 
     // Read in message with protobuff.
     Printer::RemovePrintConfig removePrintConfig;
-    if (!removePrintConfig.ParseFromArray(message.begin(), message.length())) {
+    if (!removePrintConfig.ParseFromArray(data.begin(), data.length())) {
         std::cerr << "ERROR: Failed to parse RemovePrintConfig message from input array\n";
         return false;
     }
@@ -211,19 +181,13 @@ bool WsProtoHandler::removePrintConfig(ClientConnection &connection, std::string
         lastConfigChange = Utils::currentMillis();
     }
 
-    // if (sendStatus(connection, hasChanged)) {
-    //     return true;
-    // } else {
-    //     std::cerr << "ERROR: Failed to send status message.\n";
-    //     return false;
-    // }
-    return false;
+    return sendStatus(hasChanged, res);
 }
 
-bool WsProtoHandler::changeTempControl(ClientConnection &connection, std::string_view const message) {
+bool WsProtoHandler::changeTempControl(std::string_view data, uWS::HttpResponse<false> *res) {
     // Read in message with protobuff.
     Printer::ChangeTempControl changeTempControl;
-    if (!changeTempControl.ParseFromArray(message.begin(), message.length())) {
+    if (!changeTempControl.ParseFromArray(data.begin(), data.length())) {
         std::cerr << "ERROR: Failed to parse ChangeTempControl message from input array\n";
         return false;
     }
@@ -231,13 +195,7 @@ bool WsProtoHandler::changeTempControl(ClientConnection &connection, std::string
     // Change temp control
     tempControlChangeHook(changeTempControl.isactive());
 
-    // if (sendStatus(connection, false)) {
-    //     return true;
-    // } else {
-    //     std::cerr << "ERROR: Failed to send status message.\n";
-    //     return false;
-    // }
-    return false;
+    return sendStatus(false, res);
 }
 
 void WsProtoHandler::updateState(PrinterState &state) { this->state = state; }

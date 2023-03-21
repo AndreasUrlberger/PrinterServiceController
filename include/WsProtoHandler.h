@@ -39,13 +39,13 @@ class WsProtoHandler {
     std::function<bool(PrintConfig &)> onProfileUpdateHook;
     std::function<void(bool)> tempControlChangeHook;
 
-    std::string statusRequest(std::string_view data);
-    bool addPrintConfig(ClientConnection &connection, std::string_view const message);
-    bool removePrintConfig(ClientConnection &connection, std::string_view const message);
-    std::string sendStatus(bool sendPrintConfigs);
-    bool changeTempControl(ClientConnection &connection, std::string_view const message);
+    bool statusRequest(std::string_view data, uWS::HttpResponse<false> *res);
+    bool addPrintConfig(std::string_view data, uWS::HttpResponse<false> *res);
+    bool removePrintConfig(std::string_view data, uWS::HttpResponse<false> *res);
+    bool sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false> *res);
+    bool changeTempControl(std::string_view data, uWS::HttpResponse<false> *res);
 
-    std::string onStatusRequest(uWS::HttpResponse<false> *res, uWS::HttpRequest *req, std::function<std::string(std::string_view)> parser);
+    void handleHttpRequest(uWS::HttpResponse<false> *res, uWS::HttpRequest *req, std::function<bool(std::string_view)> parser);
 
     void startWsServer();
 
