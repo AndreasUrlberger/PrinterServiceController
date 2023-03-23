@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <thread>
 
 #include "Buzzer.h"
 #include "Logger.h"
@@ -19,15 +20,31 @@ void ServiceController::run() {
     state.remainingTime = 0;
     state.state = true;
     state.tempControl = fanController.isControlOn();
+    state.fanSpeed = 0;
 
     powerButtonController.start();
     buttonController.start();
+
+    std::thread timerThread = std::thread([this]() {
+        auto start = std::chrono::steady_clock::now();
+        auto chronoInterval = std::chrono::seconds(1);
+        auto targetTime = start + chronoInterval;
+        while (true) {
+            if ((Utils::currentMillis() - lastActivity) > MAX_INACTIVE_TIME) {
+                stopStream();
+            }
+
+            std::this_thread::sleep_until(targetTime);
+            targetTime += chronoInterval;
+        }
+    });
+
     std::thread *displayTempLoopThread = new std::thread([this]() { displayTempLoop(); });
 
     printerServer.start();
     std::cout << "PrinterServerThread ended\n";
     displayTempLoopThread->join();
-    std::cout << "Joined DisplayTempLoopThread and ends now\n";
+    timerThread.join();
 
     delete displayTempLoopThread;
 }
@@ -132,5 +149,29 @@ void ServiceController::onChangeFanControl(bool isOn) {
         fanController.toggleControl();
         state.tempControl = fanController.isControlOn();
         printerServer.updateState(state);
+    }
+}
+
+void ServiceController::onServerActivity() {
+    startStream();
+
+    const uint64_t currentTime = Utils::currentMillis();
+    lastActivity = currentTime;
+}
+
+void ServiceController::stopStream() {
+    if (isStreamRunning) {
+        isStreamRunning = false;
+
+        const int result = system("kill $(pidof mjpg_streamer)");
+    }
+}
+
+void ServiceController::startStream() {
+    if (!isStreamRunning) {
+        // TODO Add mutex
+        isStreamRunning = true;
+
+        const int result = system("nohup mjpg_streamer -o \"output_http.so -w ./www -p 8000\" -i \"input_uvc.so -r 1280x720 -f 1\" > /dev/null 2>&1 &");
     }
 }

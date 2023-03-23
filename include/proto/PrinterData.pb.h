@@ -935,6 +935,7 @@ class PrinterStatus PROTOBUF_FINAL :
     kTemperatureOutsideFieldNumber = 2,
     kTemperatureInsideTopFieldNumber = 3,
     kTemperatureInsideBottomFieldNumber = 4,
+    kFanSpeedFieldNumber = 7,
   };
   // repeated .Printer.PrintConfig print_configs = 6;
   int print_configs_size() const;
@@ -1008,6 +1009,15 @@ class PrinterStatus PROTOBUF_FINAL :
   void _internal_set_temperature_inside_bottom(float value);
   public:
 
+  // float fanSpeed = 7;
+  void clear_fanspeed();
+  float fanspeed() const;
+  void set_fanspeed(float value);
+  private:
+  float _internal_fanspeed() const;
+  void _internal_set_fanspeed(float value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Printer.PrinterStatus)
  private:
   class _Internal;
@@ -1021,6 +1031,7 @@ class PrinterStatus PROTOBUF_FINAL :
   float temperature_outside_;
   float temperature_inside_top_;
   float temperature_inside_bottom_;
+  float fanspeed_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_PrinterData_2eproto;
 };
@@ -1556,6 +1567,26 @@ inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Printer::PrintConfig >
 PrinterStatus::print_configs() const {
   // @@protoc_insertion_point(field_list:Printer.PrinterStatus.print_configs)
   return print_configs_;
+}
+
+// float fanSpeed = 7;
+inline void PrinterStatus::clear_fanspeed() {
+  fanspeed_ = 0;
+}
+inline float PrinterStatus::_internal_fanspeed() const {
+  return fanspeed_;
+}
+inline float PrinterStatus::fanspeed() const {
+  // @@protoc_insertion_point(field_get:Printer.PrinterStatus.fanSpeed)
+  return _internal_fanspeed();
+}
+inline void PrinterStatus::_internal_set_fanspeed(float value) {
+  
+  fanspeed_ = value;
+}
+inline void PrinterStatus::set_fanspeed(float value) {
+  _internal_set_fanspeed(value);
+  // @@protoc_insertion_point(field_set:Printer.PrinterStatus.fanSpeed)
 }
 
 #ifdef __GNUC__

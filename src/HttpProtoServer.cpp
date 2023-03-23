@@ -2,10 +2,11 @@
 
 #include <iostream>
 
-HttpProtoServer::HttpProtoServer(std::function<void(void)> shutdownHook, std::function<bool(PrintConfig &)> onProfileUpdate, std::function<void(bool)> onTempControlChange) {
+HttpProtoServer::HttpProtoServer(std::function<void(void)> shutdownHook, std::function<bool(PrintConfig &)> onProfileUpdate, std::function<void(bool)> onTempControlChange, std::function<void(void)> onActivity) {
     this->shutdownHook = shutdownHook;
     onProfileUpdateHook = onProfileUpdate;
     tempControlChangeHook = onTempControlChange;
+    this->onActivity = onActivity;
 }
 
 HttpProtoServer::~HttpProtoServer() {}
@@ -27,53 +28,61 @@ void HttpProtoServer::startHttpServer() {
         }
     });
 
-    app.get("/statusRequest", [this](auto *res, auto *req) mutable {
+    app.post("/statusRequest", [this](auto *res, auto *req) mutable {
         handleHttpRequest(res, req, [this, res](auto data) mutable {
             return statusRequest(data, res);
         });
     });
 
-    app.get("/addPrintConfig", [this](auto *res, auto *req) mutable {
+    app.post("/addPrintConfig", [this](auto *res, auto *req) mutable {
         handleHttpRequest(res, req, [this, res](auto data) mutable {
             return addPrintConfig(data, res);
         });
     });
 
-    app.get("/removePrintConfig", [this](auto *res, auto *req) mutable {
+    app.post("/removePrintConfig", [this](auto *res, auto *req) mutable {
         handleHttpRequest(res, req, [this, res](auto data) mutable {
             return removePrintConfig(data, res);
         });
     });
 
-    app.get("/changeTempControl", [this](auto *res, auto *req) mutable {
+    app.post("/changeTempControl", [this](auto *res, auto *req) mutable {
         handleHttpRequest(res, req, [this, res](auto data) mutable {
             return changeTempControl(data, res);
         });
     });
 
+    app.post("/shutdown", [this](auto *res, auto *req) mutable {
+        res->endWithoutBody();
+        // TODO make sure that the stream, lights, etc. is turned off before.
+        shutdownHook();
+    });
+
     app.run();
 }
 
-void HttpProtoServer::handleHttpRequest(uWS::HttpResponse<false> *res, uWS::HttpRequest *req, std::function<bool(std::string_view)> parser) {
+void HttpProtoServer::handleHttpRequest(uWS::HttpResponse<false> *res, uWS::HttpRequest *req, std::function<bool(std::vector<char> buffer)> parser) {
     bool hasAborted = false;
+    std::vector<char> buffer;
+
     res->onAborted([&hasAborted]() mutable { hasAborted = true; std::cout << "Aborted\n"; });
 
-    res->onData([this, res, hasAborted](std::string_view data, bool isAll) mutable {
+    res->onData([this, res, hasAborted, buffer, parser](std::string_view data, bool isAll) mutable {
         if (hasAborted)
             return;
 
+        buffer.insert(buffer.begin(), data.begin(), data.end());
+
         if (isAll) {
-            if (!statusRequest(data, res)) {
+            if (!parser(buffer)) {
                 std::cerr << "ERROR: Failed processing the received data\n";
                 res->writeStatus(std::string("500 Internal Server Error"));
                 res->end(std::string("{\"code\":500,\"message\":\"Internal Server Error. Something failed processing the given data.\"}"));
             }
-        } else {
-            std::cerr << "ERROR: Request data is too long\n";
-            res->writeStatus(std::string("413 Payload Too Large"));
-            res->end(std::string("{\"code\":413,\"message\":\"Payload Too Large\"}"));
         }
     });
+
+    onActivity();
 }
 
 bool HttpProtoServer::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false> *res) {
@@ -82,10 +91,12 @@ bool HttpProtoServer::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false>
     printerStatus.set_temperature_outside(state.outerTemp);
     printerStatus.set_temperature_inside_top(state.innerTemp);
     printerStatus.set_temperature_inside_bottom(state.innerTemp);
+    printerStatus.set_fanspeed(state.fanSpeed);
     Printer::PrintConfig *currentPrintConfig = new Printer::PrintConfig();
     currentPrintConfig->set_name(state.profileName);
     currentPrintConfig->set_temperature(state.profileTemp);
     printerStatus.set_allocated_current_print_config(currentPrintConfig);
+    printerStatus.set_fanspeed(state.fanSpeed);
 
     if (sendPrintConfigs) {
         std::vector<PrintConfig> configs = PrintConfigs::getPrintConfigs();
@@ -102,9 +113,10 @@ bool HttpProtoServer::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false>
     return true;
 }
 
-bool HttpProtoServer::statusRequest(std::string_view data, uWS::HttpResponse<false> *res) {
+bool HttpProtoServer::statusRequest(std::vector<char> buffer, uWS::HttpResponse<false> *res) {
     Printer::StatusRequest statusRequest;
-    if (!statusRequest.ParseFromArray(data.begin(), data.length())) {
+
+    if (!statusRequest.ParseFromArray(buffer.data(), buffer.size())) {
         std::cerr << "ERROR: Failed to parse StatusRequest message from input array\n";
         return false;
     }
@@ -114,12 +126,12 @@ bool HttpProtoServer::statusRequest(std::string_view data, uWS::HttpResponse<fal
     return sendStatus(sendPrintConfigs, res);
 }
 
-bool HttpProtoServer::addPrintConfig(std::string_view data, uWS::HttpResponse<false> *res) {
+bool HttpProtoServer::addPrintConfig(std::vector<char> buffer, uWS::HttpResponse<false> *res) {
     PrintConfig config;
 
     // Read in message with protobuff.
     Printer::AddPrintConfig addPrintConfig;
-    if (!addPrintConfig.ParseFromArray(data.begin(), data.length())) {
+    if (!addPrintConfig.ParseFromArray(buffer.data(), buffer.size())) {
         std::cerr << "ERROR: Failed to parse AddPrintConfig message from input array\n";
         return false;
     }
@@ -133,12 +145,12 @@ bool HttpProtoServer::addPrintConfig(std::string_view data, uWS::HttpResponse<fa
     return sendStatus(hasChanged, res);
 }
 
-bool HttpProtoServer::removePrintConfig(std::string_view data, uWS::HttpResponse<false> *res) {
+bool HttpProtoServer::removePrintConfig(std::vector<char> buffer, uWS::HttpResponse<false> *res) {
     PrintConfig config;
 
     // Read in message with protobuff.
     Printer::RemovePrintConfig removePrintConfig;
-    if (!removePrintConfig.ParseFromArray(data.begin(), data.length())) {
+    if (!removePrintConfig.ParseFromArray(buffer.data(), buffer.size())) {
         std::cerr << "ERROR: Failed to parse RemovePrintConfig message from input array\n";
         return false;
     }
@@ -152,10 +164,10 @@ bool HttpProtoServer::removePrintConfig(std::string_view data, uWS::HttpResponse
     return sendStatus(hasChanged, res);
 }
 
-bool HttpProtoServer::changeTempControl(std::string_view data, uWS::HttpResponse<false> *res) {
+bool HttpProtoServer::changeTempControl(std::vector<char> buffer, uWS::HttpResponse<false> *res) {
     // Read in message with protobuff.
     Printer::ChangeTempControl changeTempControl;
-    if (!changeTempControl.ParseFromArray(data.begin(), data.length())) {
+    if (!changeTempControl.ParseFromArray(buffer.data(), buffer.size())) {
         std::cerr << "ERROR: Failed to parse ChangeTempControl message from input array\n";
         return false;
     }

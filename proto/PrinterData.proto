@@ -29,7 +29,7 @@ message PrinterStatus{
   float temperature_inside_top = 3;
   float temperature_inside_bottom = 4;
   PrintConfig current_print_config = 5;
-
+  
   repeated PrintConfig print_configs = 6;
+  float fanSpeed = 7;
 }
-
