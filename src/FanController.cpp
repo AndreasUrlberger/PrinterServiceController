@@ -1,6 +1,7 @@
 #include "FanController.h"
 
 #include <math.h>
+#include <pigpio.h>
 #include <stdio.h>
 #include <wiringPi.h>
 
@@ -9,14 +10,14 @@
 
 constexpr int FAN_LED = 21;
 
-FanController::FanController(uint8_t fanPin, std::function<void(bool)> onFanStateChange, std::function<void(float)> updateFanSpeed) {
+FanController::FanController(std::function<void(bool)> onFanStateChange, std::function<void(float)> updateFanSpeed) {
     onFanStateChangeHook = onFanStateChange;
     this->updateFanSpeed = updateFanSpeed;
-    this->fanPin = fanPin;
     wiringPiSetupSys();
-    pinMode(fanPin, OUTPUT);
-    turnOff();  // Otherwise it seems to be on by default.
-                // digitalWrite(FAN_LED, false);
+    pinMode(RELAY_PIN, OUTPUT);
+    // Otherwise it seems to be on by default.
+    turnOff();
+    // digitalWrite(FAN_LED, false);
 
     startFanSpeedMeasurement();
 }
@@ -58,22 +59,17 @@ void FanController::blinkLoop() {
     }
 }
 
-void FanController::tempChanged(int32_t temp, int32_t wanted) {
-    temp_soll = static_cast<float>(wanted) / 1000;
-    float temp_ist = static_cast<float>(temp) / 1000;
+void FanController::tempChanged(int32_t actualTemperature, int32_t targetTemperature) {
+    tempSoll = static_cast<float>(targetTemperature) / 1000;
+    float temp_ist = static_cast<float>(actualTemperature) / 1000;
 
-    float regelf = temp_soll - temp_ist;
-    float stell = calculateStellValue(regelf);
+    const float regelFehler = tempSoll - temp_ist;
+    const float stellwert = calculateStellValue(regelFehler);
 
-    bool tempIsRight = fabs(regelf) <= temp_abw;
-    if (!tempIsRight) {
-        fan(stell);
-    } else {
-        // printf("keine Aktion \n");
-    }
+    const float fanControlValue = std::clamp(stellwert, 0.f, MAX_FAN_RPM);
+    controlFanPWM(fanControlValue);
 
-    // printf("aktuelle Temperatur: %.1fC, Stellgroesse= %.2f, Integral: %.2f \n", temp_ist, stell, integral);
-
+    const bool tempIsRight = fabs(regelFehler) <= tempAbw;
     // update Fan Led
     if (controlOn) {
         if (tempIsRight) {
@@ -90,13 +86,13 @@ void FanController::tempChanged(int32_t temp, int32_t wanted) {
 }
 
 void FanController::turnOff() {
-    digitalWrite(fanPin, HIGH);
+    digitalWrite(RELAY_PIN, HIGH);
     fanOn = false;
     notifyChange();
 }
 
 void FanController::turnOn() {
-    digitalWrite(fanPin, LOW);
+    digitalWrite(RELAY_PIN, LOW);
     fanOn = true;
     notifyChange();
 }
@@ -108,32 +104,31 @@ void FanController::toggleControl() {
     }
 }
 
-float FanController::calculateStellValue(float Regelfehler) {
-    float prop = Regelfehler;
+float FanController::calculateStellValue(float regelfehler) {
+    const float prop = regelfehler;
 
-    integral = std::clamp(integral + Regelfehler * period, -MAX_INTEGRATOR, MAX_INTEGRATOR);
-    float stell = -kp * prop - ki * integral;
+    integral = std::clamp(integral + regelfehler * TEMP_MEAS_PERIOD, MIN_INTEGRAL, MAX_INTEGRAL);
+    const float stellwert = -kp * prop - ki * integral;
 
-    return fmax(0.f, stell);
+    return fmax(0.f, stellwert);
 }
 
-void FanController::fan(float power)  // Luefter an/aus
-{
-    if (power > 0) {
-        if (fanOn) {
-            // printf("Luefter immernoch an \n");
-        } else {
-            // printf("Luefter an \n"); // Luefter anschalten
-            innerTurnOn();
-            toggle_count++;
-            // printf("Anzahl Schaltvorgaenge: %d \n", toggle_count);
-        }
-    } else {
-        if (fanOn) {
-            // printf("Luefter aus \n"); // Luefter ausschalten
-            innerTurnOff();
-        } else {
-            // printf("Luefter immer noch aus \n"); // Luefter ausschalten
+void FanController::controlFanPWM(float power) {
+    const int controlPower = round(power / MAX_FAN_RPM * 255);
+    // Max control power is 255.
+    const int result = gpioPWM(FAN_PWM_PIN, controlPower);
+    if (result != 0) {
+        // Something went wrong.
+        switch (result) {
+            case PI_BAD_USER_GPIO:
+                std::cerr << "ERROR: Fan PWM pin is not a valid GPIO pin.\n";
+                break;
+            case PI_BAD_DUTYCYCLE:
+                std::cerr << "ERROR: Fan PWM duty cycle is not in range 0-255.\n";
+                break;
+            default:
+                std::cerr << "ERROR: Fan PWM control failed with unknown error code: " << result << "\n";
+                break;
         }
     }
 }
@@ -157,7 +152,7 @@ void FanController::measureSpeed() {
     uint32_t measuredTicks = fanTicks;
     fanTicks = 0;
 
-    const double fanSpeed = measuredTicks / maxTicksInInterval;
+    const float fanSpeed = measuredTicks / MAX_TICKS_IN_INTERVAL;
     updateFanSpeed(fanSpeed);
 }
 
@@ -166,13 +161,13 @@ void FanController::startFanSpeedMeasurement() {
 
     wiringPiSetupSys();
 
-    pinMode(fanTickPin, INPUT);
-    pullUpDnControl(fanTickPin, PUD_DOWN);
-    wiringPiISR(fanTickPin, INT_EDGE_BOTH, fanTickWrapper);
+    pinMode(FAN_TICK_PIN, INPUT);
+    pullUpDnControl(FAN_TICK_PIN, PUD_DOWN);
+    wiringPiISR(FAN_TICK_PIN, INT_EDGE_BOTH, fanTickWrapper);
 
     std::thread([this]() {
         auto start = std::chrono::steady_clock::now();
-        auto chronoInterval = std::chrono::seconds(measureInterval);
+        auto chronoInterval = std::chrono::seconds(FAN_SPEED_MEAS_PERIOD);
         auto targetTime = start + chronoInterval;
         while (true) {
             measureSpeed();
