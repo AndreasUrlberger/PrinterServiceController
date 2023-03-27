@@ -18,13 +18,13 @@ bool LightController::switchOn() {
     try {
         printerLight->on();
         isOn = true;
-    } catch (std::system_error &error) {
+    } catch (const std::system_error &error) {
         std::cerr << "Error while switching on light: " << error.what() << "\n";
-    } catch (hueplusplus::HueAPIResponseException &error) {
+    } catch (const hueplusplus::HueAPIResponseException &error) {
         std::cerr << "HueAPIResponseException while switching on light: " << error.what() << "\n";
-    } catch (hueplusplus::HueException &error) {
+    } catch (const hueplusplus::HueException &error) {
         std::cerr << "HueException while switching on light: " << error.what() << "\n";
-    } catch (nlohmann::json::parse_error &error) {
+    } catch (const nlohmann::json::parse_error &error) {
         std::cerr << "nlohmann::json::parse_error while switching on light: " << error.what() << "\n";
     } catch (...) {
         std::cerr << "Unknown error while switching on light\n";
@@ -40,13 +40,13 @@ bool LightController::switchOff() {
     try {
         printerLight->off();
         isOff = true;
-    } catch (std::system_error &error) {
+    } catch (const std::system_error &error) {
         std::cerr << "Error while switching off light: " << error.what() << "\n";
-    } catch (hueplusplus::HueAPIResponseException &error) {
+    } catch (const hueplusplus::HueAPIResponseException &error) {
         std::cerr << "HueAPIResponseException while switching off light: " << error.what() << "\n";
-    } catch (hueplusplus::HueException &error) {
+    } catch (const hueplusplus::HueException &error) {
         std::cerr << "HueException while switching off light: " << error.what() << "\n";
-    } catch (nlohmann::json::parse_error &error) {
+    } catch (const nlohmann::json::parse_error &error) {
         std::cerr << "nlohmann::json::parse_error while switching off light: " << error.what() << "\n";
     } catch (...) {
         std::cerr << "Unknown error while switching off light\n";
