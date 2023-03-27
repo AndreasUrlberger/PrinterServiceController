@@ -15,6 +15,7 @@ class LightController {
    public:
     LightController();
     void start();
+    bool tryGetLight();
     bool switchOn();
     bool switchOff();
 };

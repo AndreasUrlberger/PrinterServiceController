@@ -1,14 +1,10 @@
 #include "ButtonController.h"
 
-#include <wiringPi.h>
+#include <pigpio.h>
+
+#include <iostream>
 
 #include "Utils.h"
-
-void interruptWrapper2() {
-    if (ButtonController::staticController != nullptr) {
-        ButtonController::staticController->edgeChanging();
-    }
-}
 
 void ButtonController::longPress() {
     callback(true);
@@ -27,7 +23,11 @@ void ButtonController::threadFun(int64_t down) {
 }
 
 void ButtonController::edgeChanging() {
-    int state = digitalRead(SWITCH);
+    int state = gpioRead(SWITCH);
+    if (state == PI_BAD_GPIO) {
+        std::cerr << "ERROR: gpioRead failed in ButtonController\n";
+        return;
+    }
     isDown = state == 0;
     if (isDown) {
         isDown = true;
@@ -51,10 +51,18 @@ ButtonController::ButtonController(std::function<void(bool longClick)> callback)
 }
 
 void ButtonController::start() {
-    ButtonController::staticController = this;
-    wiringPiSetupSys();
+    if (gpioInitialise() == PI_INIT_FAILED) {
+        std::cerr << "ERROR: gpioInitialise failed in ButtonController::start\n";
+        return;
+    }
 
-    pinMode(SWITCH, INPUT);
-    pullUpDnControl(SWITCH, PUD_DOWN);
-    wiringPiISR(SWITCH, INT_EDGE_BOTH, interruptWrapper2);
+    gpioSetMode(SWITCH, PI_INPUT);
+    gpioSetPullUpDown(SWITCH, PI_PUD_DOWN);
+    gpioSetISRFuncEx(SWITCH, EITHER_EDGE, 0, interruptHandler, this);
+}
+
+void ButtonController::interruptHandler(int gpio, int level, uint32_t tick, void* buttonController) {
+    if (buttonController != nullptr) {
+        ((ButtonController*)buttonController)->edgeChanging();
+    }
 }

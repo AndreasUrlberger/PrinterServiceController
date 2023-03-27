@@ -1,8 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include <wiringPi.h>
 
-#include <chrono>
 #include <functional>
 #include <string>
 

@@ -9,9 +9,6 @@
 
 class FanController {
     // Variables.
-   public:
-    inline static FanController *staticController;
-
    private:
     // On/Off control.
     static constexpr uint8_t RELAY_PIN = 11;
@@ -43,13 +40,14 @@ class FanController {
 
     // Other.
     uint8_t ledState = false;  // 0 -> off, 1 -> blink, 2 -> on
-    std::thread blinker = std::thread(Utils::callLambda, [this]() { blinkLoop(); });
     std::function<void(bool)> onFanStateChangeHook;
     std::function<void(float)> updateFanSpeed;
 
     // Functions.
    public:
     FanController(std::function<void(bool)> onFanStateChange, std::function<void(float)> updateFanSpeed);
+
+    static void interruptHandler(int gpio, int level, uint32_t tick, void* buttonController);
 
     void tempChanged(int32_t temp, int32_t wanted);
     void turnOff();

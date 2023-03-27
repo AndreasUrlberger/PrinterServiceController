@@ -20,9 +20,9 @@ class ButtonController {
 
     void shortPress();
 
-   public:
-    inline static ButtonController* staticController;
+    static void interruptHandler(int gpio, int level, uint32_t tick, void* buttonController);
 
+   public:
     void edgeChanging();
 
     void threadFun(int64_t down);

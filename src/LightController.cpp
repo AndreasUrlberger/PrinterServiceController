@@ -6,14 +6,41 @@ LightController::LightController() {
 }
 
 void LightController::start() {
-    auto handler = std::make_shared<hueplusplus::LinHttpHandler>();
+    tryGetLight();
+}
+
+bool LightController::tryGetLight() {
+    const auto handler = std::make_shared<hueplusplus::LinHttpHandler>();
     hueplusplus::Bridge bridge(BRIDGE_IP, 80, BRIDGE_USERNAME, handler);
-    this->printerLight = std::make_unique<hueplusplus::Light>(bridge.lights().get(PRINTER_LIGHT_ID));
+
+    printerLight = nullptr;
+    try {
+        printerLight = std::make_unique<hueplusplus::Light>(bridge.lights().get(PRINTER_LIGHT_ID));
+    } catch (const std::system_error &error) {
+        std::cerr << "Error while getting light: " << error.what() << "\n";
+    } catch (const hueplusplus::HueAPIResponseException &error) {
+        std::cerr << "HueAPIResponseException while getting light: " << error.what() << "\n";
+    } catch (const hueplusplus::HueException &error) {
+        std::cerr << "HueException while getting light: " << error.what() << "\n";
+    } catch (const nlohmann::json::parse_error &error) {
+        std::cerr << "nlohmann::json::parse_error while getting light: " << error.what() << "\n";
+    } catch (const std::exception &error) {
+        std::cerr << "std::exception while getting light: " << error.what() << "\n";
+    }
+
+    return printerLight != nullptr;
 }
 
 // Switch light on and handle all exceptions. Return true if successfull.
 bool LightController::switchOn() {
     bool isOn = false;
+
+    if (printerLight == nullptr) {
+        if (!tryGetLight()) {
+            std::cerr << "ERROR: Could not get light, therefore could not switch it on\n";
+            return false;
+        }
+    }
 
     try {
         printerLight->on();
@@ -36,6 +63,13 @@ bool LightController::switchOn() {
 // Switch light off and handle all exceptions. Return true if successfull.
 bool LightController::switchOff() {
     bool isOff = false;
+
+    if (printerLight == nullptr) {
+        if (!tryGetLight()) {
+            std::cerr << "ERROR: Could not get light, therefore could not switch it off\n";
+            return false;
+        }
+    }
 
     try {
         printerLight->off();

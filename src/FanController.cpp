@@ -3,7 +3,6 @@
 #include <math.h>
 #include <pigpio.h>
 #include <stdio.h>
-#include <wiringPi.h>
 
 #include <algorithm>
 #include <iostream>
@@ -11,14 +10,19 @@
 FanController::FanController(std::function<void(bool)> onFanStateChange, std::function<void(float)> updateFanSpeed) {
     onFanStateChangeHook = onFanStateChange;
     this->updateFanSpeed = updateFanSpeed;
-    wiringPiSetupSys();
-    gpioInitialise();
-    pinMode(RELAY_PIN, OUTPUT);
-    // Otherwise it seems to be on by default.
-    turnOff();
-    // digitalWrite(FAN_LED_PIN, false);
+    if (gpioInitialise() == PI_INIT_FAILED) {
+        std::cerr << "ERROR: gpioInitialise failed in FanController::start\n";
+        return;
+    }
 
+    gpioSetMode(RELAY_PIN, PI_OUTPUT);
+
+    //  Otherwise it seems to be on by default.
+    turnOff();
     startFanSpeedMeasurement();
+
+    // Start blink thread.
+    std::thread(Utils::callLambda, [this]() { blinkLoop(); }).detach();
 }
 
 void FanController::notifyChange() {
@@ -26,20 +30,19 @@ void FanController::notifyChange() {
 }
 
 void FanController::blinkLoop() {
-    wiringPiSetupSys();  // just in case
-    pinMode(FAN_LED_PIN, OUTPUT);
+    gpioSetMode(FAN_LED_PIN, PI_OUTPUT);
 
     bool isLedOn = true;
     while (true) {
         switch (ledState) {
             case 1:
-                digitalWrite(FAN_LED_PIN, isLedOn);
+                gpioWrite(FAN_LED_PIN, isLedOn);
                 break;
             case 2:
-                digitalWrite(FAN_LED_PIN, 1);
+                gpioWrite(FAN_LED_PIN, 1);
                 break;
             default:
-                digitalWrite(FAN_LED_PIN, 0);
+                gpioWrite(FAN_LED_PIN, 0);
         }
         isLedOn = !isLedOn;
         Utils::sleep(500);
@@ -73,12 +76,12 @@ void FanController::tempChanged(int32_t actualTemperature, int32_t targetTempera
 }
 
 void FanController::turnOff() {
-    digitalWrite(RELAY_PIN, HIGH);
+    gpioWrite(RELAY_PIN, 1);
     notifyChange();
 }
 
 void FanController::turnOn() {
-    digitalWrite(RELAY_PIN, LOW);
+    gpioWrite(RELAY_PIN, 0);
     notifyChange();
 }
 
@@ -125,12 +128,6 @@ bool FanController::isControlOn() {
     return controlOn;
 }
 
-void fanTickWrapper() {
-    if (FanController::staticController != nullptr) {
-        FanController::staticController->fanTick();
-    }
-}
-
 void FanController::fanTick() {
     fanTicks++;
 }
@@ -145,13 +142,9 @@ void FanController::measureSpeed() {
 }
 
 void FanController::startFanSpeedMeasurement() {
-    staticController = this;
-
-    wiringPiSetupSys();
-
-    pinMode(FAN_TICK_PIN, INPUT);
-    pullUpDnControl(FAN_TICK_PIN, PUD_DOWN);
-    wiringPiISR(FAN_TICK_PIN, INT_EDGE_BOTH, fanTickWrapper);
+    gpioSetMode(FAN_TICK_PIN, PI_INPUT);
+    gpioSetPullUpDown(FAN_TICK_PIN, PI_PUD_DOWN);
+    gpioSetISRFuncEx(FAN_TICK_PIN, EITHER_EDGE, 0, interruptHandler, this);
 
     std::thread([this]() {
         auto start = std::chrono::steady_clock::now();
@@ -163,4 +156,11 @@ void FanController::startFanSpeedMeasurement() {
             targetTime += chronoInterval;
         }
     }).detach();
+}
+
+void FanController::interruptHandler(int gpio, int level, uint32_t tick, void* fanController) {
+    if (fanController != nullptr) {
+        FanController* const controller = static_cast<FanController*>(fanController);
+        controller->fanTick();
+    }
 }
