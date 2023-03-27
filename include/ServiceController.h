@@ -8,7 +8,6 @@
 #include "HttpProtoServer.h"
 #include "PowerButtonController.h"
 #include "PrintConfigs.h"
-#include "PrinterServer.h"
 #include "Utils.h"
 
 static constexpr auto INNER_THERMO_NAME = "28-2ca0a72153ff";

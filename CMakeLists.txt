@@ -58,10 +58,8 @@ target_sources(${TARGET} PRIVATE
     ./src/Logger.cpp
     ./src/PowerButtonController.cpp
     ./src/PrintConfigs.cpp
-    ./src/PrinterServer.cpp
     ./src/ServiceController.cpp
     ./src/Utils.cpp
-    ./src/ProtoMessageHandler.cpp
     ./src/HttpProtoServer.cpp
 
     ./include/ButtonController.h
@@ -71,10 +69,8 @@ target_sources(${TARGET} PRIVATE
     ./include/Logger.h
     ./include/PowerButtonController.h
     ./include/PrintConfigs.h
-    ./include/PrinterServer.h
     ./include/ServiceController.h
     ./include/Utils.h
-    ./include/ProtoMessageHandler.h
     ./include/HttpProtoServer.h
 
     # Include generated proto files
