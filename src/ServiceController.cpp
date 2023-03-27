@@ -24,6 +24,7 @@ void ServiceController::run() {
 
     powerButtonController.start();
     buttonController.start();
+    lightController.start();
 
     std::thread timerThread = std::thread([this]() {
         auto start = std::chrono::steady_clock::now();
@@ -159,21 +160,6 @@ void ServiceController::onServerActivity() {
     lastActivity = currentTime;
 }
 
-void ServiceController::stopStream() {
-    streamMutex.lock();
-    if (isStreamRunning) {
-        isStreamRunning = false;
-        streamMutex.unlock();
-
-        const int result = system("kill $(pidof mjpg_streamer)");
-        if (result != 0) {
-            std::cerr << "ERROR: Stopping the stream returned " << result << "\n";
-        }
-    } else {
-        streamMutex.unlock();
-    }
-}
-
 void ServiceController::startStream() {
     streamMutex.lock();
     if (!isStreamRunning) {
@@ -184,6 +170,31 @@ void ServiceController::startStream() {
         if (result != 0) {
             std::cerr << "ERROR: Starting the stream returned " << result << "\n";
         }
+
+        if (!lightController.switchOn()) {
+            std::cerr << "ERROR: Could not switch on light\n";
+        }
+
+    } else {
+        streamMutex.unlock();
+    }
+}
+
+void ServiceController::stopStream() {
+    streamMutex.lock();
+    if (isStreamRunning) {
+        isStreamRunning = false;
+        streamMutex.unlock();
+
+        const int result = system("kill $(pidof mjpg_streamer)");
+        if (result != 0) {
+            std::cerr << "ERROR: Stopping the stream returned " << result << "\n";
+        }
+
+        if (!lightController.switchOff()) {
+            std::cerr << "ERROR: Could not switch off light\n";
+        }
+
     } else {
         streamMutex.unlock();
     }

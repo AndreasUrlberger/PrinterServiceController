@@ -55,23 +55,25 @@ target_sources(${TARGET} PRIVATE
     ./src/Buzzer.cpp
     ./src/DisplayController.cpp
     ./src/FanController.cpp
+    ./src/HttpProtoServer.cpp
+    ./src/LightController.cpp
     ./src/Logger.cpp
     ./src/PowerButtonController.cpp
     ./src/PrintConfigs.cpp
     ./src/ServiceController.cpp
     ./src/Utils.cpp
-    ./src/HttpProtoServer.cpp
 
     ./include/ButtonController.h
     ./include/Buzzer.h
     ./include/DisplayController.h
     ./include/FanController.h
+    ./include/HttpProtoServer.h
+    ./include/LightController.h
     ./include/Logger.h
     ./include/PowerButtonController.h
     ./include/PrintConfigs.h
     ./include/ServiceController.h
     ./include/Utils.h
-    ./include/HttpProtoServer.h
 
     # Include generated proto files
     ${PROTO_HEADERS}
@@ -90,13 +92,15 @@ add_library(wiringPi SHARED IMPORTED)
 add_library(ssd1306 SHARED IMPORTED)
 add_library(pigpiod_if2 SHARED IMPORTED)
 add_library(pigpio SHARED IMPORTED)
+add_library(libhueplusplusshared SHARED IMPORTED)
 
 set_target_properties(wiringPi PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/Libraries/libwiringPi.so)
 set_target_properties(ssd1306 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/Libraries/libssd1306_i2c.so)
 set_target_properties(pigpiod_if2 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/Libraries/libpigpiod_if2.so)
 set_target_properties(pigpio PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/Libraries/libpigpio.so)
+set_target_properties(libhueplusplusshared PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/Libraries/libhueplusplusshared.so)
 
-target_link_libraries(${TARGET} PRIVATE wiringPi ssd1306 pthread z pigpio pigpiod_if2 ${PROTOBUF_LIBRARIES} "${CMAKE_SOURCE_DIR}/Libraries/uSockets.a")
+target_link_libraries(${TARGET} PRIVATE wiringPi ssd1306 pthread z pigpio pigpiod_if2 libhueplusplusshared ${PROTOBUF_LIBRARIES} "${CMAKE_SOURCE_DIR}/Libraries/uSockets.a")
 
 add_definitions(-Wall -g)
 

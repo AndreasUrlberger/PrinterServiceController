@@ -14,6 +14,7 @@ FanController::FanController(std::function<void(bool)> onFanStateChange, std::fu
     onFanStateChangeHook = onFanStateChange;
     this->updateFanSpeed = updateFanSpeed;
     wiringPiSetupSys();
+    gpioInitialise();
     pinMode(RELAY_PIN, OUTPUT);
     // Otherwise it seems to be on by default.
     turnOff();

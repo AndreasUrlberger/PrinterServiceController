@@ -6,6 +6,7 @@
 #include "DisplayController.h"
 #include "FanController.h"
 #include "HttpProtoServer.h"
+#include "LightController.h"
 #include "PowerButtonController.h"
 #include "PrintConfigs.h"
 #include "Utils.h"
@@ -53,6 +54,7 @@ class ServiceController {
         [this]() { onServerActivity(); }};
     ButtonController buttonController{
         [this](bool longClick) { onSecondButtonClick(longClick); }};
+    LightController lightController{};
 
    public:
     void run();
