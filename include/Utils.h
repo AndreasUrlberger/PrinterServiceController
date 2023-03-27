@@ -13,7 +13,8 @@ struct PrinterState {
     uint64_t remainingTime;
     int32_t boardTemp;
     int32_t nozzleTemp;
-    int32_t innerTemp;
+    int32_t innerTopTemp;
+    int32_t innerBottomTemp;
     int32_t outerTemp;
     std::string profileName;
     int32_t profileTemp;

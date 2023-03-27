@@ -54,17 +54,18 @@ int ServiceController::displayTempLoop() {
     displayController.setInverted(false);
 
     while (true) {
-        state.innerTemp = readTemp(INNER_THERMO_NAME);
+        state.innerTopTemp = readTemp(INNER_TOP_THERMO_NAME);
+        state.innerBottomTemp = readTemp(INNER_BOTTOM_THERMO_NAME);
         state.outerTemp = readTemp(OUTER_THERMO_NAME);
         state.outerTemp = 0;
         updateDisplay();
 
         std::ostringstream ss;
-        ss << "inner: " << state.innerTemp << " outer: " << state.outerTemp << " wanted: " << state.profileTemp;
+        ss << "inner: " << state.innerTopTemp << " outer: " << state.outerTemp << " wanted: " << state.profileTemp;
         Logger::log(ss.str());
 
         printerServer.updateState(state);
-        fanController.tempChanged(state.innerTemp, state.profileTemp);
+        fanController.tempChanged(state.innerTopTemp, state.profileTemp);
         Utils::sleep(1000);
     }
     return 0;
@@ -76,7 +77,7 @@ void ServiceController::updateDisplay() {
     state.profileName = config.name;
     const int64_t now = Utils::currentMillis();
     if (turnOffTime - now > 0 && !shuttingDown) {
-        displayController.drawTemperature(state.profileTemp, state.innerTemp, config.name);
+        displayController.drawTemperature(state.profileTemp, state.innerTopTemp, config.name);
     } else {
         displayController.turnOff();
     }

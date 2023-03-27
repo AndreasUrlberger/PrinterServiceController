@@ -14,8 +14,8 @@ class FanController {
 
    private:
     // On/Off control.
-    static constexpr uint8_t RELAY_PIN = 6;
-    bool fanOn = false;
+    static constexpr uint8_t RELAY_PIN = 11;
+    static constexpr uint8_t FAN_LED_PIN = 23;
 
     // PWM control.
     static constexpr uint8_t FAN_PWM_PIN = 12;
@@ -64,8 +64,6 @@ class FanController {
 
    private:
     void notifyChange();
-    void innerTurnOff();
-    void innerTurnOn();
     void blinkLoop();
 
     void startFanSpeedMeasurement();

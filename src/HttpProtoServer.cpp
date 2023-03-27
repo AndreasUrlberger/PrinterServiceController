@@ -91,8 +91,8 @@ bool HttpProtoServer::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false>
     Printer::PrinterStatus printerStatus;
     printerStatus.set_is_temp_control_active(state.tempControl);
     printerStatus.set_temperature_outside(state.outerTemp);
-    printerStatus.set_temperature_inside_top(state.innerTemp);
-    printerStatus.set_temperature_inside_bottom(state.innerTemp);
+    printerStatus.set_temperature_inside_top(state.innerTopTemp);
+    printerStatus.set_temperature_inside_bottom(state.innerBottomTemp);
     printerStatus.set_fan_speed(state.fanSpeed);
     Printer::PrintConfig *currentPrintConfig = new Printer::PrintConfig();
     currentPrintConfig->set_name(state.profileName);

@@ -8,8 +8,6 @@
 #include <algorithm>
 #include <iostream>
 
-constexpr int FAN_LED = 21;
-
 FanController::FanController(std::function<void(bool)> onFanStateChange, std::function<void(float)> updateFanSpeed) {
     onFanStateChangeHook = onFanStateChange;
     this->updateFanSpeed = updateFanSpeed;
@@ -18,42 +16,30 @@ FanController::FanController(std::function<void(bool)> onFanStateChange, std::fu
     pinMode(RELAY_PIN, OUTPUT);
     // Otherwise it seems to be on by default.
     turnOff();
-    // digitalWrite(FAN_LED, false);
+    // digitalWrite(FAN_LED_PIN, false);
 
     startFanSpeedMeasurement();
 }
 
 void FanController::notifyChange() {
-    onFanStateChangeHook(fanOn);
-}
-
-void FanController::innerTurnOff() {
-    if (controlOn) {
-        turnOff();
-    }
-}
-
-void FanController::innerTurnOn() {
-    if (controlOn) {
-        turnOn();
-    }
+    onFanStateChangeHook(controlOn);
 }
 
 void FanController::blinkLoop() {
     wiringPiSetupSys();  // just in case
-    pinMode(FAN_LED, OUTPUT);
+    pinMode(FAN_LED_PIN, OUTPUT);
 
     bool isLedOn = true;
     while (true) {
         switch (ledState) {
             case 1:
-                digitalWrite(FAN_LED, isLedOn);
+                digitalWrite(FAN_LED_PIN, isLedOn);
                 break;
             case 2:
-                digitalWrite(FAN_LED, 1);
+                digitalWrite(FAN_LED_PIN, 1);
                 break;
             default:
-                digitalWrite(FAN_LED, 0);
+                digitalWrite(FAN_LED_PIN, 0);
         }
         isLedOn = !isLedOn;
         Utils::sleep(500);
@@ -88,19 +74,20 @@ void FanController::tempChanged(int32_t actualTemperature, int32_t targetTempera
 
 void FanController::turnOff() {
     digitalWrite(RELAY_PIN, HIGH);
-    fanOn = false;
     notifyChange();
 }
 
 void FanController::turnOn() {
     digitalWrite(RELAY_PIN, LOW);
-    fanOn = true;
     notifyChange();
 }
 
 void FanController::toggleControl() {
     controlOn = !controlOn;
-    if (!controlOn && fanOn) {
+
+    if (controlOn) {
+        turnOn();
+    } else {
         turnOff();
     }
 }

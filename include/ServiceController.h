@@ -11,13 +11,14 @@
 #include "PrintConfigs.h"
 #include "Utils.h"
 
-static constexpr auto INNER_THERMO_NAME = "28-2ca0a72153ff";
+static constexpr auto INNER_TOP_THERMO_NAME = "28-2ca0a72153ff";
+static constexpr auto INNER_BOTTOM_THERMO_NAME = "28-2ca0a72154ff";
 static constexpr auto OUTER_THERMO_NAME = "28-baa0a72915ff";
 
 class ServiceController {
    private:
-    static constexpr uint64_t SCREEN_ALIVE_TIME = 0'000;
-    static constexpr uint64_t MAX_INACTIVE_TIME = 5'000;
+    static constexpr uint64_t SCREEN_ALIVE_TIME = 30'000;
+    static constexpr uint64_t MAX_INACTIVE_TIME = 3'000;
     int64_t turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
     bool shuttingDown = false;
     uint64_t lastActivity = Utils::currentMillis();
