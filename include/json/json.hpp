@@ -12587,6 +12587,10 @@ class binary_writer
         return *reinterpret_cast<char*>(&x);
     }
 
+// Disable the warning for the rest of the file
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
     template < typename C = CharType,
                enable_if_t < std::is_signed<C>::value and std::is_unsigned<char>::value > * = nullptr >
     static CharType to_char_type(std::uint8_t x) noexcept
@@ -12597,6 +12601,9 @@ class binary_writer
         std::memcpy(&result, &x, sizeof(x));
         return result;
     }
+
+// Re-enable the warning for future code in this file
+#pragma GCC diagnostic pop
 
     template<typename C = CharType,
              enable_if_t<std::is_unsigned<C>::value>* = nullptr>
