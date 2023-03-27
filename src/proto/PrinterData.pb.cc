@@ -67,8 +67,9 @@ static void InitDefaultsscc_info_ChangeTempControl_PrinterData_2eproto() {
   ::Printer::ChangeTempControl::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ChangeTempControl_PrinterData_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_ChangeTempControl_PrinterData_2eproto}, {}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_ChangeTempControl_PrinterData_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_ChangeTempControl_PrinterData_2eproto}, {
+      &scc_info_PrintConfig_PrinterData_2eproto.base,}};
 
 static void InitDefaultsscc_info_PrintConfig_PrinterData_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -150,7 +151,8 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_PrinterData_2eproto::offsets[]
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::Printer::ChangeTempControl, isactive_),
+  PROTOBUF_FIELD_OFFSET(::Printer::ChangeTempControl, is_active_),
+  PROTOBUF_FIELD_OFFSET(::Printer::ChangeTempControl, selected_print_config_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Printer::RemovePrintConfig, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -175,15 +177,15 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_PrinterData_2eproto::offsets[]
   PROTOBUF_FIELD_OFFSET(::Printer::PrinterStatus, temperature_inside_bottom_),
   PROTOBUF_FIELD_OFFSET(::Printer::PrinterStatus, current_print_config_),
   PROTOBUF_FIELD_OFFSET(::Printer::PrinterStatus, print_configs_),
-  PROTOBUF_FIELD_OFFSET(::Printer::PrinterStatus, fanspeed_),
+  PROTOBUF_FIELD_OFFSET(::Printer::PrinterStatus, fan_speed_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::Printer::StatusRequest)},
   { 6, -1, sizeof(::Printer::AddPrintConfig)},
   { 12, -1, sizeof(::Printer::ChangeTempControl)},
-  { 18, -1, sizeof(::Printer::RemovePrintConfig)},
-  { 24, -1, sizeof(::Printer::PrintConfig)},
-  { 31, -1, sizeof(::Printer::PrinterStatus)},
+  { 19, -1, sizeof(::Printer::RemovePrintConfig)},
+  { 25, -1, sizeof(::Printer::PrintConfig)},
+  { 32, -1, sizeof(::Printer::PrinterStatus)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -199,18 +201,19 @@ const char descriptor_table_protodef_PrinterData_2eproto[] PROTOBUF_SECTION_VARI
   "\n\021PrinterData.proto\022\007Printer\".\n\rStatusRe"
   "quest\022\035\n\025include_print_configs\030\001 \001(\010\"<\n\016"
   "AddPrintConfig\022*\n\014print_config\030\001 \001(\0132\024.P"
-  "rinter.PrintConfig\"%\n\021ChangeTempControl\022"
-  "\020\n\010isActive\030\001 \001(\010\"\?\n\021RemovePrintConfig\022*"
-  "\n\014print_config\030\001 \001(\0132\024.Printer.PrintConf"
-  "ig\"0\n\013PrintConfig\022\023\n\013temperature\030\001 \001(\005\022\014"
-  "\n\004name\030\002 \001(\t\"\202\002\n\rPrinterStatus\022\036\n\026is_tem"
-  "p_control_active\030\001 \001(\010\022\033\n\023temperature_ou"
-  "tside\030\002 \001(\002\022\036\n\026temperature_inside_top\030\003 "
-  "\001(\002\022!\n\031temperature_inside_bottom\030\004 \001(\002\0222"
-  "\n\024current_print_config\030\005 \001(\0132\024.Printer.P"
-  "rintConfig\022+\n\rprint_configs\030\006 \003(\0132\024.Prin"
-  "ter.PrintConfig\022\020\n\010fanSpeed\030\007 \001(\002b\006proto"
-  "3"
+  "rinter.PrintConfig\"[\n\021ChangeTempControl\022"
+  "\021\n\tis_active\030\001 \001(\010\0223\n\025selected_print_con"
+  "fig\030\002 \001(\0132\024.Printer.PrintConfig\"\?\n\021Remov"
+  "ePrintConfig\022*\n\014print_config\030\001 \001(\0132\024.Pri"
+  "nter.PrintConfig\"0\n\013PrintConfig\022\023\n\013tempe"
+  "rature\030\001 \001(\005\022\014\n\004name\030\002 \001(\t\"\203\002\n\rPrinterSt"
+  "atus\022\036\n\026is_temp_control_active\030\001 \001(\010\022\033\n\023"
+  "temperature_outside\030\002 \001(\002\022\036\n\026temperature"
+  "_inside_top\030\003 \001(\002\022!\n\031temperature_inside_"
+  "bottom\030\004 \001(\002\0222\n\024current_print_config\030\005 \001"
+  "(\0132\024.Printer.PrintConfig\022+\n\rprint_config"
+  "s\030\006 \003(\0132\024.Printer.PrintConfig\022\021\n\tfan_spe"
+  "ed\030\007 \001(\002b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_PrinterData_2eproto_deps[1] = {
 };
@@ -224,7 +227,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_Pri
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_PrinterData_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_PrinterData_2eproto = {
-  false, false, descriptor_table_protodef_PrinterData_2eproto, "PrinterData.proto", 561,
+  false, false, descriptor_table_protodef_PrinterData_2eproto, "PrinterData.proto", 616,
   &descriptor_table_PrinterData_2eproto_once, descriptor_table_PrinterData_2eproto_sccs, descriptor_table_PrinterData_2eproto_deps, 6, 0,
   schemas, file_default_instances, TableStruct_PrinterData_2eproto::offsets,
   file_level_metadata_PrinterData_2eproto, 6, file_level_enum_descriptors_PrinterData_2eproto, file_level_service_descriptors_PrinterData_2eproto,
@@ -647,11 +650,18 @@ void AddPrintConfig::InternalSwap(AddPrintConfig* other) {
 // ===================================================================
 
 void ChangeTempControl::InitAsDefaultInstance() {
+  ::Printer::_ChangeTempControl_default_instance_._instance.get_mutable()->selected_print_config_ = const_cast< ::Printer::PrintConfig*>(
+      ::Printer::PrintConfig::internal_default_instance());
 }
 class ChangeTempControl::_Internal {
  public:
+  static const ::Printer::PrintConfig& selected_print_config(const ChangeTempControl* msg);
 };
 
+const ::Printer::PrintConfig&
+ChangeTempControl::_Internal::selected_print_config(const ChangeTempControl* msg) {
+  return *msg->selected_print_config_;
+}
 ChangeTempControl::ChangeTempControl(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
@@ -661,12 +671,20 @@ ChangeTempControl::ChangeTempControl(::PROTOBUF_NAMESPACE_ID::Arena* arena)
 ChangeTempControl::ChangeTempControl(const ChangeTempControl& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  isactive_ = from.isactive_;
+  if (from._internal_has_selected_print_config()) {
+    selected_print_config_ = new ::Printer::PrintConfig(*from.selected_print_config_);
+  } else {
+    selected_print_config_ = nullptr;
+  }
+  is_active_ = from.is_active_;
   // @@protoc_insertion_point(copy_constructor:Printer.ChangeTempControl)
 }
 
 void ChangeTempControl::SharedCtor() {
-  isactive_ = false;
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_ChangeTempControl_PrinterData_2eproto.base);
+  ::memset(&selected_print_config_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&is_active_) -
+      reinterpret_cast<char*>(&selected_print_config_)) + sizeof(is_active_));
 }
 
 ChangeTempControl::~ChangeTempControl() {
@@ -677,6 +695,7 @@ ChangeTempControl::~ChangeTempControl() {
 
 void ChangeTempControl::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
+  if (this != internal_default_instance()) delete selected_print_config_;
 }
 
 void ChangeTempControl::ArenaDtor(void* object) {
@@ -700,7 +719,11 @@ void ChangeTempControl::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  isactive_ = false;
+  if (GetArena() == nullptr && selected_print_config_ != nullptr) {
+    delete selected_print_config_;
+  }
+  selected_print_config_ = nullptr;
+  is_active_ = false;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -712,10 +735,17 @@ const char* ChangeTempControl::_InternalParse(const char* ptr, ::PROTOBUF_NAMESP
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // bool isActive = 1;
+      // bool is_active = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          isactive_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          is_active_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .Printer.PrintConfig selected_print_config = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          ptr = ctx->ParseMessage(_internal_mutable_selected_print_config(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -747,10 +777,18 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // bool isActive = 1;
-  if (this->isactive() != 0) {
+  // bool is_active = 1;
+  if (this->is_active() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(1, this->_internal_isactive(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(1, this->_internal_is_active(), target);
+  }
+
+  // .Printer.PrintConfig selected_print_config = 2;
+  if (this->has_selected_print_config()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        2, _Internal::selected_print_config(this), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -769,8 +807,15 @@ size_t ChangeTempControl::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // bool isActive = 1;
-  if (this->isactive() != 0) {
+  // .Printer.PrintConfig selected_print_config = 2;
+  if (this->has_selected_print_config()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *selected_print_config_);
+  }
+
+  // bool is_active = 1;
+  if (this->is_active() != 0) {
     total_size += 1 + 1;
   }
 
@@ -805,8 +850,11 @@ void ChangeTempControl::MergeFrom(const ChangeTempControl& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.isactive() != 0) {
-    _internal_set_isactive(from._internal_isactive());
+  if (from.has_selected_print_config()) {
+    _internal_mutable_selected_print_config()->::Printer::PrintConfig::MergeFrom(from._internal_selected_print_config());
+  }
+  if (from.is_active() != 0) {
+    _internal_set_is_active(from._internal_is_active());
   }
 }
 
@@ -831,7 +879,12 @@ bool ChangeTempControl::IsInitialized() const {
 void ChangeTempControl::InternalSwap(ChangeTempControl* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  swap(isactive_, other->isactive_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(ChangeTempControl, is_active_)
+      + sizeof(ChangeTempControl::is_active_)
+      - PROTOBUF_FIELD_OFFSET(ChangeTempControl, selected_print_config_)>(
+          reinterpret_cast<char*>(&selected_print_config_),
+          reinterpret_cast<char*>(&other->selected_print_config_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata ChangeTempControl::GetMetadata() const {
@@ -1322,16 +1375,16 @@ PrinterStatus::PrinterStatus(const PrinterStatus& from)
     current_print_config_ = nullptr;
   }
   ::memcpy(&is_temp_control_active_, &from.is_temp_control_active_,
-    static_cast<size_t>(reinterpret_cast<char*>(&fanspeed_) -
-    reinterpret_cast<char*>(&is_temp_control_active_)) + sizeof(fanspeed_));
+    static_cast<size_t>(reinterpret_cast<char*>(&fan_speed_) -
+    reinterpret_cast<char*>(&is_temp_control_active_)) + sizeof(fan_speed_));
   // @@protoc_insertion_point(copy_constructor:Printer.PrinterStatus)
 }
 
 void PrinterStatus::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_PrinterStatus_PrinterData_2eproto.base);
   ::memset(&current_print_config_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&fanspeed_) -
-      reinterpret_cast<char*>(&current_print_config_)) + sizeof(fanspeed_));
+      reinterpret_cast<char*>(&fan_speed_) -
+      reinterpret_cast<char*>(&current_print_config_)) + sizeof(fan_speed_));
 }
 
 PrinterStatus::~PrinterStatus() {
@@ -1372,8 +1425,8 @@ void PrinterStatus::Clear() {
   }
   current_print_config_ = nullptr;
   ::memset(&is_temp_control_active_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&fanspeed_) -
-      reinterpret_cast<char*>(&is_temp_control_active_)) + sizeof(fanspeed_));
+      reinterpret_cast<char*>(&fan_speed_) -
+      reinterpret_cast<char*>(&is_temp_control_active_)) + sizeof(fan_speed_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -1432,10 +1485,10 @@ const char* PrinterStatus::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
         } else goto handle_unusual;
         continue;
-      // float fanSpeed = 7;
+      // float fan_speed = 7;
       case 7:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 61)) {
-          fanspeed_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          fan_speed_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
@@ -1507,10 +1560,10 @@ failure:
       InternalWriteMessage(6, this->_internal_print_configs(i), target, stream);
   }
 
-  // float fanSpeed = 7;
-  if (!(this->fanspeed() <= 0 && this->fanspeed() >= 0)) {
+  // float fan_speed = 7;
+  if (!(this->fan_speed() <= 0 && this->fan_speed() >= 0)) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(7, this->_internal_fanspeed(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(7, this->_internal_fan_speed(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1563,8 +1616,8 @@ size_t PrinterStatus::ByteSizeLong() const {
     total_size += 1 + 4;
   }
 
-  // float fanSpeed = 7;
-  if (!(this->fanspeed() <= 0 && this->fanspeed() >= 0)) {
+  // float fan_speed = 7;
+  if (!(this->fan_speed() <= 0 && this->fan_speed() >= 0)) {
     total_size += 1 + 4;
   }
 
@@ -1615,8 +1668,8 @@ void PrinterStatus::MergeFrom(const PrinterStatus& from) {
   if (!(from.temperature_inside_bottom() <= 0 && from.temperature_inside_bottom() >= 0)) {
     _internal_set_temperature_inside_bottom(from._internal_temperature_inside_bottom());
   }
-  if (!(from.fanspeed() <= 0 && from.fanspeed() >= 0)) {
-    _internal_set_fanspeed(from._internal_fanspeed());
+  if (!(from.fan_speed() <= 0 && from.fan_speed() >= 0)) {
+    _internal_set_fan_speed(from._internal_fan_speed());
   }
 }
 
@@ -1643,8 +1696,8 @@ void PrinterStatus::InternalSwap(PrinterStatus* other) {
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   print_configs_.InternalSwap(&other->print_configs_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(PrinterStatus, fanspeed_)
-      + sizeof(PrinterStatus::fanspeed_)
+      PROTOBUF_FIELD_OFFSET(PrinterStatus, fan_speed_)
+      + sizeof(PrinterStatus::fan_speed_)
       - PROTOBUF_FIELD_OFFSET(PrinterStatus, current_print_config_)>(
           reinterpret_cast<char*>(&current_print_config_),
           reinterpret_cast<char*>(&other->current_print_config_));

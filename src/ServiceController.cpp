@@ -54,7 +54,7 @@ int ServiceController::displayTempLoop() {
 
     while (true) {
         state.innerTemp = readTemp(INNER_THERMO_NAME);
-        // state.outerTemp = readTemp(OUTER_THERMO_NAME);
+        state.outerTemp = readTemp(OUTER_THERMO_NAME);
         state.outerTemp = 0;
         updateDisplay();
 
@@ -64,7 +64,7 @@ int ServiceController::displayTempLoop() {
 
         printerServer.updateState(state);
         fanController.tempChanged(state.innerTemp, state.profileTemp);
-        Utils::sleep(100);
+        Utils::sleep(1000);
     }
     return 0;
 }
@@ -160,18 +160,31 @@ void ServiceController::onServerActivity() {
 }
 
 void ServiceController::stopStream() {
+    streamMutex.lock();
     if (isStreamRunning) {
         isStreamRunning = false;
+        streamMutex.unlock();
 
         const int result = system("kill $(pidof mjpg_streamer)");
+        if (result != 0) {
+            std::cerr << "ERROR: Stopping the stream returned " << result << "\n";
+        }
+    } else {
+        streamMutex.unlock();
     }
 }
 
 void ServiceController::startStream() {
+    streamMutex.lock();
     if (!isStreamRunning) {
-        // TODO Add mutex
         isStreamRunning = true;
+        streamMutex.unlock();
 
-        const int result = system("nohup mjpg_streamer -o \"output_http.so -w ./www -p 8000\" -i \"input_uvc.so -r 1280x720 -f 1\" > /dev/null 2>&1 &");
+        const int result = system("nohup mjpg_streamer -o \"output_http.so -w ./www -p 8000\" -i \"input_uvc.so -r 1280x720 -f 1 -softfps 1\" > /dev/null 2>&1 &");
+        if (result != 0) {
+            std::cerr << "ERROR: Starting the stream returned " << result << "\n";
+        }
+    } else {
+        streamMutex.unlock();
     }
 }

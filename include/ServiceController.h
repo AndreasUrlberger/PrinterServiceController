@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include "ButtonController.h"
 #include "DisplayController.h"
 #include "FanController.h"
@@ -20,6 +22,7 @@ class ServiceController {
     bool shuttingDown = false;
     uint64_t lastActivity = Utils::currentMillis();
     bool isStreamRunning = false;
+    std::mutex streamMutex;
 
     int displayTempLoop();
     void updateDisplay();
@@ -42,7 +45,6 @@ class ServiceController {
         [this]() { onShortPress(); }};
     DisplayController displayController;
     FanController fanController{
-        6,
         [this](bool state) { onFanStateChanged(state); },
         [this](float fanSpeed) { state.fanSpeed = fanSpeed; }};
     HttpProtoServer printerServer{

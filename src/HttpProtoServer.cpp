@@ -53,6 +53,7 @@ void HttpProtoServer::startHttpServer() {
     });
 
     app.post("/shutdown", [this](auto *res, auto *req) mutable {
+        addCorsHeaders(res);
         res->endWithoutBody();
         // TODO make sure that the stream, lights, etc. is turned off before.
         shutdownHook();
@@ -77,6 +78,7 @@ void HttpProtoServer::handleHttpRequest(uWS::HttpResponse<false> *res, uWS::Http
             if (!parser(buffer)) {
                 std::cerr << "ERROR: Failed processing the received data\n";
                 res->writeStatus(std::string("500 Internal Server Error"));
+                addCorsHeaders(res);
                 res->end(std::string("{\"code\":500,\"message\":\"Internal Server Error. Something failed processing the given data.\"}"));
             }
         }
@@ -91,12 +93,12 @@ bool HttpProtoServer::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false>
     printerStatus.set_temperature_outside(state.outerTemp);
     printerStatus.set_temperature_inside_top(state.innerTemp);
     printerStatus.set_temperature_inside_bottom(state.innerTemp);
-    printerStatus.set_fanspeed(state.fanSpeed);
+    printerStatus.set_fan_speed(state.fanSpeed);
     Printer::PrintConfig *currentPrintConfig = new Printer::PrintConfig();
     currentPrintConfig->set_name(state.profileName);
     currentPrintConfig->set_temperature(state.profileTemp);
     printerStatus.set_allocated_current_print_config(currentPrintConfig);
-    printerStatus.set_fanspeed(state.fanSpeed);
+    printerStatus.set_fan_speed(state.fanSpeed);
 
     if (sendPrintConfigs) {
         std::vector<PrintConfig> configs = PrintConfigs::getPrintConfigs();
@@ -109,8 +111,15 @@ bool HttpProtoServer::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false>
     }
 
     const std::string outData = printerStatus.SerializeAsString();
+    addCorsHeaders(res);
     res->end(outData);
     return true;
+}
+
+void HttpProtoServer::addCorsHeaders(uWS::HttpResponse<false> *res) {
+    res->writeHeader("Access-Control-Allow-Origin", "*");
+    res->writeHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res->writeHeader("Access-Control-Allow-Headers", "origin, content-type, accept, x-requested-with");
 }
 
 bool HttpProtoServer::statusRequest(std::vector<char> buffer, uWS::HttpResponse<false> *res) {
@@ -159,7 +168,7 @@ bool HttpProtoServer::removePrintConfig(std::vector<char> buffer, uWS::HttpRespo
     config.name = receivedConfig.name();
     config.temperature = receivedConfig.temperature();
 
-    const bool hasChanged = PrintConfigs::removeConfig(config);
+    const bool hasChanged = PrintConfigs::removeConfig(config, state);
 
     return sendStatus(hasChanged, res);
 }
@@ -173,7 +182,11 @@ bool HttpProtoServer::changeTempControl(std::vector<char> buffer, uWS::HttpRespo
     }
 
     // Change temp control
-    tempControlChangeHook(changeTempControl.isactive());
+    tempControlChangeHook(changeTempControl.is_active());
+    PrintConfig config;
+    config.name = changeTempControl.selected_print_config().name();
+    config.temperature = changeTempControl.selected_print_config().temperature();
+    onProfileUpdateHook(config);
 
     return sendStatus(false, res);
 }

@@ -482,15 +482,34 @@ class ChangeTempControl PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kSelectedPrintConfigFieldNumber = 2,
     kIsActiveFieldNumber = 1,
   };
-  // bool isActive = 1;
-  void clear_isactive();
-  bool isactive() const;
-  void set_isactive(bool value);
+  // .Printer.PrintConfig selected_print_config = 2;
+  bool has_selected_print_config() const;
   private:
-  bool _internal_isactive() const;
-  void _internal_set_isactive(bool value);
+  bool _internal_has_selected_print_config() const;
+  public:
+  void clear_selected_print_config();
+  const ::Printer::PrintConfig& selected_print_config() const;
+  ::Printer::PrintConfig* release_selected_print_config();
+  ::Printer::PrintConfig* mutable_selected_print_config();
+  void set_allocated_selected_print_config(::Printer::PrintConfig* selected_print_config);
+  private:
+  const ::Printer::PrintConfig& _internal_selected_print_config() const;
+  ::Printer::PrintConfig* _internal_mutable_selected_print_config();
+  public:
+  void unsafe_arena_set_allocated_selected_print_config(
+      ::Printer::PrintConfig* selected_print_config);
+  ::Printer::PrintConfig* unsafe_arena_release_selected_print_config();
+
+  // bool is_active = 1;
+  void clear_is_active();
+  bool is_active() const;
+  void set_is_active(bool value);
+  private:
+  bool _internal_is_active() const;
+  void _internal_set_is_active(bool value);
   public:
 
   // @@protoc_insertion_point(class_scope:Printer.ChangeTempControl)
@@ -500,7 +519,8 @@ class ChangeTempControl PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  bool isactive_;
+  ::Printer::PrintConfig* selected_print_config_;
+  bool is_active_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_PrinterData_2eproto;
 };
@@ -1009,13 +1029,13 @@ class PrinterStatus PROTOBUF_FINAL :
   void _internal_set_temperature_inside_bottom(float value);
   public:
 
-  // float fanSpeed = 7;
-  void clear_fanspeed();
-  float fanspeed() const;
-  void set_fanspeed(float value);
+  // float fan_speed = 7;
+  void clear_fan_speed();
+  float fan_speed() const;
+  void set_fan_speed(float value);
   private:
-  float _internal_fanspeed() const;
-  void _internal_set_fanspeed(float value);
+  float _internal_fan_speed() const;
+  void _internal_set_fan_speed(float value);
   public:
 
   // @@protoc_insertion_point(class_scope:Printer.PrinterStatus)
@@ -1031,7 +1051,7 @@ class PrinterStatus PROTOBUF_FINAL :
   float temperature_outside_;
   float temperature_inside_top_;
   float temperature_inside_bottom_;
-  float fanspeed_;
+  float fan_speed_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_PrinterData_2eproto;
 };
@@ -1155,24 +1175,105 @@ inline void AddPrintConfig::set_allocated_print_config(::Printer::PrintConfig* p
 
 // ChangeTempControl
 
-// bool isActive = 1;
-inline void ChangeTempControl::clear_isactive() {
-  isactive_ = false;
+// bool is_active = 1;
+inline void ChangeTempControl::clear_is_active() {
+  is_active_ = false;
 }
-inline bool ChangeTempControl::_internal_isactive() const {
-  return isactive_;
+inline bool ChangeTempControl::_internal_is_active() const {
+  return is_active_;
 }
-inline bool ChangeTempControl::isactive() const {
-  // @@protoc_insertion_point(field_get:Printer.ChangeTempControl.isActive)
-  return _internal_isactive();
+inline bool ChangeTempControl::is_active() const {
+  // @@protoc_insertion_point(field_get:Printer.ChangeTempControl.is_active)
+  return _internal_is_active();
 }
-inline void ChangeTempControl::_internal_set_isactive(bool value) {
+inline void ChangeTempControl::_internal_set_is_active(bool value) {
   
-  isactive_ = value;
+  is_active_ = value;
 }
-inline void ChangeTempControl::set_isactive(bool value) {
-  _internal_set_isactive(value);
-  // @@protoc_insertion_point(field_set:Printer.ChangeTempControl.isActive)
+inline void ChangeTempControl::set_is_active(bool value) {
+  _internal_set_is_active(value);
+  // @@protoc_insertion_point(field_set:Printer.ChangeTempControl.is_active)
+}
+
+// .Printer.PrintConfig selected_print_config = 2;
+inline bool ChangeTempControl::_internal_has_selected_print_config() const {
+  return this != internal_default_instance() && selected_print_config_ != nullptr;
+}
+inline bool ChangeTempControl::has_selected_print_config() const {
+  return _internal_has_selected_print_config();
+}
+inline void ChangeTempControl::clear_selected_print_config() {
+  if (GetArena() == nullptr && selected_print_config_ != nullptr) {
+    delete selected_print_config_;
+  }
+  selected_print_config_ = nullptr;
+}
+inline const ::Printer::PrintConfig& ChangeTempControl::_internal_selected_print_config() const {
+  const ::Printer::PrintConfig* p = selected_print_config_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::Printer::PrintConfig*>(
+      &::Printer::_PrintConfig_default_instance_);
+}
+inline const ::Printer::PrintConfig& ChangeTempControl::selected_print_config() const {
+  // @@protoc_insertion_point(field_get:Printer.ChangeTempControl.selected_print_config)
+  return _internal_selected_print_config();
+}
+inline void ChangeTempControl::unsafe_arena_set_allocated_selected_print_config(
+    ::Printer::PrintConfig* selected_print_config) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(selected_print_config_);
+  }
+  selected_print_config_ = selected_print_config;
+  if (selected_print_config) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Printer.ChangeTempControl.selected_print_config)
+}
+inline ::Printer::PrintConfig* ChangeTempControl::release_selected_print_config() {
+  auto temp = unsafe_arena_release_selected_print_config();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::Printer::PrintConfig* ChangeTempControl::unsafe_arena_release_selected_print_config() {
+  // @@protoc_insertion_point(field_release:Printer.ChangeTempControl.selected_print_config)
+  
+  ::Printer::PrintConfig* temp = selected_print_config_;
+  selected_print_config_ = nullptr;
+  return temp;
+}
+inline ::Printer::PrintConfig* ChangeTempControl::_internal_mutable_selected_print_config() {
+  
+  if (selected_print_config_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Printer::PrintConfig>(GetArena());
+    selected_print_config_ = p;
+  }
+  return selected_print_config_;
+}
+inline ::Printer::PrintConfig* ChangeTempControl::mutable_selected_print_config() {
+  // @@protoc_insertion_point(field_mutable:Printer.ChangeTempControl.selected_print_config)
+  return _internal_mutable_selected_print_config();
+}
+inline void ChangeTempControl::set_allocated_selected_print_config(::Printer::PrintConfig* selected_print_config) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete selected_print_config_;
+  }
+  if (selected_print_config) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(selected_print_config);
+    if (message_arena != submessage_arena) {
+      selected_print_config = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, selected_print_config, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  selected_print_config_ = selected_print_config;
+  // @@protoc_insertion_point(field_set_allocated:Printer.ChangeTempControl.selected_print_config)
 }
 
 // -------------------------------------------------------------------
@@ -1569,24 +1670,24 @@ PrinterStatus::print_configs() const {
   return print_configs_;
 }
 
-// float fanSpeed = 7;
-inline void PrinterStatus::clear_fanspeed() {
-  fanspeed_ = 0;
+// float fan_speed = 7;
+inline void PrinterStatus::clear_fan_speed() {
+  fan_speed_ = 0;
 }
-inline float PrinterStatus::_internal_fanspeed() const {
-  return fanspeed_;
+inline float PrinterStatus::_internal_fan_speed() const {
+  return fan_speed_;
 }
-inline float PrinterStatus::fanspeed() const {
-  // @@protoc_insertion_point(field_get:Printer.PrinterStatus.fanSpeed)
-  return _internal_fanspeed();
+inline float PrinterStatus::fan_speed() const {
+  // @@protoc_insertion_point(field_get:Printer.PrinterStatus.fan_speed)
+  return _internal_fan_speed();
 }
-inline void PrinterStatus::_internal_set_fanspeed(float value) {
+inline void PrinterStatus::_internal_set_fan_speed(float value) {
   
-  fanspeed_ = value;
+  fan_speed_ = value;
 }
-inline void PrinterStatus::set_fanspeed(float value) {
-  _internal_set_fanspeed(value);
-  // @@protoc_insertion_point(field_set:Printer.PrinterStatus.fanSpeed)
+inline void PrinterStatus::set_fan_speed(float value) {
+  _internal_set_fan_speed(value);
+  // @@protoc_insertion_point(field_set:Printer.PrinterStatus.fan_speed)
 }
 
 #ifdef __GNUC__

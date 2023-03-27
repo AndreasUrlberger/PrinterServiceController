@@ -25,6 +25,7 @@ class HttpProtoServer {
     bool changeTempControl(std::vector<char> buffer, uWS::HttpResponse<false> *res);
     bool sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false> *res);
     void handleHttpRequest(uWS::HttpResponse<false> *res, uWS::HttpRequest *req, std::function<bool(std::vector<char> buffer)> parser);
+    void addCorsHeaders(uWS::HttpResponse<false> *res);
 
     void startHttpServer();
 
