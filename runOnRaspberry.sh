@@ -2,7 +2,7 @@
 set timeout -1
 
 set USER pi
-set HOST 192.168.178.155
+set HOST 192.168.178.143
 set PASSW raspberry
 
 spawn scp ./build/PrinterServiceController $USER@$HOST:/home/pi/

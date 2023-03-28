@@ -18,22 +18,19 @@ void PowerButtonController::shortPress() {
 }
 
 void PowerButtonController::threadFun(int64_t down) {
+    // realDownTime is the time when the button was pressed down, the time this thread was started.
     int64_t realDownTime = down;
     std::this_thread::sleep_for(std::chrono::milliseconds(longPressTime));
-    if (isDown && realDownTime == lastDown) {
+    const bool anyPressesInBetween = lastDown != realDownTime;
+    if (isLevelHigh && !anyPressesInBetween) {
         longPress();
     }
 }
 
-void PowerButtonController::edgeChanging() {
-    int state = gpioRead(SWITCH);
-    if (state == PI_BAD_GPIO) {
-        std::cerr << "ERROR: gpioRead failed in PowerButtonController\n";
-        return;
-    }
-    isDown = state == 0;
-    if (isDown) {
-        isDown = true;
+void PowerButtonController::edgeChanging(bool buttonLevelIsHigh) {
+    isLevelHigh = buttonLevelIsHigh;
+
+    if (isLevelHigh) {
         lastDown = std::chrono::system_clock::now().time_since_epoch().count();
         if (pressedThread != nullptr) {
             delete pressedThread;
@@ -41,9 +38,9 @@ void PowerButtonController::edgeChanging() {
         pressedThread = new std::thread([this]() { threadFun(lastDown); });
         pressedThread->detach();
     } else {
-        int64_t now = std::chrono::system_clock::now().time_since_epoch().count();
-        int64_t downTime = (now - lastDown) / 1'000'000L;
-        if (downTime < shortPressTime && downTime >= minShortPressTime) {
+        const int64_t now = std::chrono::system_clock::now().time_since_epoch().count();
+        const int64_t downTimeMs = (now - lastDown) / 1'000'000L;
+        if (downTimeMs < maxShortPressTime && downTimeMs >= minShortPressTime) {
             shortPress();
         }
     }
@@ -72,6 +69,6 @@ void PowerButtonController::start() {
 void PowerButtonController::interruptHandler(int gpio, int level, uint32_t tick, void* controller) {
     if (controller != nullptr) {
         PowerButtonController* const buttonController = static_cast<PowerButtonController*>(controller);
-        buttonController->edgeChanging();
+        buttonController->edgeChanging(level == 1);
     }
 }

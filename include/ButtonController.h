@@ -7,11 +7,11 @@
 
 class ButtonController {
     uint32_t SWITCH = 5;
-    int64_t shortPressTime = 1000L;   // max duration for a short click
-    int64_t minShortPressTime = 50L;  // used to avoid double clicks due to a cheap button
-    int64_t longPressTime = 2000L;    // min duration for a long click
+    int64_t maxShortPressTime = 1000L;  // max duration for a short click
+    int64_t minShortPressTime = 50L;    // used to avoid double clicks due to a cheap button
+    int64_t longPressTime = 2000L;      // min duration for a long click
 
-    bool isDown = false;
+    bool isLevelHigh = false;
     int64_t lastDown = 0;
     std::thread* pressedThread = nullptr;
     std::function<void(bool longClick)> callback;
@@ -23,7 +23,7 @@ class ButtonController {
     static void interruptHandler(int gpio, int level, uint32_t tick, void* buttonController);
 
    public:
-    void edgeChanging();
+    void edgeChanging(bool isHigh);
 
     void threadFun(int64_t down);
 

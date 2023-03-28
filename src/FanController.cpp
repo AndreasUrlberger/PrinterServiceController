@@ -15,8 +15,42 @@ FanController::FanController(std::function<void(bool)> onFanStateChange, std::fu
         return;
     }
 
-    gpioSetMode(RELAY_PIN, PI_OUTPUT);
+    int result = gpioSetMode(RELAY_PIN, PI_OUTPUT);
+    // 0 if OK, otherwise PI_BAD_GPIO or PI_BAD_MODE.
+    if (result != 0) {
+        // Something went wrong.
+        switch (result) {
+            case PI_BAD_GPIO:
+                std::cerr << "ERROR: Setting Mode, Relay pin is not a valid GPIO pin.\n";
+                break;
+            case PI_BAD_MODE:
+                std::cerr << "ERROR: Setting Mode, Relay pin is not a valid GPIO output pin.\n";
+                break;
+            default:
+                std::cerr << "ERROR: Setting Mode, Relay pin setup failed with unknown error code: " << result << "\n";
+                break;
+        }
+    }
 
+    result = gpioSetPullUpDown(RELAY_PIN, PI_PUD_DOWN);
+    // 0 if OK, otherwise PI_BAD_GPIO or PI_BAD_MODE.
+    if (result != 0) {
+        // Something went wrong.
+        switch (result) {
+            case PI_BAD_GPIO:
+                std::cerr << "ERROR: Setting Pull Up/Down, Relay pin is not a valid GPIO pin.\n";
+                break;
+            case PI_BAD_MODE:
+                std::cerr << "ERROR: Setting Pull Up/Down, Relay pin is not a valid GPIO output pin.\n";
+                break;
+            default:
+                std::cerr << "ERROR: Setting Pull Up/Down, Relay pin setup failed with unknown error code: " << result << "\n";
+                break;
+        }
+    }
+}
+
+void FanController::start() {
     //  Otherwise it seems to be on by default.
     turnOff();
     startFanSpeedMeasurement();
@@ -49,6 +83,7 @@ void FanController::blinkLoop() {
     }
 }
 
+// Actual and target temperature are in milli degrees celsius.
 void FanController::tempChanged(int32_t actualTemperature, int32_t targetTemperature) {
     tempSoll = static_cast<float>(targetTemperature) / 1000;
     float temp_ist = static_cast<float>(actualTemperature) / 1000;
@@ -76,12 +111,42 @@ void FanController::tempChanged(int32_t actualTemperature, int32_t targetTempera
 }
 
 void FanController::turnOff() {
-    gpioWrite(RELAY_PIN, 1);
+    int result = gpioWrite(RELAY_PIN, 1);
+    // 0 if OK, otherwise PI_BAD_GPIO or PI_BAD_MODE.
+    if (result != 0) {
+        // Something went wrong.
+        switch (result) {
+            case PI_BAD_GPIO:
+                std::cerr << "ERROR: Turning off, Relay pin is not a valid GPIO pin.\n";
+                break;
+            case PI_BAD_MODE:
+                std::cerr << "ERROR: Turning off, Relay pin is not a valid GPIO output pin.\n";
+                break;
+            default:
+                std::cerr << "ERROR: Turning off, Relay pin setup failed with unknown error code: " << result << "\n";
+                break;
+        }
+    }
     notifyChange();
 }
 
 void FanController::turnOn() {
-    gpioWrite(RELAY_PIN, 0);
+    int result = gpioWrite(RELAY_PIN, 0);
+    // 0 if OK, otherwise PI_BAD_GPIO or PI_BAD_MODE.
+    if (result != 0) {
+        // Something went wrong.
+        switch (result) {
+            case PI_BAD_GPIO:
+                std::cerr << "ERROR: Turning on, Relay pin is not a valid GPIO pin.\n";
+                break;
+            case PI_BAD_MODE:
+                std::cerr << "ERROR: Turning on, Relay pin is not a valid GPIO output pin.\n";
+                break;
+            default:
+                std::cerr << "ERROR: Turning on, Relay pin setup failed with unknown error code: " << result << "\n";
+                break;
+        }
+    }
     notifyChange();
 }
 
@@ -105,22 +170,39 @@ float FanController::calculateStellValue(float regelfehler) {
 }
 
 void FanController::controlFanPWM(float power) {
-    const int controlPower = round(power / MAX_FAN_RPM * 255);
-    // Max control power is 255.
-    const int result = gpioPWM(FAN_PWM_PIN, controlPower);
+    const int controlPower = round(power / MAX_FAN_RPM * FAN_PWM_RANGE);
+    // Enable hardware PWM on FAN_PWM_PIN.
+    int result = gpioHardwarePWM(FAN_PWM_PIN, FAN_PWM_FREQUENCY, controlPower);
+    // Returns 0 if OK, otherwise PI_BAD_GPIO, PI_NOT_HPWM_GPIO, PI_BAD_HPWM_DUTY, PI_BAD_HPWM_FREQ, or PI_HPWM_ILLEGAL.
     if (result != 0) {
         // Something went wrong.
         switch (result) {
-            case PI_BAD_USER_GPIO:
+            case PI_BAD_GPIO:
                 std::cerr << "ERROR: Fan PWM pin is not a valid GPIO pin.\n";
                 break;
-            case PI_BAD_DUTYCYCLE:
-                std::cerr << "ERROR: Fan PWM duty cycle is not in range 0-255.\n";
+            case PI_NOT_HPWM_GPIO:
+                std::cerr << "ERROR: Fan PWM pin is not a valid hardware PWM pin.\n";
+                break;
+            case PI_BAD_HPWM_DUTY:
+                std::cerr << "ERROR: Fan PWM duty cycle is not in valid range.\n";
+                break;
+            case PI_BAD_HPWM_FREQ:
+                std::cerr << "ERROR: Fan PWM frequency is not in valid range.\n";
+                break;
+            case PI_HPWM_ILLEGAL:
+                std::cerr << "ERROR: Fan PWM frequency is not in valid range.\n";
                 break;
             default:
-                std::cerr << "ERROR: Fan PWM control failed with unknown error code: " << result << "\n";
+                std::cerr << "ERROR: Fan PWM pin setup failed with unknown error code: " << result << "\n";
                 break;
         }
+    }
+
+    // Read hardware PWM frequency
+    result = gpioGetPWMfrequency(FAN_PWM_PIN);
+    //  Returns the frequency (in hertz) used for the GPIO if OK, otherwise PI_BAD_USER_GPIO.
+    if (result == PI_BAD_USER_GPIO) {
+        std::cerr << "ERROR: Get Frequency, Fan PWM pin is not a valid GPIO pin.\n";
     }
 }
 

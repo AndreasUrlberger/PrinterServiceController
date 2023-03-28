@@ -25,6 +25,11 @@ void ServiceController::run() {
     powerButtonController.start();
     buttonController.start();
     lightController.start();
+    fanController.start();
+
+    // Might not be necessary.
+    state.tempControl = fanController.isControlOn();
+    printerServer.updateState(state);
 
     std::thread timerThread = std::thread([this]() {
         auto start = std::chrono::steady_clock::now();
@@ -40,14 +45,12 @@ void ServiceController::run() {
         }
     });
 
-    std::thread *displayTempLoopThread = new std::thread([this]() { displayTempLoop(); });
+    std::thread displayTempLoopThread = std::thread([this]() { displayTempLoop(); });
 
     printerServer.start();
     std::cout << "PrinterServerThread ended\n";
-    displayTempLoopThread->join();
+    displayTempLoopThread.join();
     timerThread.join();
-
-    delete displayTempLoopThread;
 }
 
 int ServiceController::displayTempLoop() {
@@ -57,7 +60,6 @@ int ServiceController::displayTempLoop() {
         state.innerTopTemp = readTemp(INNER_TOP_THERMO_NAME);
         state.innerBottomTemp = readTemp(INNER_BOTTOM_THERMO_NAME);
         state.outerTemp = readTemp(OUTER_THERMO_NAME);
-        state.outerTemp = 0;
         updateDisplay();
 
         std::ostringstream ss;

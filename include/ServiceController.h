@@ -12,7 +12,7 @@
 #include "Utils.h"
 
 static constexpr auto INNER_TOP_THERMO_NAME = "28-2ca0a72153ff";
-static constexpr auto INNER_BOTTOM_THERMO_NAME = "28-2ca0a72154ff";
+static constexpr auto INNER_BOTTOM_THERMO_NAME = "28-3c290457da46";
 static constexpr auto OUTER_THERMO_NAME = "28-baa0a72915ff";
 
 class ServiceController {
@@ -45,9 +45,6 @@ class ServiceController {
         [this]() { onShutdown(); },
         [this]() { onShortPress(); }};
     DisplayController displayController;
-    FanController fanController{
-        [this](bool state) { onFanStateChanged(state); },
-        [this](float fanSpeed) { state.fanSpeed = fanSpeed; }};
     HttpProtoServer printerServer{
         [this]() { onShutdown(); },
         [this](PrintConfig &config) { return onProfileUpdate(config); },
@@ -56,6 +53,9 @@ class ServiceController {
     ButtonController buttonController{
         [this](bool longClick) { onSecondButtonClick(longClick); }};
     LightController lightController{};
+    FanController fanController{
+        [this](bool state) { onFanStateChanged(state); },
+        [this](float fanSpeed) { state.fanSpeed = fanSpeed; }};
 
    public:
     void run();

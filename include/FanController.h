@@ -16,6 +16,8 @@ class FanController {
 
     // PWM control.
     static constexpr uint8_t FAN_PWM_PIN = 12;
+    static constexpr uint32_t FAN_PWM_FREQUENCY = 25'000;
+    static constexpr uint32_t FAN_PWM_RANGE = 1'000'000;
     static constexpr uint8_t FAN_TICK_PIN = 7;
 
     // Fan speed measurement.
@@ -28,15 +30,15 @@ class FanController {
 
     // Temperature control.
     static constexpr float TEMP_MEAS_PERIOD = 1.f;
-    static constexpr float MIN_INTEGRAL = -500;
-    static constexpr float MAX_INTEGRAL = 500;
+    static constexpr float MIN_INTEGRAL = -5000;
+    static constexpr float MAX_INTEGRAL = 5000;
     float tempSoll = 25;  // soll/ist Temperaturen
     float tempAbw = 1.0;  // zulaessige Temperaturabweichung +/-
     float integral = 0;   // Integral-Anteil des Reglers
     int toggleCount = 0;  // Anzahl Schaltvorgaenge
-    float kp = 1;         // Proportionalfaktor
-    float ki = 1;         // Integralfaktor
-    bool controlOn = true;
+    float kp = 10;        // Proportionalfaktor
+    float ki = 10;        // Integralfaktor
+    bool controlOn = false;
 
     // Other.
     uint8_t ledState = false;  // 0 -> off, 1 -> blink, 2 -> on
@@ -57,8 +59,8 @@ class FanController {
     float calculateStellValue(float Regelfehler);  // berechnet die Stellgroesse aus dem Regelfehler
     void controlFanPWM(float power);
     bool isControlOn();
-
     void fanTick();
+    void start();
 
    private:
     void notifyChange();
