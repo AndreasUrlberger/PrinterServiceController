@@ -1,10 +1,10 @@
-#include "ButtonController.h"
+#include "ButtonController.hpp"
 
 #include <pigpio.h>
 
 #include <iostream>
 
-#include "Utils.h"
+#include "Utils.hpp"
 
 void ButtonController::longPress() {
     callback(true);

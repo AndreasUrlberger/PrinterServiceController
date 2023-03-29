@@ -1,4 +1,4 @@
-#include "FanController.h"
+#include "FanController.hpp"
 
 #include <math.h>
 #include <pigpio.h>

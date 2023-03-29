@@ -2,14 +2,14 @@
 
 #include <mutex>
 
-#include "ButtonController.h"
-#include "DisplayController.h"
-#include "FanController.h"
-#include "HttpProtoServer.h"
-#include "LightController.h"
-#include "PowerButtonController.h"
-#include "PrintConfigs.h"
-#include "Utils.h"
+#include "ButtonController.hpp"
+#include "DisplayController.hpp"
+#include "FanController.hpp"
+#include "HttpProtoServer.hpp"
+#include "LightController.hpp"
+#include "PowerButtonController.hpp"
+#include "PrintConfigs.hpp"
+#include "Utils.hpp"
 
 static constexpr auto INNER_TOP_THERMO_NAME = "28-2ca0a72153ff";
 static constexpr auto INNER_BOTTOM_THERMO_NAME = "28-3c290457da46";

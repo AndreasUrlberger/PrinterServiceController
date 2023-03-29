@@ -1,4 +1,4 @@
-#include "DisplayController.h"
+#include "DisplayController.hpp"
 
 DisplayController::DisplayController() {
     const char* filename = "/dev/i2c-3";

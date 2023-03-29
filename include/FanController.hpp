@@ -5,7 +5,7 @@
 #include <functional>
 #include <thread>
 
-#include "Utils.h"
+#include "Utils.hpp"
 
 class FanController {
     // Variables.

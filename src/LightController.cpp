@@ -1,4 +1,4 @@
-#include "LightController.h"
+#include "LightController.hpp"
 
 #include <hueplusplus/LinHttpHandler.h>
 

@@ -1,4 +1,4 @@
-#include "PrintConfigs.h"
+#include "PrintConfigs.hpp"
 
 #include <algorithm>
 #include <cstring>

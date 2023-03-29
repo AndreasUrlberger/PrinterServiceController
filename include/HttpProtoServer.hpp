@@ -3,9 +3,9 @@
 #include <functional>
 #include <string>
 
-#include "PrintConfigs.h"
+#include "PrintConfigs.hpp"
 #include "PrinterData.pb.h"
-#include "Utils.h"
+#include "Utils.hpp"
 #include "uWebSockets/App.h"
 
 #define HOST_PORT 1933

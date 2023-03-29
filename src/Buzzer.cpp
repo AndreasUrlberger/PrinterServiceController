@@ -1,11 +1,11 @@
-#include "Buzzer.h"
+#include "Buzzer.hpp"
 
 #include <pigpio.h>
 #include <stdint.h>
 
 #include <iostream>
 
-#include "Utils.h"
+#include "Utils.hpp"
 
 static constexpr int pin = 26;
 

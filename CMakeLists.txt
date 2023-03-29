@@ -62,20 +62,22 @@ target_sources(${TARGET} PRIVATE
     ./src/Logger.cpp
     ./src/PowerButtonController.cpp
     ./src/PrintConfigs.cpp
+    ./src/PrinterState.cpp
     ./src/ServiceController.cpp
     ./src/Utils.cpp
 
-    ./include/ButtonController.h
-    ./include/Buzzer.h
-    ./include/DisplayController.h
-    ./include/FanController.h
-    ./include/HttpProtoServer.h
-    ./include/LightController.h
-    ./include/Logger.h
-    ./include/PowerButtonController.h
-    ./include/PrintConfigs.h
-    ./include/ServiceController.h
-    ./include/Utils.h
+    ./include/ButtonController.hpp
+    ./include/Buzzer.hpp
+    ./include/DisplayController.hpp
+    ./include/FanController.hpp
+    ./include/HttpProtoServer.hpp
+    ./include/LightController.hpp
+    ./include/Logger.hpp
+    ./include/PowerButtonController.hpp
+    ./include/PrintConfigs.hpp
+    ./include/PrinterState.hpp
+    ./include/ServiceController.hpp
+    ./include/Utils.hpp
 
     # Include generated proto files
     ${PROTO_HEADERS}

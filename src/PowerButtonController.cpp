@@ -1,11 +1,11 @@
-#include "PowerButtonController.h"
+#include "PowerButtonController.hpp"
 
 #include <pigpio.h>
 
 #include <iostream>
 
-#include "Buzzer.h"
-#include "Utils.h"
+#include "Buzzer.hpp"
+#include "Utils.hpp"
 
 void PowerButtonController::longPress() {
     std::thread doubleBuzzer = std::thread(Buzzer::doubleBuzz);

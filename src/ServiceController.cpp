@@ -1,4 +1,4 @@
-#include "ServiceController.h"
+#include "ServiceController.hpp"
 
 #include <stdint.h>
 
@@ -7,8 +7,8 @@
 #include <sstream>
 #include <thread>
 
-#include "Buzzer.h"
-#include "Logger.h"
+#include "Buzzer.hpp"
+#include "Logger.hpp"
 
 // practically a function alias since most compilers will directly call PrintConfigs::getPrintConfigs
 constexpr auto printConfigs = PrintConfigs::getPrintConfigs;
