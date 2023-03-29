@@ -1,8 +1,9 @@
 #include "DisplayController.hpp"
 
-DisplayController::DisplayController() {
-    const char* filename = "/dev/i2c-3";
-    oled = ssd1306_i2c_open(filename, 0x3c, displayWidth, displayHeight, NULL);
+DisplayController::DisplayController(const char* filename, const uint8_t displayHeight, const uint8_t displayWidth, const uint8_t fontSize, const char* fontName) : filename(filename), displayHeight(displayHeight), displayWidth(displayWidth), fontSize(fontSize), fontName(fontName) {
+    // Create dump file. This is done to avoid the display output to be printed to the console.
+    auto nullFile = fopen("/dev/null", "w");
+    oled = ssd1306_i2c_open(filename, 0x3c, displayWidth, displayHeight, nullFile);
     if (!oled) {
         throw std::runtime_error("Could not create the screen");
     }
@@ -15,45 +16,48 @@ DisplayController::DisplayController() {
     turnOn();
 
     opts[0].type = ssd1306_graphics_options_t::SSD1306_OPT_FONT_FILE;
-    opts[0].value.font_file = "/usr/share/fonts/truetype/freefont/FreeMono.ttf";
+    opts[0].value.font_file = fontName;
     opts[1].type = ssd1306_graphics_options_t::SSD1306_OPT_ROTATE_FONT;
     opts[1].value.rotation_degrees = 180;
 }
 
 DisplayController::~DisplayController() {
-    if (oled != nullptr && fbp != nullptr) {
+    if (oled != nullptr) {
         ssd1306_i2c_run_cmd(oled, SSD1306_I2C_CMD_POWER_OFF, 0, 0);
-        ssd1306_framebuffer_destroy(fbp);
-        fbp = nullptr;
         ssd1306_i2c_close(oled);
         oled = nullptr;
+    }
+
+    if (fbp != nullptr) {
+        ssd1306_framebuffer_destroy(fbp);
+        fbp = nullptr;
     }
 }
 
 void DisplayController::turnOff() {
     if (isOn) {
-        ssd1306_i2c_run_cmd(oled, SSD1306_I2C_CMD_POWER_OFF, 0, 0);
         isOn = false;
+        ssd1306_i2c_run_cmd(oled, SSD1306_I2C_CMD_POWER_OFF, 0, 0);
     }
 }
 
 void DisplayController::turnOn() {
     if (!isOn) {
+        isOn = true;
         setInverted(!isInverted);
         ssd1306_i2c_run_cmd(oled, SSD1306_I2C_CMD_POWER_ON, 0, 0);
-        isOn = true;
     }
 }
 
-bool DisplayController::isIconVisible() {
+bool DisplayController::isIconVisible() const {
     return iconVisible;
 }
 
-void DisplayController::setIconVisible(bool visible) {
+void DisplayController::setIconVisible(const bool visible) {
     iconVisible = visible;
 }
 
-void DisplayController::setInverted(bool inverted) {
+void DisplayController::setInverted(const bool inverted) {
     isInverted = inverted;
     if (isInverted) {
         ssd1306_i2c_run_cmd(oled, SSD1306_I2C_CMD_DISP_INVERTED, 0, 0);
@@ -62,18 +66,18 @@ void DisplayController::setInverted(bool inverted) {
     }
 }
 
-void DisplayController::drawFanIcon(uint8_t xOff, uint8_t yOff) {
+void DisplayController::drawFanIcon(const uint8_t xOff, const uint8_t yOff) {
     for (uint8_t x = 0; x < 17; ++x) {
         for (uint8_t y = 0; y < 17; y++) {
             uint8_t xCord = static_cast<uint8_t>(x + xOff);
             uint8_t yCord = static_cast<uint8_t>(y + yOff);
-            // ssd1306_framebuffer_put_pixel(fbp, xCord, yCord, fan[x][y]); // add rotation
-            ssd1306_framebuffer_put_pixel_rotation(fbp, xCord, yCord, fan[x][y], 180);
+            // Screen is upside down, therefore we need to rotate the icon 180 degrees.
+            ssd1306_framebuffer_put_pixel_rotation(fbp, xCord, yCord, fanIcon[x][y], 180);
         }
     }
 }
 
-void DisplayController::drawTemperature(int32_t want, int32_t have, std::string name) {
+void DisplayController::drawTemperature(const int32_t want, const int32_t have, const std::string name) {
     ssd1306_framebuffer_clear(fbp);
     int haveInt = have / 1000;
     int haveDec = std::abs(have % 1000) / 100;  // one decimal digit
