@@ -89,7 +89,7 @@ void HttpProtoServer::handleHttpRequest(uWS::HttpResponse<false> *res, uWS::Http
 
 bool HttpProtoServer::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false> *res) {
     Printer::PrinterStatus printerStatus;
-    printerStatus.set_is_temp_control_active(state.tempControl);
+    printerStatus.set_is_temp_control_active(state.isTempControlActive);
     printerStatus.set_temperature_outside(state.outerTemp);
     printerStatus.set_temperature_inside_top(state.innerTopTemp);
     printerStatus.set_temperature_inside_bottom(state.innerBottomTemp);

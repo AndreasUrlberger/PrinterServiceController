@@ -5,12 +5,10 @@
 #include <string>
 
 struct PrinterState {
-    bool state;
-    bool tempControl;
-    double progress;
+    bool isOn;
+    bool isTempControlActive;
+    double printProgress;
     uint64_t remainingTime;
-    int32_t boardTemp;
-    int32_t nozzleTemp;
     int32_t innerTopTemp;
     int32_t innerBottomTemp;
     int32_t outerTemp;

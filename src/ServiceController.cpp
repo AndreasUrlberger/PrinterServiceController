@@ -14,12 +14,10 @@
 constexpr auto printConfigs = PrintConfigs::getPrintConfigs;
 
 void ServiceController::run() {
-    state.boardTemp = 0;
-    state.nozzleTemp = 0;
-    state.progress = 0;
+    state.printProgress = 0;
     state.remainingTime = 0;
-    state.state = true;
-    state.tempControl = fanController.isControlOn();
+    state.isOn = true;
+    state.isTempControlActive = fanController.isControlOn();
     state.fanSpeed = 0;
 
     powerButtonController.start();
@@ -28,7 +26,7 @@ void ServiceController::run() {
     fanController.start();
 
     // Might not be necessary.
-    state.tempControl = fanController.isControlOn();
+    state.isTempControlActive = fanController.isControlOn();
     printerServer.updateState(state);
 
     std::thread timerThread = std::thread([this]() {
@@ -151,7 +149,7 @@ void ServiceController::onSecondButtonClick(bool longClick) {
 void ServiceController::onChangeFanControl(bool isOn) {
     if (fanController.isControlOn() xor isOn) {
         fanController.toggleControl();
-        state.tempControl = fanController.isControlOn();
+        state.isTempControlActive = fanController.isControlOn();
         printerServer.updateState(state);
     }
 }
