@@ -7,7 +7,7 @@
 
 #include "Timing.hpp"
 
-static constexpr int pin = 26;
+Buzzer::Buzzer(const uint8_t pin) : pin(pin) {}
 
 void Buzzer::singleBuzz() {
     setup();

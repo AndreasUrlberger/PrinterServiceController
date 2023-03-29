@@ -1,12 +1,15 @@
 #pragma once
 
-class Buzzer
-{
-private:
-	static void setup();
-	static inline bool isSetup = false;
-public:
-	static void singleBuzz();
-	static void doubleBuzz();
-};
+class Buzzer {
+   private:
+    bool isSetup = false;
+    const uint8_t pin;
 
+    void setup();
+
+   public:
+    Buzzer(const uint8_t pin);
+    ~Buzzer() = default;
+    void singleBuzz();
+    void doubleBuzz();
+};

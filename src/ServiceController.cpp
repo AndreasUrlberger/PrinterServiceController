@@ -7,7 +7,6 @@
 #include <sstream>
 #include <thread>
 
-#include "Buzzer.hpp"
 #include "Logger.hpp"
 
 // practically a function alias since most compilers will directly call PrintConfigs::getPrintConfigs
@@ -136,7 +135,7 @@ void ServiceController::onActionButtonShortClick() {
 }
 
 void ServiceController::onActionButtonLongClick() {
-    Buzzer::singleBuzz();
+    buzzer.singleBuzz();
     fanController.toggleControl();
 
     keepDisplayAlive();
