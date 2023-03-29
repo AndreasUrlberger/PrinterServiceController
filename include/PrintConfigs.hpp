@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-#include "Utils.hpp"
+#include "PrinterState.hpp"
 
 struct PrintConfig {
     std::string name;

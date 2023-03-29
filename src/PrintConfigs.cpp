@@ -129,12 +129,12 @@ bool PrintConfigs::removeConfig(PrintConfig &profile, PrinterState &state) {
     const auto searchResult = std::find_if_not(configs.begin(), configs.end(), profileComp);
     const bool containsElement = searchResult != configs.end();
     if (containsElement) {
-        // Make sure the current profile is not a remove profile.
-        if (state.profileName == profile.name && state.profileTemp == profile.temperature) {
+        // Make sure the current profile is not a removed profile.
+        if (state.getProfileName() == profile.name && state.getProfileTemp() == profile.temperature) {
             // Find any other profile and set it as the current profile.
             const auto otherElement = std::find_if(configs.begin(), configs.end(), profileComp);
-            state.profileName = otherElement->name;
-            state.profileTemp = otherElement->temperature;
+            state.setProfileName(otherElement->name, false);
+            state.setProfileTemp(otherElement->temperature);
         }
         configs.erase(searchResult);
         savePrintConfigs();

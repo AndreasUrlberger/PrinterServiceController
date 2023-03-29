@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <iostream>
 
+#include "Timing.hpp"
+
 FanController::FanController(std::function<void(bool)> onFanStateChange, std::function<void(float)> updateFanSpeed) {
     onFanStateChangeHook = onFanStateChange;
     this->updateFanSpeed = updateFanSpeed;
@@ -56,7 +58,7 @@ void FanController::start() {
     startFanSpeedMeasurement();
 
     // Start blink thread.
-    std::thread(Utils::callLambda, [this]() { blinkLoop(); }).detach();
+    std::thread([this]() { blinkLoop(); }).detach();
 }
 
 void FanController::notifyChange() {
@@ -79,7 +81,7 @@ void FanController::blinkLoop() {
                 gpioWrite(FAN_LED_PIN, 0);
         }
         isLedOn = !isLedOn;
-        Utils::sleep(500);
+        Timing::sleepMillis(500);
     }
 }
 

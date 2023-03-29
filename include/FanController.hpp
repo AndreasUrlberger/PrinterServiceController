@@ -5,8 +5,6 @@
 #include <functional>
 #include <thread>
 
-#include "Utils.hpp"
-
 class FanController {
     // Variables.
    private:

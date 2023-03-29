@@ -8,7 +8,7 @@
 #include "HttpProtoServer.hpp"
 #include "LightController.hpp"
 #include "PrintConfigs.hpp"
-#include "Utils.hpp"
+#include "Timing.hpp"
 
 static constexpr auto INNER_TOP_THERMO_NAME = "28-2ca0a72153ff";
 static constexpr auto INNER_BOTTOM_THERMO_NAME = "28-3c290457da46";
@@ -18,9 +18,9 @@ class ServiceController {
    private:
     static constexpr uint64_t SCREEN_ALIVE_TIME = 30'000;
     static constexpr uint64_t MAX_INACTIVE_TIME = 3'000;
-    int64_t turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
+    int64_t turnOffTime = Timing::currentTimeMillis() + SCREEN_ALIVE_TIME;
     bool shuttingDown = false;
-    uint64_t lastActivity = Utils::currentMillis();
+    uint64_t lastActivity = Timing::currentTimeMillis();
     bool isStreamRunning = false;
     std::mutex streamMutex;
 
@@ -61,7 +61,7 @@ class ServiceController {
     LightController lightController{};
     FanController fanController{
         [this](bool state) { onFanStateChanged(state); },
-        [this](float fanSpeed) { state.fanSpeed = fanSpeed; }};
+        [this](float fanSpeed) { state.setFanSpeed(fanSpeed); }};
 
    public:
     void run();

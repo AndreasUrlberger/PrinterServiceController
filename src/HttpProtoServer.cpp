@@ -89,16 +89,16 @@ void HttpProtoServer::handleHttpRequest(uWS::HttpResponse<false> *res, uWS::Http
 
 bool HttpProtoServer::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false> *res) {
     Printer::PrinterStatus printerStatus;
-    printerStatus.set_is_temp_control_active(state.isTempControlActive);
-    printerStatus.set_temperature_outside(state.outerTemp);
-    printerStatus.set_temperature_inside_top(state.innerTopTemp);
-    printerStatus.set_temperature_inside_bottom(state.innerBottomTemp);
-    printerStatus.set_fan_speed(state.fanSpeed);
+    printerStatus.set_is_temp_control_active(state.getIsTempControlActive());
+    printerStatus.set_temperature_outside(state.getOuterTemp());
+    printerStatus.set_temperature_inside_top(state.getInnerTopTemp());
+    printerStatus.set_temperature_inside_bottom(state.getInnerBottomTemp());
+    printerStatus.set_fan_speed(state.getFanSpeed());
     Printer::PrintConfig *currentPrintConfig = new Printer::PrintConfig();
-    currentPrintConfig->set_name(state.profileName);
-    currentPrintConfig->set_temperature(state.profileTemp);
+    currentPrintConfig->set_name(state.getProfileName());
+    currentPrintConfig->set_temperature(state.getProfileTemp());
     printerStatus.set_allocated_current_print_config(currentPrintConfig);
-    printerStatus.set_fan_speed(state.fanSpeed);
+    printerStatus.set_fan_speed(state.getFanSpeed());
 
     if (sendPrintConfigs) {
         std::vector<PrintConfig> configs = PrintConfigs::getPrintConfigs();
@@ -191,4 +191,5 @@ bool HttpProtoServer::changeTempControl(std::vector<char> buffer, uWS::HttpRespo
     return sendStatus(false, res);
 }
 
+// TODO Definitely change this.
 void HttpProtoServer::updateState(PrinterState &state) { this->state = state; }

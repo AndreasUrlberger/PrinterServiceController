@@ -5,7 +5,7 @@
 
 #include "PrintConfigs.hpp"
 #include "PrinterData.pb.h"
-#include "Utils.hpp"
+#include "PrinterState.hpp"
 #include "uWebSockets/App.h"
 
 #define HOST_PORT 1933

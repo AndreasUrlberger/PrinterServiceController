@@ -14,27 +14,21 @@
 constexpr auto printConfigs = PrintConfigs::getPrintConfigs;
 
 void ServiceController::run() {
-    state.printProgress = 0;
-    state.remainingTime = 0;
-    state.isOn = true;
-    state.isTempControlActive = fanController.isControlOn();
-    state.fanSpeed = 0;
+    state.setIsOn(true, false);
+    state.setIsTempControlActive(fanController.isControlOn(), false);
+    state.setFanSpeed(0, true);
 
     powerButtonController.start();
     actionButtonController.start();
     lightController.start();
     fanController.start();
 
-    // Might not be necessary.
-    state.isTempControlActive = fanController.isControlOn();
-    printerServer.updateState(state);
-
     std::thread timerThread = std::thread([this]() {
         auto start = std::chrono::steady_clock::now();
         auto chronoInterval = std::chrono::seconds(1);
         auto targetTime = start + chronoInterval;
         while (true) {
-            if ((Utils::currentMillis() - lastActivity) > MAX_INACTIVE_TIME) {
+            if ((Timing::currentTimeMillis() - lastActivity) > MAX_INACTIVE_TIME) {
                 stopStream();
             }
 
@@ -55,29 +49,29 @@ int ServiceController::displayTempLoop() {
     displayController.setInverted(false);
 
     while (true) {
-        state.innerTopTemp = readTemp(INNER_TOP_THERMO_NAME);
-        state.innerBottomTemp = readTemp(INNER_BOTTOM_THERMO_NAME);
-        state.outerTemp = readTemp(OUTER_THERMO_NAME);
+        state.setInnerTopTemp(readTemp(INNER_TOP_THERMO_NAME), false);
+        state.setInnerBottomTemp(readTemp(INNER_BOTTOM_THERMO_NAME), false);
+        state.setOuterTemp(readTemp(OUTER_THERMO_NAME), true);
         updateDisplay();
 
         std::ostringstream ss;
-        ss << "inner: " << state.innerTopTemp << " outer: " << state.outerTemp << " wanted: " << state.profileTemp;
+        ss << "inner: " << state.getInnerTopTemp() << " outer: " << state.getOuterTemp() << " wanted: " << state.getProfileTemp();
         Logger::log(ss.str());
 
         printerServer.updateState(state);
-        fanController.tempChanged(state.innerTopTemp, state.profileTemp);
-        Utils::sleep(1000);
+        fanController.tempChanged(state.getInnerTopTemp(), state.getProfileTemp());
+        Timing::sleepSeconds(1);
     }
     return 0;
 }
 
 void ServiceController::updateDisplay() {
     PrintConfig config = printConfigs()[0];
-    state.profileTemp = config.temperature;
-    state.profileName = config.name;
-    const int64_t now = Utils::currentMillis();
+    state.setProfileTemp(config.temperature, false);
+    state.setProfileName(config.name, true);
+    const int64_t now = Timing::currentTimeMillis();
     if (turnOffTime - now > 0 && !shuttingDown) {
-        displayController.drawTemperature(state.profileTemp, state.innerTopTemp, config.name);
+        displayController.drawTemperature(state.getProfileTemp(), state.getInnerTopTemp(), config.name);
     } else {
         displayController.turnOff();
     }
@@ -118,8 +112,8 @@ void ServiceController::onFanStateChanged(bool isOn) {
 bool ServiceController::onProfileUpdate(PrintConfig &profile) {
     const bool hasChanged = PrintConfigs::addConfig(profile);
     // update server
-    state.profileName = profile.name;
-    state.profileTemp = profile.temperature;
+    state.setProfileName(profile.name, false);
+    state.setProfileTemp(profile.temperature, true);
     printerServer.updateState(state);
     return hasChanged;
 }
@@ -149,7 +143,7 @@ void ServiceController::onActionButtonLongClick() {
 }
 
 void ServiceController::keepDisplayAlive() {
-    turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
+    turnOffTime = Timing::currentTimeMillis() + SCREEN_ALIVE_TIME;
     updateDisplay();
     displayController.turnOn();
 }
@@ -157,7 +151,7 @@ void ServiceController::keepDisplayAlive() {
 void ServiceController::onChangeFanControl(bool isOn) {
     if (fanController.isControlOn() xor isOn) {
         fanController.toggleControl();
-        state.isTempControlActive = fanController.isControlOn();
+        state.setIsTempControlActive(fanController.isControlOn(), true);
         printerServer.updateState(state);
     }
 }
@@ -165,7 +159,7 @@ void ServiceController::onChangeFanControl(bool isOn) {
 void ServiceController::onServerActivity() {
     startStream();
 
-    const uint64_t currentTime = Utils::currentMillis();
+    const uint64_t currentTime = Timing::currentTimeMillis();
     lastActivity = currentTime;
 }
 

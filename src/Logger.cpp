@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <stdexcept>
 
-#include "Utils.hpp"
+#include "Timing.hpp"
 
 namespace fs = std::filesystem;
 static constexpr auto LOG_FILE_PATH = "/usr/share/printer-service-controller/";
@@ -38,7 +38,7 @@ void Logger::log(std::string text) {
         openFile();
         open = true;
     }
-    std::string message = std::to_string(Utils::currentMillis());
+    std::string message = std::to_string(Timing::currentTimeMillis());
     message += ": ";
     message += text;
     message += "\n";

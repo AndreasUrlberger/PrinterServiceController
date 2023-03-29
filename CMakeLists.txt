@@ -64,7 +64,6 @@ target_sources(${TARGET} PRIVATE
     ./src/PrinterState.cpp
     ./src/ServiceController.cpp
     ./src/Timing.cpp
-    ./src/Utils.cpp
 
     ./include/ButtonController.hpp
     ./include/Buzzer.hpp
@@ -77,7 +76,6 @@ target_sources(${TARGET} PRIVATE
     ./include/PrinterState.hpp
     ./include/ServiceController.hpp
     ./include/Timing.hpp
-    ./include/Utils.hpp
 
     # Include generated proto files
     ${PROTO_HEADERS}
