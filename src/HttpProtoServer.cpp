@@ -2,29 +2,19 @@
 
 #include <iostream>
 
-HttpProtoServer::HttpProtoServer(std::function<void(void)> shutdownHook, std::function<bool(PrintConfig &)> onProfileUpdate, std::function<void(bool)> onTempControlChange, std::function<void(void)> onActivity) {
-    this->shutdownHook = shutdownHook;
-    onProfileUpdateHook = onProfileUpdate;
-    tempControlChangeHook = onTempControlChange;
-    this->onActivity = onActivity;
-}
+HttpProtoServer::HttpProtoServer(PrinterState &state, const uint16_t port, const std::function<void(void)> shutdownHook, const std::function<bool(PrintConfig &)> onProfileUpdate, const std::function<void(bool)> onTempControlChange, const std::function<void(void)> onActivity) : state(state), port(port), onShutdown(shutdownHook), onProfileUpdate(onProfileUpdate), onTempControlChange(onTempControlChange), onActivity(onActivity) {}
 
-HttpProtoServer::~HttpProtoServer() {}
-
-bool HttpProtoServer::start() {
+void HttpProtoServer::start() {
     startHttpServer();
-    return true;
 }
 
 void HttpProtoServer::startHttpServer() {
-    std::cout << "start http server\n";
-
     app.addServerName("Printer-3D");
-    app.listen(HOST_PORT, [](auto *listen_socket) {
+    app.listen(port, [this](auto *listen_socket) {
         if (listen_socket) {
-            std::cout << "Listening on port " << HOST_PORT << std::endl;
+            std::cout << "Listening on port " << port << std::endl;
         } else {
-            std::cout << "Thread " << std::this_thread::get_id() << " failed to listen on port " << HOST_PORT << std::endl;
+            std::cout << "Thread " << std::this_thread::get_id() << " failed to listen on port " << port << std::endl;
         }
     });
 
@@ -55,8 +45,7 @@ void HttpProtoServer::startHttpServer() {
     app.post("/shutdown", [this](auto *res, auto *req) mutable {
         addCorsHeaders(res);
         res->endWithoutBody();
-        // TODO make sure that the stream, lights, etc. is turned off before.
-        shutdownHook();
+        onShutdown();
     });
 
     app.run();
@@ -87,7 +76,7 @@ void HttpProtoServer::handleHttpRequest(uWS::HttpResponse<false> *res, uWS::Http
     onActivity();
 }
 
-bool HttpProtoServer::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false> *res) {
+void HttpProtoServer::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false> *res) {
     Printer::PrinterStatus printerStatus;
     printerStatus.set_is_temp_control_active(state.getIsTempControlActive());
     printerStatus.set_temperature_outside(state.getOuterTemp());
@@ -113,7 +102,6 @@ bool HttpProtoServer::sendStatus(bool sendPrintConfigs, uWS::HttpResponse<false>
     const std::string outData = printerStatus.SerializeAsString();
     addCorsHeaders(res);
     res->end(outData);
-    return true;
 }
 
 void HttpProtoServer::addCorsHeaders(uWS::HttpResponse<false> *res) {
@@ -132,7 +120,8 @@ bool HttpProtoServer::statusRequest(std::vector<char> buffer, uWS::HttpResponse<
 
     const bool sendPrintConfigs = statusRequest.include_print_configs();
 
-    return sendStatus(sendPrintConfigs, res);
+    sendStatus(sendPrintConfigs, res);
+    return true;
 }
 
 bool HttpProtoServer::addPrintConfig(std::vector<char> buffer, uWS::HttpResponse<false> *res) {
@@ -149,9 +138,10 @@ bool HttpProtoServer::addPrintConfig(std::vector<char> buffer, uWS::HttpResponse
     config.name = receivedConfig.name();
     config.temperature = receivedConfig.temperature();
 
-    const bool hasChanged = onProfileUpdateHook(config);
+    const bool hasChanged = onProfileUpdate(config);
 
-    return sendStatus(hasChanged, res);
+    sendStatus(hasChanged, res);
+    return true;
 }
 
 bool HttpProtoServer::removePrintConfig(std::vector<char> buffer, uWS::HttpResponse<false> *res) {
@@ -170,7 +160,8 @@ bool HttpProtoServer::removePrintConfig(std::vector<char> buffer, uWS::HttpRespo
 
     const bool hasChanged = PrintConfigs::removeConfig(config, state);
 
-    return sendStatus(hasChanged, res);
+    sendStatus(hasChanged, res);
+    return true;
 }
 
 bool HttpProtoServer::changeTempControl(std::vector<char> buffer, uWS::HttpResponse<false> *res) {
@@ -182,14 +173,12 @@ bool HttpProtoServer::changeTempControl(std::vector<char> buffer, uWS::HttpRespo
     }
 
     // Change temp control
-    tempControlChangeHook(changeTempControl.is_active());
+    onTempControlChange(changeTempControl.is_active());
     PrintConfig config;
     config.name = changeTempControl.selected_print_config().name();
     config.temperature = changeTempControl.selected_print_config().temperature();
-    onProfileUpdateHook(config);
+    onProfileUpdate(config);
 
-    return sendStatus(false, res);
+    sendStatus(false, res);
+    return true;
 }
-
-// TODO Definitely change this.
-void HttpProtoServer::updateState(PrinterState &state) { this->state = state; }

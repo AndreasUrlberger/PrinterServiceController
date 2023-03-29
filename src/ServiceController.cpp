@@ -57,7 +57,6 @@ int ServiceController::displayTempLoop() {
         ss << "inner: " << state.getInnerTopTemp() << " outer: " << state.getOuterTemp() << " wanted: " << state.getProfileTemp();
         Logger::log(ss.str());
 
-        printerServer.updateState(state);
         fanController.tempChanged(state.getInnerTopTemp(), state.getProfileTemp());
         Timing::sleepSeconds(1);
     }
@@ -113,7 +112,6 @@ bool ServiceController::onProfileUpdate(PrintConfig &profile) {
     // update server
     state.setProfileName(profile.name, false);
     state.setProfileTemp(profile.temperature, true);
-    printerServer.updateState(state);
     return hasChanged;
 }
 
@@ -151,7 +149,6 @@ void ServiceController::onChangeFanControl(bool isOn) {
     if (fanController.isControlOn() xor isOn) {
         fanController.toggleControl();
         state.setIsTempControlActive(fanController.isControlOn(), true);
-        printerServer.updateState(state);
     }
 }
 

@@ -20,21 +20,24 @@ class ServiceController {
     static constexpr auto OUTER_THERMO_NAME{"28-baa0a72915ff"};
 
     // General settings.
-    static constexpr uint64_t SCREEN_ALIVE_TIME{UINT64_C(30'000)};
-    static constexpr uint64_t MAX_INACTIVE_TIME{UINT64_C(3'000)};
+    static constexpr const uint64_t SCREEN_ALIVE_TIME{UINT64_C(30'000)};
+    static constexpr const uint64_t MAX_INACTIVE_TIME{UINT64_C(3'000)};
 
     // Light settings.
     static constexpr auto BRIDGE_IP{"192.168.178.92"};
     static constexpr auto BRIDGE_USERNAME{"yXEXyXC5BYDJbmS-6yNdji6qcatY6BedJmRIb4kO"};
-    static constexpr uint8_t PRINTER_LIGHT_ID{UINT8_C(9)};
+    static constexpr const uint8_t PRINTER_LIGHT_ID{UINT8_C(9)};
 
     // Display settings.
-    static constexpr uint8_t DISPLAY_HEIGHT{UINT8_C(64)};
-    static constexpr uint8_t DISPLAY_WIDTH{UINT8_C(128)};
+    static constexpr const uint8_t DISPLAY_HEIGHT{UINT8_C(64)};
+    static constexpr const uint8_t DISPLAY_WIDTH{UINT8_C(128)};
     // Only need to change this if a different i2c bus is used.
     static constexpr const char* const DISPLAY_FILE_NAME{"/dev/i2c-3"};
-    static constexpr uint8_t DISPLAY_FONT_SIZE{UINT8_C(7)};
+    static constexpr const uint8_t DISPLAY_FONT_SIZE{UINT8_C(7)};
     static constexpr const char* const DISPLAY_FONT_NAME{"/usr/share/fonts/truetype/freefont/FreeMono.ttf"};
+
+    // Http server settings.
+    static constexpr const uint16_t SERVER_PORT{UINT16_C(1933)};
 
     // PRIVATE FUNCTIONS.
     uint64_t turnOffTime{Timing::currentTimeMillis() + SCREEN_ALIVE_TIME};
@@ -61,7 +64,7 @@ class ServiceController {
     void startStream();
 
     // PRIVATE VARIABLES.
-    PrinterState state;
+    PrinterState state{};
 
     Buzzer buzzer{UINT8_C(26)};
     ButtonController powerButtonController{
@@ -75,6 +78,8 @@ class ServiceController {
         DISPLAY_FONT_SIZE,
         DISPLAY_FONT_NAME};
     HttpProtoServer printerServer{
+        state,
+        SERVER_PORT,
         [this]() { onShutdown(); },
         [this](PrintConfig& config) { return onProfileUpdate(config); },
         [this](bool isOn) { onChangeFanControl(isOn); },
