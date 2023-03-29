@@ -18,6 +18,11 @@ class ServiceController {
    private:
     static constexpr uint64_t SCREEN_ALIVE_TIME = 30'000;
     static constexpr uint64_t MAX_INACTIVE_TIME = 3'000;
+
+    static constexpr auto BRIDGE_IP = "192.168.178.92";
+    static constexpr auto BRIDGE_USERNAME = "yXEXyXC5BYDJbmS-6yNdji6qcatY6BedJmRIb4kO";
+    static constexpr int PRINTER_LIGHT_ID = 9;
+
     int64_t turnOffTime = Timing::currentTimeMillis() + SCREEN_ALIVE_TIME;
     bool shuttingDown = false;
     uint64_t lastActivity = Timing::currentTimeMillis();
@@ -58,7 +63,7 @@ class ServiceController {
         UINT8_C(5),
         [this]() { onActionButtonShortClick(); },
         [this]() { onActionButtonLongClick(); }};
-    LightController lightController{};
+    LightController lightController{BRIDGE_IP, BRIDGE_USERNAME, PRINTER_LIGHT_ID};
     FanController fanController{
         [this](bool state) { onFanStateChanged(state); },
         [this](float fanSpeed) { state.setFanSpeed(fanSpeed); }};
