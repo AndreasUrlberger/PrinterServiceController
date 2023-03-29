@@ -1,33 +1,38 @@
 #pragma once
 
-#include <stdint.h>  //for uint32_t
+#include <stdint.h>
 
 #include <functional>
 #include <thread>
 
 class ButtonController {
-    uint32_t SWITCH = 5;
-    int64_t maxShortPressTime = 1000L;  // max duration for a short click
-    int64_t minShortPressTime = 50L;    // used to avoid double clicks due to a cheap button
-    int64_t longPressTime = 2000L;      // min duration for a long click
+    // VARIABLES.
+    const uint8_t buttonPin;
 
-    bool isLevelHigh = false;
-    int64_t lastDown = 0;
-    std::thread* pressedThread = nullptr;
-    std::function<void(bool longClick)> callback;
+    const std::function<void()> onShortClick;
+    const std::function<void()> onLongClick;
 
-    void longPress();
+    // Min time for a short click, used to software debounce the button.
+    const uint64_t minShortPressTime;
+    // Max time for a short click.
+    const uint64_t maxShortPressTime;
+    // Min time for a long click.
+    const uint64_t minLongPressTime;
 
-    void shortPress();
+    bool isCurrentlyHigh{false};
+    uint64_t latestDown{UINT64_C(0)};
+    std::thread* pressedThread{nullptr};
 
+    // FUNCTIONS.
     static void interruptHandler(int gpio, int level, uint32_t tick, void* buttonController);
 
    public:
-    void edgeChanging(bool isHigh);
+    // FUNCTIONS.
+    void onEdgeChange(bool buttonLevelIsHigh);
 
-    void threadFun(int64_t down);
+    void awaitLongClick(uint64_t down);
 
-    ButtonController(std::function<void(bool longClick)> callback);
+    ButtonController(uint8_t buttonPin, std::function<void()> onShortClick, std::function<void()> onLongClick, uint64_t minShortPressTime = UINT64_C(50), uint64_t maxShortPressTime = UINT64_C(1000), uint64_t minLongPressTime = UINT64_C(1500));
 
     void start();
 };

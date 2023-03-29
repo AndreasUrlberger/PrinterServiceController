@@ -21,7 +21,7 @@ void ServiceController::run() {
     state.fanSpeed = 0;
 
     powerButtonController.start();
-    buttonController.start();
+    actionButtonController.start();
     lightController.start();
     fanController.start();
 
@@ -106,12 +106,6 @@ void ServiceController::onShutdown() {
     system("sudo shutdown -h now");
 }
 
-void ServiceController::onShortPress() {
-    turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
-    updateDisplay();
-    displayController.turnOn();
-}
-
 void ServiceController::onFanStateChanged(bool isOn) {
     if (isOn) {
         Logger::log(std::string{"fanState: on"});
@@ -130,19 +124,33 @@ bool ServiceController::onProfileUpdate(PrintConfig &profile) {
     return hasChanged;
 }
 
-void ServiceController::onSecondButtonClick(bool longClick) {
+void ServiceController::onPowerButtonShortClick() {
+    keepDisplayAlive();
+}
+
+void ServiceController::onPowerButtonLongClick() {
+    onShutdown();
+}
+
+void ServiceController::onActionButtonShortClick() {
+    // Switch config
+    auto configs = printConfigs();
+    auto nextConfig = configs[configs.size() - 1];
+    PrintConfigs::addConfig(nextConfig);
+
+    keepDisplayAlive();
+}
+
+void ServiceController::onActionButtonLongClick() {
+    Buzzer::singleBuzz();
+    fanController.toggleControl();
+
+    keepDisplayAlive();
+}
+
+void ServiceController::keepDisplayAlive() {
     turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
-    if (longClick) {
-        Buzzer::singleBuzz();
-        fanController.toggleControl();
-    } else {
-        // switch config
-        auto configs = printConfigs();
-        auto nextConfig = configs[configs.size() - 1];
-        PrintConfigs::addConfig(nextConfig);
-        // manually trigger display
-        updateDisplay();
-    }
+    updateDisplay();
     displayController.turnOn();
 }
 

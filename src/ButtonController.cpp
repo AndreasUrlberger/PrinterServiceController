@@ -4,47 +4,38 @@
 
 #include <iostream>
 
-#include "Utils.hpp"
+#include "Timing.hpp"
 
-void ButtonController::longPress() {
-    callback(true);
-}
-
-void ButtonController::shortPress() {
-    callback(false);
-}
-
-void ButtonController::threadFun(int64_t down) {
-    // realDownTime is the time when the button was pressed down, the time this thread was started.
-    const int64_t realDownTime = down;
-    std::this_thread::sleep_for(std::chrono::milliseconds(longPressTime));
-    const bool anyPressesInBetween = lastDown != realDownTime;
-    if (isLevelHigh && !anyPressesInBetween) {
-        longPress();
+void ButtonController::awaitLongClick(uint64_t timeAtClick) {
+    // originalDownTime is the time when the button was pressed down, the time this thread was started.
+    const uint64_t originalDownTime = timeAtClick;
+    Timing::sleepMillis(minLongPressTime);
+    const bool anyPressesInBetween = latestDown != originalDownTime;
+    if (isCurrentlyHigh && !anyPressesInBetween) {
+        onLongClick();
     }
 }
 
-void ButtonController::edgeChanging(bool buttonLevelIsHigh) {
-    isLevelHigh = buttonLevelIsHigh;
+void ButtonController::onEdgeChange(bool buttonLevelIsHigh) {
+    isCurrentlyHigh = buttonLevelIsHigh;
+    const uint64_t currenTimeNs = Timing::currentTimeNanos();
 
-    if (isLevelHigh) {
-        lastDown = std::chrono::system_clock::now().time_since_epoch().count();
+    if (isCurrentlyHigh) {
+        latestDown = currenTimeNs;
         if (pressedThread != nullptr) {
             delete pressedThread;
         }
-        pressedThread = new std::thread([this]() { threadFun(lastDown); });
+        pressedThread = new std::thread([this]() { awaitLongClick(latestDown); });
         pressedThread->detach();
     } else {
-        const int64_t now = std::chrono::system_clock::now().time_since_epoch().count();
-        const int64_t downTimeMs = (now - lastDown) / 1'000'000L;
+        const uint64_t downTimeMs = (currenTimeNs - latestDown) / UINT64_C(1'000'000);
         if (downTimeMs < maxShortPressTime && downTimeMs >= minShortPressTime) {
-            shortPress();
+            onShortClick();
         }
     }
 }
 
-ButtonController::ButtonController(std::function<void(bool longClick)> callback) {
-    this->callback = callback;
+ButtonController::ButtonController(uint8_t buttonPin, std::function<void()> onShortClick, std::function<void()> onLongClick, uint64_t minShortPressTime, uint64_t maxShortPressTime, uint64_t minLongPressTime) : buttonPin(buttonPin), onShortClick(onShortClick), onLongClick(onLongClick), minShortPressTime(minShortPressTime), maxShortPressTime(maxShortPressTime), minLongPressTime(minLongPressTime) {
 }
 
 void ButtonController::start() {
@@ -53,13 +44,13 @@ void ButtonController::start() {
         return;
     }
 
-    gpioSetMode(SWITCH, PI_INPUT);
-    gpioSetPullUpDown(SWITCH, PI_PUD_DOWN);
-    gpioSetISRFuncEx(SWITCH, EITHER_EDGE, 0, interruptHandler, this);
+    gpioSetMode(buttonPin, PI_INPUT);
+    gpioSetPullUpDown(buttonPin, PI_PUD_DOWN);
+    gpioSetISRFuncEx(buttonPin, EITHER_EDGE, 0, interruptHandler, this);
 }
 
 void ButtonController::interruptHandler(int gpio, int level, uint32_t tick, void* buttonController) {
     if (buttonController != nullptr) {
-        ((ButtonController*)buttonController)->edgeChanging(level == 1);
+        ((ButtonController*)buttonController)->onEdgeChange(level == 1);
     }
 }

@@ -60,10 +60,10 @@ target_sources(${TARGET} PRIVATE
     ./src/HttpProtoServer.cpp
     ./src/LightController.cpp
     ./src/Logger.cpp
-    ./src/PowerButtonController.cpp
     ./src/PrintConfigs.cpp
     ./src/PrinterState.cpp
     ./src/ServiceController.cpp
+    ./src/Timing.cpp
     ./src/Utils.cpp
 
     ./include/ButtonController.hpp
@@ -73,10 +73,10 @@ target_sources(${TARGET} PRIVATE
     ./include/HttpProtoServer.hpp
     ./include/LightController.hpp
     ./include/Logger.hpp
-    ./include/PowerButtonController.hpp
     ./include/PrintConfigs.hpp
     ./include/PrinterState.hpp
     ./include/ServiceController.hpp
+    ./include/Timing.hpp
     ./include/Utils.hpp
 
     # Include generated proto files

@@ -7,7 +7,6 @@
 #include "FanController.hpp"
 #include "HttpProtoServer.hpp"
 #include "LightController.hpp"
-#include "PowerButtonController.hpp"
 #include "PrintConfigs.hpp"
 #include "Utils.hpp"
 
@@ -29,10 +28,13 @@ class ServiceController {
     void updateDisplay();
     int32_t readTemp(std::string deviceName);
     void onShutdown();
-    void onShortPress();
     void onFanStateChanged(bool state);
     bool onProfileUpdate(PrintConfig &profile);
-    void onSecondButtonClick(bool longClick);
+    void onPowerButtonShortClick();
+    void onPowerButtonLongClick();
+    void onActionButtonShortClick();
+    void onActionButtonLongClick();
+    void keepDisplayAlive();
     void onChangeFanControl(bool isOn);
     void onServerActivity();
 
@@ -41,17 +43,21 @@ class ServiceController {
 
     PrinterState state;
 
-    PowerButtonController powerButtonController{
-        [this]() { onShutdown(); },
-        [this]() { onShortPress(); }};
+    ButtonController powerButtonController{
+        UINT8_C(3),
+        [this]() { onPowerButtonShortClick(); },
+        [this]() { onPowerButtonLongClick(); }};
     DisplayController displayController;
     HttpProtoServer printerServer{
         [this]() { onShutdown(); },
         [this](PrintConfig &config) { return onProfileUpdate(config); },
         [this](bool isOn) { onChangeFanControl(isOn); },
         [this]() { onServerActivity(); }};
-    ButtonController buttonController{
-        [this](bool longClick) { onSecondButtonClick(longClick); }};
+    ButtonController actionButtonController{
+        // Button pin
+        UINT8_C(5),
+        [this]() { onActionButtonShortClick(); },
+        [this]() { onActionButtonLongClick(); }};
     LightController lightController{};
     FanController fanController{
         [this](bool state) { onFanStateChanged(state); },
