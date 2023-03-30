@@ -69,15 +69,14 @@ class FanController : private PrinterState::PrinterStateListener {
     void blinkLoop();
     void startFanSpeedMeasurement();
     void measureSpeed();
+    void tempChanged(const int32_t temp, const int32_t wanted);
+    static void interruptHandler(const int gpio, const int level, const uint32_t tick, void* buttonController);
 
     // PUBLIC FUNCTIONS.
    public:
     FanController(PrinterState& state, const FanControllerConfig& config);
     void onPrinterStateChanged() override;
 
-    static void interruptHandler(const int gpio, const int level, const uint32_t tick, void* buttonController);
-
-    void tempChanged(const int32_t temp, const int32_t wanted);
     void turnOff();
     void turnOn();
     void toggleControl();

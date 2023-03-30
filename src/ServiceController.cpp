@@ -18,6 +18,9 @@ ServiceController::ServiceController() {
 
 void ServiceController::onPrinterStateChanged() {
     // TODO update display?
+
+    // TODO subscribe display controller to state?.
+    displayController.setIconVisible(state.getIsTempControlActive());
 }
 
 void ServiceController::run() {
@@ -41,7 +44,6 @@ void ServiceController::run() {
     std::thread displayTempLoopThread = std::thread([this]() { displayTempLoop(); });
 
     printerServer.start();
-    std::cout << "PrinterServerThread ended\n";
     displayTempLoopThread.join();
     timerThread.join();
 }
@@ -49,7 +51,7 @@ void ServiceController::run() {
 int ServiceController::displayTempLoop() {
     displayController.setInverted(false);
 
-    while (true) {
+    Timing::runEveryNMillis(UINT64_C(1000), [this]() {
         state.setInnerTopTemp(readTemp(INNER_TOP_THERMO_NAME), false);
         state.setInnerBottomTemp(readTemp(INNER_BOTTOM_THERMO_NAME), false);
         state.setOuterTemp(readTemp(OUTER_THERMO_NAME), true);
@@ -58,10 +60,8 @@ int ServiceController::displayTempLoop() {
         std::ostringstream ss;
         ss << "inner: " << state.getInnerTopTemp() << " outer: " << state.getOuterTemp() << " wanted: " << state.getProfileTemp();
         Logger::log(ss.str());
+    });
 
-        fanController.tempChanged(state.getInnerTopTemp(), state.getProfileTemp());
-        Timing::sleepSeconds(1);
-    }
     return 0;
 }
 
@@ -98,15 +98,6 @@ void ServiceController::onShutdown() {
     turnOffTime = 0;
     displayController.turnOff();
     system("sudo shutdown -h now");
-}
-
-void ServiceController::onFanStateChanged(bool isOn) {
-    if (isOn) {
-        Logger::log(std::string{"fanState: on"});
-    } else {
-        Logger::log(std::string{"fanState: off"});
-    }
-    displayController.setIconVisible(isOn);
 }
 
 bool ServiceController::onProfileUpdate(PrintConfig &profile) {

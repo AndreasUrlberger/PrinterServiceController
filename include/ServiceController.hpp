@@ -77,7 +77,6 @@ class ServiceController : private PrinterState::PrinterStateListener {
     void updateDisplay();
     int32_t readTemp(std::string deviceName);
     void onShutdown();
-    void onFanStateChanged(bool state);
     bool onProfileUpdate(PrintConfig& profile);
     void onPowerButtonShortClick();
     void onPowerButtonLongClick();
