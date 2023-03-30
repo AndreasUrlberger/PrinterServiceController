@@ -223,9 +223,11 @@ void FanController::startFanSpeedMeasurement() {
     gpioSetPullUpDown(config.FAN_TICK_PIN, PI_PUD_DOWN);
     gpioSetISRFuncEx(config.FAN_TICK_PIN, EITHER_EDGE, 0, interruptHandler, this);
 
-    Timing::runEveryNMillis(config.FAN_SPEED_MEAS_PERIOD_MS, [this]() {
-        measureSpeed();
-    });
+    std::thread([this]() {
+        Timing::runEveryNMillis(config.FAN_SPEED_MEAS_PERIOD_MS, [this]() {
+            measureSpeed();
+        });
+    }).detach();
 }
 
 void FanController::interruptHandler(const int gpio, const int level, const uint32_t tick, void* fanController) {

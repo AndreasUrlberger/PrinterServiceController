@@ -97,3 +97,17 @@ void PrinterState::setFanSpeed(const float fanSpeed, const bool notify) {
         notifyListeners();
     }
 }
+
+std::string PrinterState::toString() const {
+    std::string result = "PrinterState{";
+    result += "isOn=" + std::to_string(isOn);
+    result += ", isTempControlActive=" + std::to_string(isTempControlActive);
+    result += ", innerTopTemp=" + std::to_string(innerTopTemp);
+    result += ", innerBottomTemp=" + std::to_string(innerBottomTemp);
+    result += ", outerTemp=" + std::to_string(outerTemp);
+    result += ", profileName=" + profileName;
+    result += ", profileTemp=" + std::to_string(profileTemp);
+    result += ", fanSpeed=" + std::to_string(fanSpeed);
+    result += "}";
+    return result;
+}

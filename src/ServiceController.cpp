@@ -17,6 +17,8 @@ ServiceController::ServiceController() {
 }
 
 void ServiceController::onPrinterStateChanged() {
+    std::cout << "State: " << state.toString() << std::endl;
+
     // TODO update display?
 
     // TODO subscribe display controller to state?.
@@ -69,8 +71,8 @@ void ServiceController::updateDisplay() {
     PrintConfig config = printConfigs()[0];
     state.setProfileTemp(config.temperature, false);
     state.setProfileName(config.name, true);
-    const int64_t now = Timing::currentTimeMillis();
-    if (turnOffTime - now > 0 && !shuttingDown) {
+    const uint64_t now = Timing::currentTimeMillis();
+    if (turnOffTime > now && !shuttingDown) {
         displayController.drawTemperature(state.getProfileTemp(), state.getInnerTopTemp(), config.name);
     } else {
         displayController.turnOff();

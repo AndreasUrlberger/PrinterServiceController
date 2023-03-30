@@ -48,4 +48,6 @@ class PrinterState {
     void setProfileName(const std::string& profileName, const bool notify = true);
     void setProfileTemp(const int32_t profileTemp, const bool notify = true);
     void setFanSpeed(const float fanSpeed, const bool notify = true);
+
+    std::string toString() const;
 };

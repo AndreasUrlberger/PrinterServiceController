@@ -20,7 +20,7 @@ class ServiceController : private PrinterState::PrinterStateListener {
     static constexpr auto OUTER_THERMO_NAME{"28-baa0a72915ff"};
 
     // General settings.
-    static constexpr const uint64_t SCREEN_ALIVE_TIME{UINT64_C(30'000)};
+    static constexpr const uint64_t SCREEN_ALIVE_TIME{UINT64_C(20'000)};
     static constexpr const uint64_t MAX_INACTIVE_TIME{UINT64_C(3'000)};
 
     // Light settings.
@@ -33,7 +33,7 @@ class ServiceController : private PrinterState::PrinterStateListener {
     static constexpr const uint8_t DISPLAY_WIDTH{UINT8_C(128)};
     // Only need to change this if a different i2c bus is used.
     static constexpr const char* const DISPLAY_FILE_NAME{"/dev/i2c-3"};
-    static constexpr const uint8_t DISPLAY_FONT_SIZE{UINT8_C(7)};
+    static constexpr const uint8_t DISPLAY_FONT_SIZE{UINT8_C(5)};
     static constexpr const char* const DISPLAY_FONT_NAME{"/usr/share/fonts/truetype/freefont/FreeMono.ttf"};
 
     // Http server settings.
