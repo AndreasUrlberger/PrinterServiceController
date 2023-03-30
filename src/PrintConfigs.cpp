@@ -10,10 +10,6 @@
 
 namespace fs = std::filesystem;
 
-static const char *defaultConfig = "25000:PETG\n30000:PLA\n";
-static constexpr auto CONFIG_FILE_PATH = "/usr/share/printer-service-controller/";
-static constexpr auto CONFIG_FILE_NAME = "print-configs.txt";
-
 void PrintConfigs::evaluateLine(const std::string line, std::vector<PrintConfig> &configs) {
     if (line.empty())
         return;
@@ -45,7 +41,7 @@ void PrintConfigs::loadPrintConfigs() {
             throw std::runtime_error("Could not create the config file (" + path + ")");
             return;
         } else {
-            file.write(defaultConfig, strlen(defaultConfig));
+            file.write(DEFAULT_CONFIG, strlen(DEFAULT_CONFIG));
             file.close();
         }
         file.open(path, std::fstream::in);

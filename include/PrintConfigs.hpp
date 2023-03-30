@@ -10,6 +10,10 @@ struct PrintConfig {
 };
 
 class PrintConfigs {
+    static constexpr const char *const DEFAULT_CONFIG{"25000:PETG\n30000:PLA\n"};
+    static constexpr const char *const CONFIG_FILE_PATH{"/usr/share/printer-service-controller/"};
+    static constexpr const char *const CONFIG_FILE_NAME{"print-configs.txt"};
+
    private:
     inline static bool valid;
     inline static std::vector<PrintConfig> configs;
