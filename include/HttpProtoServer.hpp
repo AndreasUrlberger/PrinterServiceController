@@ -10,7 +10,7 @@
 
 class HttpProtoServer {
    private:
-   // PRIVATE VARIABLES.
+    // PRIVATE VARIABLES.
     uWS::App app{};
     PrinterState &state;
     const uint16_t port;
@@ -31,9 +31,9 @@ class HttpProtoServer {
     void startHttpServer();
 
    public:
-   // PUBLIC FUNCTIONS.
+    // PUBLIC FUNCTIONS.
     void start();
 
-    HttpProtoServer(PrinterState &state, const uint16_t port, const std::function<void(void)> onShutdown, const std::function<bool(PrintConfig &)> onProfileUpdate, const std::function<void(bool)> onTempControlChange, const std::function<void(void)> onActivity);
+    HttpProtoServer(PrinterState &state, const uint16_t port, const std::function<void(void)> onShutdown, const std::function<bool(PrintConfig &)> onProfileUpdate, const std::function<void(void)> onActivity);
     ~HttpProtoServer() = default;
 };

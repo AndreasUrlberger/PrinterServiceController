@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-HttpProtoServer::HttpProtoServer(PrinterState &state, const uint16_t port, const std::function<void(void)> shutdownHook, const std::function<bool(PrintConfig &)> onProfileUpdate, const std::function<void(bool)> onTempControlChange, const std::function<void(void)> onActivity) : state(state), port(port), onShutdown(shutdownHook), onProfileUpdate(onProfileUpdate), onTempControlChange(onTempControlChange), onActivity(onActivity) {}
+HttpProtoServer::HttpProtoServer(PrinterState &state, const uint16_t port, const std::function<void(void)> shutdownHook, const std::function<bool(PrintConfig &)> onProfileUpdate, const std::function<void(void)> onActivity) : state(state), port(port), onShutdown(shutdownHook), onProfileUpdate(onProfileUpdate), onActivity(onActivity) {}
 
 void HttpProtoServer::start() {
     startHttpServer();
@@ -137,10 +137,15 @@ bool HttpProtoServer::addPrintConfig(std::vector<char> buffer, uWS::HttpResponse
     Printer::PrintConfig receivedConfig = addPrintConfig.print_config();
     config.name = receivedConfig.name();
     config.temperature = receivedConfig.temperature();
-
     const bool hasChanged = onProfileUpdate(config);
 
     sendStatus(hasChanged, res);
+
+    if (hasChanged) {
+        state.setProfileTemp(config.temperature, false);
+        state.setProfileName(config.name, true);
+    }
+
     return true;
 }
 
@@ -157,10 +162,15 @@ bool HttpProtoServer::removePrintConfig(std::vector<char> buffer, uWS::HttpRespo
     Printer::PrintConfig receivedConfig = removePrintConfig.print_config();
     config.name = receivedConfig.name();
     config.temperature = receivedConfig.temperature();
-
     const bool hasChanged = PrintConfigs::removeConfig(config, state);
 
     sendStatus(hasChanged, res);
+
+    if (hasChanged) {
+        state.setProfileTemp(config.temperature, false);
+        state.setProfileName(config.name, true);
+    }
+
     return true;
 }
 
@@ -172,13 +182,18 @@ bool HttpProtoServer::changeTempControl(std::vector<char> buffer, uWS::HttpRespo
         return false;
     }
 
-    // Change temp control
-    onTempControlChange(changeTempControl.is_active());
     PrintConfig config;
     config.name = changeTempControl.selected_print_config().name();
     config.temperature = changeTempControl.selected_print_config().temperature();
-    onProfileUpdate(config);
+    const bool hasChanged = onProfileUpdate(config);
 
     sendStatus(false, res);
+
+    if (hasChanged) {
+        state.setProfileTemp(config.temperature, false);
+        state.setProfileName(config.name, false);
+    }
+
+    state.setIsTempControlActive(changeTempControl.is_active(), true);
     return true;
 }

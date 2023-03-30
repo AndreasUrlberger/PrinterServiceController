@@ -11,7 +11,7 @@
 #include "PrintConfigs.hpp"
 #include "Timing.hpp"
 
-class ServiceController {
+class ServiceController : private PrinterState::PrinterStateListener {
    private:
     // PRIVATE VARIABLES.
     // Thermometer settings.
@@ -39,6 +39,33 @@ class ServiceController {
     // Http server settings.
     static constexpr const uint16_t SERVER_PORT{UINT16_C(1933)};
 
+    // Fan controller settings.
+    static constexpr const FanController::FanControllerConfig FAN_CONFIG{
+        // PWM control.
+        UINT8_C(12),  // FAN_PWM_PIN.
+        UINT8_C(7),   // FAN_TICK_PIN.
+
+        // On/Off control.
+        UINT8_C(11),  // RELAY_PIN.
+        UINT8_C(23),  // FAN_LED_PIN.
+
+        // Fan speed measurement.
+        750.0f,           // MIN_FAN_RPM.
+        3000.0f,          // MAX_FAN_RPM.
+        UINT64_C(1'000),  // FAN_SPEED_MEAS_PERIOD_MS.
+
+        // Temperature control.
+        1.0f,      // TEMP_MEAS_PERIOD.
+        -5000.0f,  // minIntegral.
+        5000.0f,   // maxIntegral.
+        1.0f,      // maxTempDeviation.
+        10.0f,     // Proportionalfaktor
+        10.0f,     // Integralfaktor
+
+        // Other.
+        UINT64_C(500)  // BLINK_INTERVAL_MS.
+    };
+
     // PRIVATE FUNCTIONS.
     uint64_t turnOffTime{Timing::currentTimeMillis() + SCREEN_ALIVE_TIME};
     bool shuttingDown{false};
@@ -57,7 +84,6 @@ class ServiceController {
     void onActionButtonShortClick();
     void onActionButtonLongClick();
     void keepDisplayAlive();
-    void onChangeFanControl(bool isOn);
     void onServerActivity();
 
     void stopStream();
@@ -82,7 +108,6 @@ class ServiceController {
         SERVER_PORT,
         [this]() { onShutdown(); },
         [this](PrintConfig& config) { return onProfileUpdate(config); },
-        [this](bool isOn) { onChangeFanControl(isOn); },
         [this]() { onServerActivity(); }};
     ButtonController actionButtonController{
         // Button pin
@@ -90,11 +115,12 @@ class ServiceController {
         [this]() { onActionButtonShortClick(); },
         [this]() { onActionButtonLongClick(); }};
     LightController lightController{BRIDGE_IP, BRIDGE_USERNAME, PRINTER_LIGHT_ID};
-    FanController fanController{
-        [this](bool state) { onFanStateChanged(state); },
-        [this](float fanSpeed) { state.setFanSpeed(fanSpeed); }};
+    FanController fanController{state, FAN_CONFIG};
 
    public:
-   // PUBLIC FUNCTIONS.
+    // PUBLIC FUNCTIONS.
+    ServiceController();
+    void onPrinterStateChanged() override;
+
     void run();
 };

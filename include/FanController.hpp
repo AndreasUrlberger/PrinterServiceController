@@ -1,69 +1,86 @@
 #pragma once
 
-#include <stdint.h>  //for uint32_t
+#include <stdint.h>
 
 #include <functional>
 #include <thread>
 
-class FanController {
-    // Variables.
+#include "PrinterState.hpp"
+
+class FanController : private PrinterState::PrinterStateListener {
+   public:
+    struct FanControllerConfig {
+        // PWM control.
+        const uint8_t FAN_PWM_PIN{};
+        const uint8_t FAN_TICK_PIN{};
+
+        // On/Off control.
+        const uint8_t RELAY_PIN{};
+        const uint8_t FAN_LED_PIN{};
+
+        // Fan speed measurement.
+        const float MIN_FAN_RPM{};
+        const float MAX_FAN_RPM{};
+        const uint64_t FAN_SPEED_MEAS_PERIOD_MS{};
+
+        // Temperature control.
+        const float TEMP_MEAS_PERIOD{};
+        float minIntegral{};
+        float maxIntegral{};
+        float maxTempDeviation{};
+        float kp{10};  // Proportionalfaktor
+        float ki{10};  // Integralfaktor
+
+        // Other.
+        const uint64_t BLINK_INTERVAL_MS{};
+    };
+
    private:
-    // On/Off control.
-    static constexpr uint8_t RELAY_PIN = 11;
-    static constexpr uint8_t FAN_LED_PIN = 23;
+    enum LedState {
+        OFF,
+        BLINK,
+        ON
+    };
+
+    // PRIVATE VARIABLES.
 
     // PWM control.
-    static constexpr uint8_t FAN_PWM_PIN = 12;
     static constexpr uint32_t FAN_PWM_FREQUENCY = 25'000;
     static constexpr uint32_t FAN_PWM_RANGE = 1'000'000;
-    static constexpr uint8_t FAN_TICK_PIN = 7;
 
     // Fan speed measurement.
-    static constexpr float MIN_FAN_RPM = 750;
-    static constexpr float MAX_FAN_RPM = 3000;
-    static constexpr float FAN_RPS = MAX_FAN_RPM / 60.0;
-    static constexpr int FAN_SPEED_MEAS_PERIOD = 1;
-    static constexpr float MAX_TICKS_IN_INTERVAL = FAN_SPEED_MEAS_PERIOD * FAN_RPS * 2;
+    const float FAN_RPS = config.MAX_FAN_RPM / 60.0;
+    const float MAX_TICKS_IN_INTERVAL = config.FAN_SPEED_MEAS_PERIOD_MS * FAN_RPS * 2;
     uint32_t fanTicks = 0;
 
     // Temperature control.
-    static constexpr float TEMP_MEAS_PERIOD = 1.f;
-    static constexpr float MIN_INTEGRAL = -5000;
-    static constexpr float MAX_INTEGRAL = 5000;
-    float tempSoll = 25;  // soll/ist Temperaturen
-    float tempAbw = 1.0;  // zulaessige Temperaturabweichung +/-
-    float integral = 0;   // Integral-Anteil des Reglers
-    int toggleCount = 0;  // Anzahl Schaltvorgaenge
-    float kp = 10;        // Proportionalfaktor
-    float ki = 10;        // Integralfaktor
-    bool controlOn = false;
+    float integral{0};  // Integral-Anteil des Reglers
 
     // Other.
-    uint8_t ledState = false;  // 0 -> off, 1 -> blink, 2 -> on
-    std::function<void(bool)> onFanStateChangeHook;
-    std::function<void(float)> updateFanSpeed;
+    LedState ledState{LedState::OFF};
+    PrinterState& state;
+    const FanControllerConfig config;
 
-    // Functions.
+    // PRIVATE FUNCTIONS.
+   private:
+    void fanTick();
+    float calculateStellValue(const float Regelfehler);  // berechnet die Stellgroesse aus dem Regelfehler
+    void controlFanPWM(const float power);
+    void blinkLoop();
+    void startFanSpeedMeasurement();
+    void measureSpeed();
+
+    // PUBLIC FUNCTIONS.
    public:
-    FanController(std::function<void(bool)> onFanStateChange, std::function<void(float)> updateFanSpeed);
+    FanController(PrinterState& state, const FanControllerConfig& config);
+    void onPrinterStateChanged() override;
 
-    static void interruptHandler(int gpio, int level, uint32_t tick, void* buttonController);
+    static void interruptHandler(const int gpio, const int level, const uint32_t tick, void* buttonController);
 
-    void tempChanged(int32_t temp, int32_t wanted);
+    void tempChanged(const int32_t temp, const int32_t wanted);
     void turnOff();
     void turnOn();
     void toggleControl();
 
-    float calculateStellValue(float Regelfehler);  // berechnet die Stellgroesse aus dem Regelfehler
-    void controlFanPWM(float power);
-    bool isControlOn();
-    void fanTick();
     void start();
-
-   private:
-    void notifyChange();
-    void blinkLoop();
-
-    void startFanSpeedMeasurement();
-    void measureSpeed();
 };

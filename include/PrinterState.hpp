@@ -5,13 +5,14 @@
 #include <vector>
 
 class PrinterState {
+   public:
     class PrinterStateListener {
        public:
-        virtual void onPrinterStateChanged(const PrinterState* const state) const = 0;
+        virtual void onPrinterStateChanged() = 0;
     };
 
    private:
-    // VARIABLES
+    // PRIVATE VARIABLES.
     bool isOn{};
     bool isTempControlActive{};
     uint64_t innerTopTemp{};
@@ -20,14 +21,14 @@ class PrinterState {
     std::string profileName{};
     int32_t profileTemp{};
     float fanSpeed{};
-    std::vector<const PrinterStateListener*> listeners{};
+    std::vector<PrinterStateListener*> listeners{};
 
    public:
-    // FUNCTIONS
+    // PUBLIC FUNCTIONS.
     PrinterState() = default;
     ~PrinterState() = default;
 
-    void addListener(const PrinterStateListener* const listener);
+    void addListener(PrinterStateListener* const listener);
     void notifyListeners() const;
 
     bool getIsOn() const;

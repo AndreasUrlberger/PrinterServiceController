@@ -1,12 +1,12 @@
 #include "PrinterState.hpp"
 
-void PrinterState::addListener(const PrinterStateListener* const listener) {
+void PrinterState::addListener(PrinterStateListener* const listener) {
     listeners.push_back(listener);
 }
 
 void PrinterState::notifyListeners() const {
-    for (const PrinterStateListener* const listener : listeners) {
-        listener->onPrinterStateChanged(this);
+    for (PrinterStateListener* const listener : listeners) {
+        listener->onPrinterStateChanged();
     }
 }
 

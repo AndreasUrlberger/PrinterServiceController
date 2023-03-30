@@ -12,9 +12,17 @@
 // practically a function alias since most compilers will directly call PrintConfigs::getPrintConfigs
 constexpr auto printConfigs = PrintConfigs::getPrintConfigs;
 
+ServiceController::ServiceController() {
+    state.addListener(this);
+}
+
+void ServiceController::onPrinterStateChanged() {
+    // TODO update display?
+}
+
 void ServiceController::run() {
     state.setIsOn(true, false);
-    state.setIsTempControlActive(fanController.isControlOn(), false);
+    state.setIsTempControlActive(false, false);
     state.setFanSpeed(0, true);
 
     powerButtonController.start();
@@ -23,17 +31,11 @@ void ServiceController::run() {
     fanController.start();
 
     std::thread timerThread = std::thread([this]() {
-        auto start = std::chrono::steady_clock::now();
-        auto chronoInterval = std::chrono::seconds(1);
-        auto targetTime = start + chronoInterval;
-        while (true) {
+        Timing::runEveryNSeconds(UINT64_C(1), [this]() {
             if ((Timing::currentTimeMillis() - lastActivity) > MAX_INACTIVE_TIME) {
                 stopStream();
             }
-
-            std::this_thread::sleep_until(targetTime);
-            targetTime += chronoInterval;
-        }
+        });
     });
 
     std::thread displayTempLoopThread = std::thread([this]() { displayTempLoop(); });
@@ -143,13 +145,6 @@ void ServiceController::keepDisplayAlive() {
     turnOffTime = Timing::currentTimeMillis() + SCREEN_ALIVE_TIME;
     updateDisplay();
     displayController.turnOn();
-}
-
-void ServiceController::onChangeFanControl(bool isOn) {
-    if (fanController.isControlOn() xor isOn) {
-        fanController.toggleControl();
-        state.setIsTempControlActive(fanController.isControlOn(), true);
-    }
 }
 
 void ServiceController::onServerActivity() {

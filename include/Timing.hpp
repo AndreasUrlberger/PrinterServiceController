@@ -9,9 +9,9 @@ class Timing {
     Timing() = delete;
     ~Timing() = delete;
 
-    static void runEveryNSeconds(uint64_t seconds, std::function<void*(void*)> executable);
+    static void runEveryNSeconds(uint64_t seconds, std::function<void(void)> executable);
 
-    static void runEveryNMillis(uint64_t millis, std::function<void*(void*)> executable);
+    static void runEveryNMillis(uint64_t millis, std::function<void(void)> executable);
 
     static void sleepSeconds(uint64_t seconds);
 
