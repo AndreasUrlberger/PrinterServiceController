@@ -155,6 +155,7 @@ void FanController::turnOn() {
 }
 
 void FanController::toggleControl() {
+    std::cout << "Toggle Control, triggering setIsTempControlActive\n";
     state.setIsTempControlActive(!state.getIsTempControlActive(), true);
 }
 
@@ -215,7 +216,8 @@ void FanController::measureSpeed() {
     fanTicks = UINT32_C(0);
 
     const float fanSpeed = measuredTicks / MAX_TICKS_IN_INTERVAL;
-    state.setFanSpeed(fanSpeed, true);
+    // Do not notify listeners since nobody is interested in the fan speed.
+    state.setFanSpeed(fanSpeed, false);
 }
 
 void FanController::startFanSpeedMeasurement() {

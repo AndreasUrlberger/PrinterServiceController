@@ -56,6 +56,7 @@ int ServiceController::displayTempLoop() {
     Timing::runEveryNMillis(UINT64_C(1000), [this]() {
         state.setInnerTopTemp(readTemp(INNER_TOP_THERMO_NAME), false);
         state.setInnerBottomTemp(readTemp(INNER_BOTTOM_THERMO_NAME), false);
+        std::cout << "DisplayTempLoop, setting outer temp" << std::endl;
         state.setOuterTemp(readTemp(OUTER_THERMO_NAME), true);
         updateDisplay();
 
@@ -69,8 +70,6 @@ int ServiceController::displayTempLoop() {
 
 void ServiceController::updateDisplay() {
     PrintConfig config = printConfigs()[0];
-    state.setProfileTemp(config.temperature, false);
-    state.setProfileName(config.name, true);
     const uint64_t now = Timing::currentTimeMillis();
     if (turnOffTime > now && !shuttingDown) {
         displayController.drawTemperature(state.getProfileTemp(), state.getInnerTopTemp(), config.name);
@@ -106,6 +105,7 @@ bool ServiceController::onProfileUpdate(PrintConfig &profile) {
     const bool hasChanged = PrintConfigs::addConfig(profile);
     // update server
     state.setProfileName(profile.name, false);
+    std::cout << "OnProfileUpdate, setting profile temp" << std::endl;
     state.setProfileTemp(profile.temperature, true);
     return hasChanged;
 }

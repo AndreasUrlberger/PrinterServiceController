@@ -1,5 +1,7 @@
 #include "PrinterState.hpp"
 
+#include <iostream>
+
 void PrinterState::addListener(PrinterStateListener* const listener) {
     listeners.push_back(listener);
 }
@@ -43,6 +45,7 @@ float PrinterState::getFanSpeed() const {
 }
 
 void PrinterState::setIsOn(const bool isOn, const bool notify) {
+    std::cout << "PrinterState::setIsOn(" << isOn << "), notify: " << notify << ")\n";
     this->isOn = isOn;
     if (notify) {
         notifyListeners();
@@ -50,6 +53,7 @@ void PrinterState::setIsOn(const bool isOn, const bool notify) {
 }
 
 void PrinterState::setIsTempControlActive(const bool isTempControlActive, const bool notify) {
+    std::cout << "PrinterState::setIsTempControlActive(" << isTempControlActive << "), notify: " << notify << ")\n";
     this->isTempControlActive = isTempControlActive;
     if (notify) {
         notifyListeners();
@@ -57,6 +61,7 @@ void PrinterState::setIsTempControlActive(const bool isTempControlActive, const 
 }
 
 void PrinterState::setInnerTopTemp(const uint64_t innerTopTemp, const bool notify) {
+    std::cout << "PrinterState::setInnerTopTemp(" << innerTopTemp << "), notify: " << notify << ")\n";
     this->innerTopTemp = innerTopTemp;
     if (notify) {
         notifyListeners();
@@ -64,6 +69,7 @@ void PrinterState::setInnerTopTemp(const uint64_t innerTopTemp, const bool notif
 }
 
 void PrinterState::setInnerBottomTemp(const uint64_t innerBottomTemp, const bool notify) {
+    std::cout << "PrinterState::setInnerBottomTemp(" << innerBottomTemp << "), notify: " << notify << ")\n";
     this->innerBottomTemp = innerBottomTemp;
     if (notify) {
         notifyListeners();
@@ -71,6 +77,7 @@ void PrinterState::setInnerBottomTemp(const uint64_t innerBottomTemp, const bool
 }
 
 void PrinterState::setOuterTemp(const uint64_t outerTemp, const bool notify) {
+    std::cout << "PrinterState::setOuterTemp(" << outerTemp << "), notify: " << notify << ")\n";
     this->outerTemp = outerTemp;
     if (notify) {
         notifyListeners();
@@ -78,6 +85,7 @@ void PrinterState::setOuterTemp(const uint64_t outerTemp, const bool notify) {
 }
 
 void PrinterState::setProfileName(const std::string& profileName, const bool notify) {
+    std::cout << "PrinterState::setProfileName(" << profileName << "), notify: " << notify << ")\n";
     this->profileName = profileName;
     if (notify) {
         notifyListeners();
@@ -85,6 +93,7 @@ void PrinterState::setProfileName(const std::string& profileName, const bool not
 }
 
 void PrinterState::setProfileTemp(const int32_t profileTemp, const bool notify) {
+    std::cout << "PrinterState::setProfileTemp(" << profileTemp << "), notify: " << notify << ")\n";
     this->profileTemp = profileTemp;
     if (notify) {
         notifyListeners();
@@ -92,6 +101,7 @@ void PrinterState::setProfileTemp(const int32_t profileTemp, const bool notify) 
 }
 
 void PrinterState::setFanSpeed(const float fanSpeed, const bool notify) {
+    std::cout << "PrinterState::setFanSpeed(" << fanSpeed << "), notify: " << notify << ")\n";
     this->fanSpeed = fanSpeed;
     if (notify) {
         notifyListeners();

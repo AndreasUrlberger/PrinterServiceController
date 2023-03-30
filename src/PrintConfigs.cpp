@@ -6,6 +6,7 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>  // ifstream, ofstream
+#include <iostream>
 #include <stdexcept>
 
 namespace fs = std::filesystem;
@@ -131,6 +132,7 @@ bool PrintConfigs::removeConfig(PrintConfig &profile, PrinterState &state) {
             // Find any other profile and set it as the current profile.
             const auto otherElement = std::find_if(configs.begin(), configs.end(), profileComp);
             state.setProfileName(otherElement->name, false);
+            std::cout << "PrintConfigs, Set profile to " << otherElement->name << std::endl;
             state.setProfileTemp(otherElement->temperature);
         }
         configs.erase(searchResult);
