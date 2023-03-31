@@ -44,22 +44,22 @@ class FanController : private PrinterState::PrinterStateListener {
 
     // PRIVATE VARIABLES.
 
+    // Other.
+    LedState ledState{LedState::OFF};
+    PrinterState& state;
+    const FanControllerConfig config;
+
     // PWM control.
     static constexpr uint32_t FAN_PWM_FREQUENCY = 25'000;
     static constexpr uint32_t FAN_PWM_RANGE = 1'000'000;
 
     // Fan speed measurement.
     const float FAN_RPS = config.MAX_FAN_RPM / 60.0;
-    const float MAX_TICKS_IN_INTERVAL = config.FAN_SPEED_MEAS_PERIOD_MS * FAN_RPS * 2;
+    const float MAX_TICKS_IN_INTERVAL = (config.FAN_SPEED_MEAS_PERIOD_MS / 1000.0f) * FAN_RPS * 2;
     uint32_t fanTicks = 0;
 
     // Temperature control.
     float integral{0};  // Integral-Anteil des Reglers
-
-    // Other.
-    LedState ledState{LedState::OFF};
-    PrinterState& state;
-    const FanControllerConfig config;
 
     // PRIVATE FUNCTIONS.
    private:

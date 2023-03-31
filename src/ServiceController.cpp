@@ -9,19 +9,11 @@
 
 #include "Logger.hpp"
 
-// practically a function alias since most compilers will directly call PrintConfigs::getPrintConfigs
-constexpr auto printConfigs = PrintConfigs::getPrintConfigs;
-
 ServiceController::ServiceController() {
     state.addListener(this);
 }
 
 void ServiceController::onPrinterStateChanged() {
-    std::cout << "State: " << state.toString() << std::endl;
-
-    // TODO update display?
-
-    // TODO subscribe display controller to state?.
     displayController.setIconVisible(state.getIsTempControlActive());
 }
 
@@ -56,7 +48,6 @@ int ServiceController::displayTempLoop() {
     Timing::runEveryNMillis(UINT64_C(1000), [this]() {
         state.setInnerTopTemp(readTemp(INNER_TOP_THERMO_NAME), false);
         state.setInnerBottomTemp(readTemp(INNER_BOTTOM_THERMO_NAME), false);
-        std::cout << "DisplayTempLoop, setting outer temp" << std::endl;
         state.setOuterTemp(readTemp(OUTER_THERMO_NAME), true);
         updateDisplay();
 
@@ -69,7 +60,7 @@ int ServiceController::displayTempLoop() {
 }
 
 void ServiceController::updateDisplay() {
-    PrintConfig config = printConfigs()[0];
+    PrintConfig config = PrintConfigs::getPrintConfigs()[0];
     const uint64_t now = Timing::currentTimeMillis();
     if (turnOffTime > now && !shuttingDown) {
         displayController.drawTemperature(state.getProfileTemp(), state.getInnerTopTemp(), config.name);
@@ -105,7 +96,6 @@ bool ServiceController::onProfileUpdate(PrintConfig &profile) {
     const bool hasChanged = PrintConfigs::addConfig(profile);
     // update server
     state.setProfileName(profile.name, false);
-    std::cout << "OnProfileUpdate, setting profile temp" << std::endl;
     state.setProfileTemp(profile.temperature, true);
     return hasChanged;
 }
@@ -120,7 +110,7 @@ void ServiceController::onPowerButtonLongClick() {
 
 void ServiceController::onActionButtonShortClick() {
     // Switch config
-    auto configs = printConfigs();
+    auto configs = PrintConfigs::getPrintConfigs();
     auto nextConfig = configs[configs.size() - 1];
     PrintConfigs::addConfig(nextConfig);
 

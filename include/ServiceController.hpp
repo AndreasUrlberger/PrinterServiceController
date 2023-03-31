@@ -52,7 +52,7 @@ class ServiceController : private PrinterState::PrinterStateListener {
         // Fan speed measurement.
         750.0f,           // MIN_FAN_RPM.
         3000.0f,          // MAX_FAN_RPM.
-        UINT64_C(1'000),  // FAN_SPEED_MEAS_PERIOD_MS.
+        UINT64_C(3'000),  // FAN_SPEED_MEAS_PERIOD_MS.
 
         // Temperature control.
         1.0f,      // TEMP_MEAS_PERIOD.
