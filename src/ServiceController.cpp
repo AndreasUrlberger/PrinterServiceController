@@ -1,4 +1,4 @@
-#include "ServiceController.h"
+#include "ServiceController.hpp"
 
 #include <stdint.h>
 
@@ -7,46 +7,42 @@
 #include <sstream>
 #include <thread>
 
-#include "Buzzer.h"
-#include "Logger.h"
+#include "Logger.hpp"
 
-// practically a function alias since most compilers will directly call PrintConfigs::getPrintConfigs
-constexpr auto printConfigs = PrintConfigs::getPrintConfigs;
+ServiceController::ServiceController() {
+    state.addListener(this);
+}
+
+void ServiceController::onPrinterStateChanged() {
+    displayController.setIconVisible(state.getIsTempControlActive());
+}
 
 void ServiceController::run() {
-    state.printProgress = 0;
-    state.remainingTime = 0;
-    state.isOn = true;
-    state.isTempControlActive = fanController.isControlOn();
-    state.fanSpeed = 0;
+    state.setIsOn(true, false);
+    state.setIsTempControlActive(false, false);
+    state.setFanSpeed(0, false);
+    auto configs = PrintConfigs::getPrintConfigs();
+    if (configs.size() > 0) {
+        state.setProfileTemp(configs[0].temperature, false);
+        state.setProfileName(configs[0].name, true);
+    }
 
     powerButtonController.start();
-    buttonController.start();
+    actionButtonController.start();
     lightController.start();
     fanController.start();
 
-    // Might not be necessary.
-    state.isTempControlActive = fanController.isControlOn();
-    printerServer.updateState(state);
-
     std::thread timerThread = std::thread([this]() {
-        auto start = std::chrono::steady_clock::now();
-        auto chronoInterval = std::chrono::seconds(1);
-        auto targetTime = start + chronoInterval;
-        while (true) {
-            if ((Utils::currentMillis() - lastActivity) > MAX_INACTIVE_TIME) {
+        Timing::runEveryNSeconds(UINT64_C(1), [this]() {
+            if ((Timing::currentTimeMillis() - lastActivity) > MAX_INACTIVE_TIME) {
                 stopStream();
             }
-
-            std::this_thread::sleep_until(targetTime);
-            targetTime += chronoInterval;
-        }
+        });
     });
 
     std::thread displayTempLoopThread = std::thread([this]() { displayTempLoop(); });
 
     printerServer.start();
-    std::cout << "PrinterServerThread ended\n";
     displayTempLoopThread.join();
     timerThread.join();
 }
@@ -54,30 +50,25 @@ void ServiceController::run() {
 int ServiceController::displayTempLoop() {
     displayController.setInverted(false);
 
-    while (true) {
-        state.innerTopTemp = readTemp(INNER_TOP_THERMO_NAME);
-        state.innerBottomTemp = readTemp(INNER_BOTTOM_THERMO_NAME);
-        state.outerTemp = readTemp(OUTER_THERMO_NAME);
+    Timing::runEveryNMillis(UINT64_C(1000), [this]() {
+        state.setInnerTopTemp(readTemp(INNER_TOP_THERMO_NAME), false);
+        state.setInnerBottomTemp(readTemp(INNER_BOTTOM_THERMO_NAME), false);
+        state.setOuterTemp(readTemp(OUTER_THERMO_NAME), true);
         updateDisplay();
 
         std::ostringstream ss;
-        ss << "inner: " << state.innerTopTemp << " outer: " << state.outerTemp << " wanted: " << state.profileTemp;
+        ss << "inner: " << state.getInnerTopTemp() << " outer: " << state.getOuterTemp() << " wanted: " << state.getProfileTemp();
         Logger::log(ss.str());
+    });
 
-        printerServer.updateState(state);
-        fanController.tempChanged(state.innerTopTemp, state.profileTemp);
-        Utils::sleep(1000);
-    }
     return 0;
 }
 
 void ServiceController::updateDisplay() {
-    PrintConfig config = printConfigs()[0];
-    state.profileTemp = config.temperature;
-    state.profileName = config.name;
-    const int64_t now = Utils::currentMillis();
-    if (turnOffTime - now > 0 && !shuttingDown) {
-        displayController.drawTemperature(state.profileTemp, state.innerTopTemp, config.name);
+    PrintConfig config = PrintConfigs::getPrintConfigs()[0];
+    const uint64_t now = Timing::currentTimeMillis();
+    if (turnOffTime > now && !shuttingDown) {
+        displayController.drawTemperature(state.getProfileTemp(), state.getInnerTopTemp(), config.name);
     } else {
         displayController.turnOff();
     }
@@ -106,58 +97,48 @@ void ServiceController::onShutdown() {
     system("sudo shutdown -h now");
 }
 
-void ServiceController::onShortPress() {
-    turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
-    updateDisplay();
-    displayController.turnOn();
-}
-
-void ServiceController::onFanStateChanged(bool isOn) {
-    if (isOn) {
-        Logger::log(std::string{"fanState: on"});
-    } else {
-        Logger::log(std::string{"fanState: off"});
-    }
-    displayController.setIconVisible(isOn);
-}
-
 bool ServiceController::onProfileUpdate(PrintConfig &profile) {
     const bool hasChanged = PrintConfigs::addConfig(profile);
     // update server
-    state.profileName = profile.name;
-    state.profileTemp = profile.temperature;
-    printerServer.updateState(state);
+    state.setProfileName(profile.name, false);
+    state.setProfileTemp(profile.temperature, true);
     return hasChanged;
 }
 
-void ServiceController::onSecondButtonClick(bool longClick) {
-    turnOffTime = Utils::currentMillis() + SCREEN_ALIVE_TIME;
-    if (longClick) {
-        Buzzer::singleBuzz();
-        fanController.toggleControl();
-    } else {
-        // switch config
-        auto configs = printConfigs();
-        auto nextConfig = configs[configs.size() - 1];
-        PrintConfigs::addConfig(nextConfig);
-        // manually trigger display
-        updateDisplay();
-    }
-    displayController.turnOn();
+void ServiceController::onPowerButtonShortClick() {
+    keepDisplayAlive();
 }
 
-void ServiceController::onChangeFanControl(bool isOn) {
-    if (fanController.isControlOn() xor isOn) {
-        fanController.toggleControl();
-        state.isTempControlActive = fanController.isControlOn();
-        printerServer.updateState(state);
-    }
+void ServiceController::onPowerButtonLongClick() {
+    onShutdown();
+}
+
+void ServiceController::onActionButtonShortClick() {
+    // Switch config
+    auto configs = PrintConfigs::getPrintConfigs();
+    auto nextConfig = configs[configs.size() - 1];
+    PrintConfigs::addConfig(nextConfig);
+
+    keepDisplayAlive();
+}
+
+void ServiceController::onActionButtonLongClick() {
+    buzzer.singleBuzz();
+    fanController.toggleControl();
+
+    keepDisplayAlive();
+}
+
+void ServiceController::keepDisplayAlive() {
+    turnOffTime = Timing::currentTimeMillis() + SCREEN_ALIVE_TIME;
+    updateDisplay();
+    displayController.turnOn();
 }
 
 void ServiceController::onServerActivity() {
     startStream();
 
-    const uint64_t currentTime = Utils::currentMillis();
+    const uint64_t currentTime = Timing::currentTimeMillis();
     lastActivity = currentTime;
 }
 

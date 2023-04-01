@@ -1,9 +1,10 @@
-#include "LightController.h"
+#include "LightController.hpp"
 
 #include <hueplusplus/LinHttpHandler.h>
 
-LightController::LightController() {
-}
+// Constructor setting the parameters in constructor initializer list
+LightController::LightController(const std::string bridgeIp, const std::string bridgeUsername, const int lightId)
+    : bridgeIp(bridgeIp), bridgeUsername(bridgeUsername), lightId(lightId) {}
 
 void LightController::start() {
     tryGetLight();
@@ -11,11 +12,11 @@ void LightController::start() {
 
 bool LightController::tryGetLight() {
     const auto handler = std::make_shared<hueplusplus::LinHttpHandler>();
-    hueplusplus::Bridge bridge(BRIDGE_IP, 80, BRIDGE_USERNAME, handler);
+    hueplusplus::Bridge bridge(bridgeIp, 80, bridgeUsername, handler);
 
     printerLight = nullptr;
     try {
-        printerLight = std::make_unique<hueplusplus::Light>(bridge.lights().get(PRINTER_LIGHT_ID));
+        printerLight = std::make_unique<hueplusplus::Light>(bridge.lights().get(lightId));
     } catch (const std::system_error &error) {
         std::cerr << "Error while getting light: " << error.what() << "\n";
     } catch (const hueplusplus::HueAPIResponseException &error) {

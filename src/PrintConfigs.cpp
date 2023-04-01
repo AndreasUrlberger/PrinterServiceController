@@ -1,26 +1,23 @@
-#include "PrintConfigs.h"
+#include "PrintConfigs.hpp"
+
+#include <assert.h>
 
 #include <algorithm>
 #include <cstring>
 #include <filesystem>
 #include <fstream>  // ifstream, ofstream
+#include <iostream>
 #include <stdexcept>
 
 namespace fs = std::filesystem;
 
-static const char *defaultConfig = "25000:PETG\n30000:PLA\n";
-static constexpr auto CONFIG_FILE_PATH = "/usr/share/printer-service-controller/";
-static constexpr auto CONFIG_FILE_NAME = "print-configs.txt";
-
-void PrintConfigs::evaluateLine(std::string line, std::vector<PrintConfig> &configs) {
+void PrintConfigs::evaluateLine(const std::string line, std::vector<PrintConfig> &configs) {
     if (line.empty())
         return;
 
-    int endOfTemp = line.find_first_of(':');
-    printf("evaluateLine: endOfTemp: %d, line: '%s'\n", endOfTemp, line.c_str());
-    std::string temp = line.substr(0, endOfTemp);
-    printf("evaluateLine: endOfTemp + 1: %d, line: '%s'\n", (endOfTemp + 1), line.c_str());
-    std::string rest = line.substr(endOfTemp + 1);
+    const size_t endOfTemp = line.find_first_of(':');
+    const std::string temp = line.substr(0, endOfTemp);
+    const std::string rest = line.substr(endOfTemp + 1);
     PrintConfig config;
     config.name = rest;
     config.temperature = std::stoi(temp);
@@ -35,7 +32,7 @@ void PrintConfigs::loadPrintConfigs() {
         }
     }
 
-    std::string path = std::string(CONFIG_FILE_PATH) + std::string(CONFIG_FILE_NAME);
+    const std::string path = std::string(CONFIG_FILE_PATH) + std::string(CONFIG_FILE_NAME);
     std::fstream file;
     file.open(path, std::fstream::in);
     if (!file) {
@@ -45,7 +42,7 @@ void PrintConfigs::loadPrintConfigs() {
             throw std::runtime_error("Could not create the config file (" + path + ")");
             return;
         } else {
-            file.write(defaultConfig, strlen(defaultConfig));
+            file.write(DEFAULT_CONFIG, strlen(DEFAULT_CONFIG));
             file.close();
         }
         file.open(path, std::fstream::in);
@@ -62,7 +59,7 @@ void PrintConfigs::loadPrintConfigs() {
     if (configs.size() == 0) {
         PrintConfig config;
         config.name = "PETG";
-        config.temperature = 25'000;
+        config.temperature = INT32_C(25'000);
         configs.emplace(configs.begin(), config);
     }
     file.close();
@@ -77,17 +74,18 @@ std::vector<PrintConfig> &PrintConfigs::getPrintConfigs() {
 }
 
 void PrintConfigs::savePrintConfigs() {
-    // File and directory must exist at this point
-    std::string path = std::string(CONFIG_FILE_PATH) + std::string(CONFIG_FILE_NAME);
+    assert(valid);  // PrintConfigs is not valid, file or directory for saves does not exist.
+
+    const std::string path = std::string(CONFIG_FILE_PATH) + std::string(CONFIG_FILE_NAME);
     std::fstream file;
     file.open(path, std::fstream::out);
 
     std::ostringstream ss;
-    for (PrintConfig config : getPrintConfigs()) {
+    for (const PrintConfig config : getPrintConfigs()) {
         ss << config.temperature << ':' << config.name << std::endl;
     }
     std::string outputString = ss.str();
-    const char *configsText = outputString.c_str();
+    const char *const configsText = outputString.c_str();
     file.write(configsText, strlen(configsText));
     file.close();
 }
@@ -129,12 +127,12 @@ bool PrintConfigs::removeConfig(PrintConfig &profile, PrinterState &state) {
     const auto searchResult = std::find_if_not(configs.begin(), configs.end(), profileComp);
     const bool containsElement = searchResult != configs.end();
     if (containsElement) {
-        // Make sure the current profile is not a remove profile.
-        if (state.profileName == profile.name && state.profileTemp == profile.temperature) {
+        // Make sure the current profile is not a removed profile.
+        if (state.getProfileName() == profile.name && state.getProfileTemp() == profile.temperature) {
             // Find any other profile and set it as the current profile.
             const auto otherElement = std::find_if(configs.begin(), configs.end(), profileComp);
-            state.profileName = otherElement->name;
-            state.profileTemp = otherElement->temperature;
+            state.setProfileName(otherElement->name, false);
+            state.setProfileTemp(otherElement->temperature);
         }
         configs.erase(searchResult);
         savePrintConfigs();

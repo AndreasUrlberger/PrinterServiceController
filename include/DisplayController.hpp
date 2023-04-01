@@ -6,10 +6,45 @@
 
 class DisplayController {
    private:
-    static constexpr uint8_t displayHeight = 64u;
-    static constexpr uint8_t displayWidth = 128u;
+    // VARIABLES.
+    const char* filename;
+    const uint8_t displayHeight;
+    const uint8_t displayWidth;
+    const uint8_t fontSize;
+    const char* fontName;
 
-    static constexpr bool fan[17][17] = {
+    ssd1306_framebuffer_t* fbp;
+    ssd1306_framebuffer_box_t bbox;
+    ssd1306_graphics_options_t opts[2];
+    ssd1306_i2c_t* oled;
+
+    bool iconVisible = false;
+    bool isOn = false;
+    bool isInverted = false;
+
+    // FUNCTIONS.
+    void drawFanIcon(const uint8_t xOff, const uint8_t yOff);
+
+   public:
+    void drawTemperature(const int32_t want, const int32_t have, const std::string name);
+
+    // Constructor with all const variables.
+    DisplayController(const char* filename, const uint8_t displayHeight, const uint8_t displayWidth, const uint8_t fontSize, const char* fontName);
+
+    ~DisplayController();
+
+    void turnOn();
+
+    void turnOff();
+
+    bool isIconVisible() const;
+
+    void setIconVisible(const bool visible);
+
+    void setInverted(const bool inverted);
+
+    // Variables.
+    static constexpr bool fanIcon[17][17]{
         {
             false,
             false,
@@ -334,32 +369,4 @@ class DisplayController {
             false,
         },
     };
-
-    bool iconVisible = false;
-    uint8_t fontSize = 7;
-    ssd1306_framebuffer_t* fbp;
-    ssd1306_framebuffer_box_t bbox;
-    ssd1306_graphics_options_t opts[2];
-    ssd1306_i2c_t* oled;
-    bool isOn = false;
-    bool isInverted = false;
-
-    void drawFanIcon(uint8_t xOff, uint8_t yOff);
-
-   public:
-    void drawTemperature(int32_t want, int32_t have, std::string name);
-
-    DisplayController();
-
-    ~DisplayController();
-
-    void turnOff();
-
-    void turnOn();
-
-    bool isIconVisible();
-
-    void setIconVisible(bool visible);
-
-    void setInverted(bool inverted);
 };
