@@ -20,7 +20,12 @@ void ServiceController::onPrinterStateChanged() {
 void ServiceController::run() {
     state.setIsOn(true, false);
     state.setIsTempControlActive(false, false);
-    state.setFanSpeed(0, true);
+    state.setFanSpeed(0, false);
+    auto configs = PrintConfigs::getPrintConfigs();
+    if (configs.size() > 0) {
+        state.setProfileTemp(configs[0].temperature, false);
+        state.setProfileName(configs[0].name, true);
+    }
 
     powerButtonController.start();
     actionButtonController.start();

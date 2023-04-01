@@ -2,7 +2,7 @@
 #include "ServiceController.hpp"
 
 int main(int argc, char *argv[]) {
-    Logger::enableLogging();
+    Logger::disableLogging();
     ServiceController controller;
     controller.run();
 }
