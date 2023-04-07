@@ -118,6 +118,8 @@ void ServiceController::onActionButtonShortClick() {
     auto configs = PrintConfigs::getPrintConfigs();
     auto nextConfig = configs[configs.size() - 1];
     PrintConfigs::addConfig(nextConfig);
+    state.setProfileName(nextConfig.name, false);
+    state.setProfileTemp(nextConfig.temperature, true);
 
     keepDisplayAlive();
 }
