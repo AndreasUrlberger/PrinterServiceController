@@ -6,8 +6,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 WORKDIR /printer
 # Install required packages
 RUN apt-get update
-RUN apt-get install -y sudo 
-RUN apt-get install -y expect
+RUN apt-get install -y sudo expect git-lfs
 
 # Required Setup from https://github.com/abhiTronix/raspberry-pi-cross-compilers/wiki/Cross-Compiler-CMake-Usage-Guide-with-rsynced-Raspberry-Pi-32-bit-OS#cross-compiler-cmake-usage-guide-with-rsynced-raspberry-pi-32-bit-os
 RUN apt-get install -y build-essential cmake unzip gfortran
