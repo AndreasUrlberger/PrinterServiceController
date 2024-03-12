@@ -1,0 +1,16 @@
+{
+    "name": "PrinterServiceController",
+    "dockerComposeFile": "./docker-compose.yml",
+    "service": "dev",
+    "workspaceFolder": "/printer",
+    "shutdownAction": "stopCompose",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "twxs.cmake",
+                "ms-vscode.cmake-tools"
+            ]
+        }
+    }
+}

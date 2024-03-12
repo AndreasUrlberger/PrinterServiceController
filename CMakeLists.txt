@@ -1,4 +1,4 @@
-set(CMAKE_TOOLCHAIN_FILE /home/andreas/Documents/PrinterInterface/PrinterServiceController/Toolchain-RaspberryPi.cmake)
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/Toolchain-RaspberryPi.cmake)
 cmake_minimum_required(VERSION 3.0.0)
 
 set(CMAKE_C_STANDARD 20)

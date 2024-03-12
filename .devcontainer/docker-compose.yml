@@ -1,0 +1,9 @@
+services:
+  dev:
+  # Necessary for the cross-compilation toolchain to work
+    platform: linux/x86_64
+    build: .
+    ports:
+      - "8000:80"
+    volumes:
+      - ..:/printer

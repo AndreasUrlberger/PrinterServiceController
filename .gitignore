@@ -365,3 +365,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Library files copied from the raspberry pi
+.devcontainer/rootfs/
+# Cross-compilation toolchain files
+.devcontainer/cross-pi-gcc*
+.devcontainer/cross-gcc*.tar.gz
