@@ -3,15 +3,16 @@
 #include <ssd1306_i2c.h>
 
 #include <stdexcept>
+#include <string>
 
 class DisplayController {
    private:
     // VARIABLES.
-    const char* filename;
+    const std::string filename;
     const uint8_t displayHeight;
     const uint8_t displayWidth;
     const uint8_t fontSize;
-    const char* fontName;
+    const std::string fontName;
 
     ssd1306_framebuffer_t* fbp;
     ssd1306_framebuffer_box_t bbox;
@@ -29,7 +30,7 @@ class DisplayController {
     void drawTemperature(const int32_t want, const int32_t have, const std::string name);
 
     // Constructor with all const variables.
-    DisplayController(const char* filename, const uint8_t displayHeight, const uint8_t displayWidth, const uint8_t fontSize, const char* fontName);
+    DisplayController(const std::string filename, const uint8_t displayHeight, const uint8_t displayWidth, const uint8_t fontSize, const std::string fontName);
 
     ~DisplayController();
 

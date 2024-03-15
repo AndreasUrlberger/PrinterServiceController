@@ -5,7 +5,7 @@ set USER pi
 set HOST 192.168.178.143
 set PASSW raspberry
 
-spawn scp ./build/PrinterServiceController $USER@$HOST:/home/pi/
+spawn scp ./build/PrinterServiceController ./PrinterConfig.json $USER@$HOST:/home/pi/
 expect -re {\.*password:}
 send -- "$PASSW\r"
 interact

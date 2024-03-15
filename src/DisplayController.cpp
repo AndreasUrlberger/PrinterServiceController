@@ -1,11 +1,11 @@
 #include "DisplayController.hpp"
 #include <iostream>
 
-DisplayController::DisplayController(const char *filename, const uint8_t displayHeight, const uint8_t displayWidth, const uint8_t fontSize, const char *fontName) : filename(filename), displayHeight(displayHeight), displayWidth(displayWidth), fontSize(fontSize), fontName(fontName)
+DisplayController::DisplayController(const std::string filename, const uint8_t displayHeight, const uint8_t displayWidth, const uint8_t fontSize, const std::string fontName) : filename(filename), displayHeight(displayHeight), displayWidth(displayWidth), fontSize(fontSize), fontName(fontName)
 {
     // Create dump file. This is done to avoid the display output to be printed to the console.
     auto nullFile = fopen("/dev/null", "w");
-    oled = ssd1306_i2c_open(filename, 0x3c, displayWidth, displayHeight, nullFile);
+    oled = ssd1306_i2c_open(filename.c_str(), 0x3c, displayWidth, displayHeight, nullFile);
     if (!oled)
     {
         throw std::runtime_error("Could not create the screen");
@@ -27,7 +27,7 @@ DisplayController::DisplayController(const char *filename, const uint8_t display
         turnOn();
 
         opts[0].type = ssd1306_graphics_options_t::SSD1306_OPT_FONT_FILE;
-        opts[0].value.font_file = fontName;
+        opts[0].value.font_file = fontName.c_str();
         opts[1].type = ssd1306_graphics_options_t::SSD1306_OPT_ROTATE_FONT;
         opts[1].value.rotation_degrees = 180;
     }

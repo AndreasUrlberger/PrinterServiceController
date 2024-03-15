@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mutex>
+#include <string>
 
 #include "ButtonController.hpp"
 #include "Buzzer.hpp"
@@ -11,63 +12,56 @@
 #include "PrintConfigs.hpp"
 #include "Timing.hpp"
 
-class ServiceController : private PrinterState::PrinterStateListener {
-   private:
-    // PRIVATE VARIABLES.
-    // Thermometer settings.
-    static constexpr auto INNER_TOP_THERMO_NAME{"28-2ca0a72153ff"};
-    static constexpr auto INNER_BOTTOM_THERMO_NAME{"28-3c290457da46"};
-    static constexpr auto OUTER_THERMO_NAME{"28-baa0a72915ff"};
+class ServiceController : private PrinterState::PrinterStateListener
+{
 
-    // General settings.
-    static constexpr const uint64_t SCREEN_ALIVE_TIME{UINT64_C(20'000)};
-    static constexpr const uint64_t MAX_INACTIVE_TIME{UINT64_C(3'000)};
-
-    // Light settings.
-    static constexpr auto BRIDGE_IP{"192.168.178.92"};
-    static constexpr auto BRIDGE_USERNAME{"yXEXyXC5BYDJbmS-6yNdji6qcatY6BedJmRIb4kO"};
-    static constexpr const uint8_t PRINTER_LIGHT_ID{UINT8_C(9)};
-
-    // Display settings.
-    static constexpr const uint8_t DISPLAY_HEIGHT{UINT8_C(64)};
-    static constexpr const uint8_t DISPLAY_WIDTH{UINT8_C(128)};
-    // Only need to change this if a different i2c bus is used.
-    static constexpr const char* const DISPLAY_FILE_NAME{"/dev/i2c-3"};
-    static constexpr const uint8_t DISPLAY_FONT_SIZE{UINT8_C(5)};
-    static constexpr const char* const DISPLAY_FONT_NAME{"/usr/share/fonts/truetype/freefont/FreeMono.ttf"};
-
-    // Http server settings.
-    static constexpr const uint16_t SERVER_PORT{UINT16_C(1933)};
-
-    // Fan controller settings.
-    static constexpr const FanController::FanControllerConfig FAN_CONFIG{
-        // PWM control.
-        UINT8_C(12),  // FAN_PWM_PIN.
-        UINT8_C(7),   // FAN_TICK_PIN.
-
-        // On/Off control.
-        UINT8_C(11),  // RELAY_PIN.
-        UINT8_C(23),  // FAN_LED_PIN.
-
-        // Fan speed measurement.
-        750.0f,           // MIN_FAN_RPM.
-        3000.0f,          // MAX_FAN_RPM.
-        UINT64_C(3'000),  // FAN_SPEED_MEAS_PERIOD_MS.
-
-        // Temperature control.
-        1.0f,      // TEMP_MEAS_PERIOD.
-        -5000.0f,  // minIntegral.
-        5000.0f,   // maxIntegral.
-        1.0f,      // maxTempDeviation.
-        10.0f,     // Proportionalfaktor
-        10.0f,     // Integralfaktor
-
-        // Other.
-        UINT64_C(500)  // BLINK_INTERVAL_MS.
+public:
+    struct ThermometerConfig
+    {
+        const std::string innerTopThermoName;
+        const std::string innerBottomThermoName;
+        const std::string outerThermoName;
     };
 
-    // PRIVATE FUNCTIONS.
-    uint64_t turnOffTime{Timing::currentTimeMillis() + SCREEN_ALIVE_TIME};
+    struct GeneralConfig
+    {
+        const uint64_t screenAliveTime;
+        const uint64_t maxInactiveTime;
+    };
+
+    struct LightConfig
+    {
+        const std::string bridgeIp;
+        const std::string bridgeUsername;
+        const uint8_t printerLightId;
+    };
+
+    struct DisplayConfig
+    {
+        const uint8_t height;
+        const uint8_t width;
+        const std::string fileName;
+        const uint8_t fontSize;
+        const std::string fontName;
+    };
+
+    struct HttpServerConfig
+    {
+        const uint16_t port;
+    };
+
+    struct CameraConfig
+    {
+        const std::string startCommand;
+        const std::string stopCommand;
+    };
+
+private:
+    const ThermometerConfig thermoConfig;
+    const GeneralConfig generalConfig;
+    const CameraConfig cameraConfig;
+
+    uint64_t turnOffTime;
     bool shuttingDown{false};
     uint64_t lastActivity{Timing::currentTimeMillis()};
     bool isStreamRunning{false};
@@ -77,7 +71,7 @@ class ServiceController : private PrinterState::PrinterStateListener {
     void updateDisplay();
     int32_t readTemp(std::string deviceName);
     void onShutdown();
-    bool onProfileUpdate(PrintConfig& profile);
+    bool onProfileUpdate(PrintConfig &profile);
     void onPowerButtonShortClick();
     void onPowerButtonLongClick();
     void onActionButtonShortClick();
@@ -88,37 +82,29 @@ class ServiceController : private PrinterState::PrinterStateListener {
     void stopStream();
     void startStream();
 
-    // PRIVATE VARIABLES.
     PrinterState state{};
 
     Buzzer buzzer{UINT8_C(26)};
     ButtonController powerButtonController{
         UINT8_C(3),
-        [this]() { onPowerButtonShortClick(); },
-        [this]() { onPowerButtonLongClick(); }};
-    DisplayController displayController{
-        DISPLAY_FILE_NAME,
-        DISPLAY_HEIGHT,
-        DISPLAY_WIDTH,
-        DISPLAY_FONT_SIZE,
-        DISPLAY_FONT_NAME};
-    HttpProtoServer printerServer{
-        state,
-        SERVER_PORT,
-        [this]() { onShutdown(); },
-        [this](PrintConfig& config) { return onProfileUpdate(config); },
-        [this]() { onServerActivity(); }};
+        [this]()
+        { onPowerButtonShortClick(); },
+        [this]()
+        { onPowerButtonLongClick(); }};
+    DisplayController displayController;
+    HttpProtoServer printerServer;
     ButtonController actionButtonController{
         // Button pin
         UINT8_C(5),
-        [this]() { onActionButtonShortClick(); },
-        [this]() { onActionButtonLongClick(); }};
-    LightController lightController{BRIDGE_IP, BRIDGE_USERNAME, PRINTER_LIGHT_ID};
-    FanController fanController{state, FAN_CONFIG};
+        [this]()
+        { onActionButtonShortClick(); },
+        [this]()
+        { onActionButtonLongClick(); }};
+    LightController lightController;
+    FanController fanController;
 
-   public:
-    // PUBLIC FUNCTIONS.
-    ServiceController();
+public:
+    ServiceController(const ThermometerConfig &thermoConfig, const GeneralConfig &generalConfig, const CameraConfig &cameraConfig, const LightConfig &lightConfig, const DisplayConfig &displayConfig, const HttpServerConfig &httpServerConfig, const FanController::FanControllerConfig &fanConfig);
     void onPrinterStateChanged() override;
 
     void run();
