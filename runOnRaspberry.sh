@@ -2,7 +2,7 @@
 set timeout -1
 
 set USER pi
-set HOST 192.168.178.143
+set HOST 192.168.178.150
 set PASSW raspberry
 
 spawn scp ./build/PrinterServiceController ./PrinterConfig.json $USER@$HOST:/home/pi/
@@ -15,6 +15,6 @@ expect "password:"
 send -- "$PASSW\r"
 
 expect -re {\.*[$#]}
-send -- "sudo ./PrinterServiceController\r"
+send -- "sudo ./PrinterServiceController ./PrinterConfig.json\r"
 
 interact

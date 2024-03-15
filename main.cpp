@@ -17,8 +17,19 @@ int main(int argc, char *argv[])
     Logger::enableLogging();
 
     nlohmann::json config;
-    std::ifstream configFile("./PrinterConfig.json");
-    configFile >> config;
+    if (argc > 1){
+        std::cout << "Using given config file: '" << argv[1] << "'\n";
+        std::ifstream configFile(argv[1]);
+        configFile >> config;
+    }
+    else{
+        std::cout << "No config file given, using default values\n";
+        config = nlohmann::json::object();
+    }
+
+    // Print Config
+    std::cout << "Config:\n'"
+              << config.dump(4) << "'\n";
 
     ServiceController *controller = createController(config);
     controller->run();
