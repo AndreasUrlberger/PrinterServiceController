@@ -1,10 +1,11 @@
 #include "DisplayController.hpp"
 #include <iostream>
 
-DisplayController::DisplayController(const std::string filename, const uint8_t displayHeight, const uint8_t displayWidth, const uint8_t fontSize, const std::string fontName) : filename(filename), displayHeight(displayHeight), displayWidth(displayWidth), fontSize(fontSize), fontName(fontName)
+DisplayController::DisplayController(const std::string givenFilename, const uint8_t displayHeight, const uint8_t displayWidth, const uint8_t fontSize, const std::string givenFontName) : filename(givenFilename), displayHeight(displayHeight), displayWidth(displayWidth), fontSize(fontSize), fontName(givenFontName)
 {
     // Create dump file. This is done to avoid the display output to be printed to the console.
     auto nullFile = fopen("/dev/null", "w");
+    // It's important to make sure that filename will not change after this assignment, e.g. if we would use the given filename directly, as it would be freed after the constructor ends.
     oled = ssd1306_i2c_open(filename.c_str(), 0x3c, displayWidth, displayHeight, nullFile);
     if (!oled)
     {
@@ -27,6 +28,7 @@ DisplayController::DisplayController(const std::string filename, const uint8_t d
         turnOn();
 
         opts[0].type = ssd1306_graphics_options_t::SSD1306_OPT_FONT_FILE;
+         // It's important to make sure that fontName will not change after this assignment, e.g. if we would use the given fontName directly, as it would be freed after the constructor ends.
         opts[0].value.font_file = fontName.c_str();
         opts[1].type = ssd1306_graphics_options_t::SSD1306_OPT_ROTATE_FONT;
         opts[1].value.rotation_degrees = 180;
