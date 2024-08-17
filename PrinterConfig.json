@@ -9,9 +9,9 @@
         "max_inactive_time_ms": 3000
     },
     "light_config": {
-        "bridge_ip": "192.168.178.92",
-        "bridge_username": "yXEXyXC5BYDJbmS-6yNdji6qcatY6BedJmRIb4kO",
-        "printer_light_id": 9
+        "bridge_ip": "",
+        "bridge_username": "",
+        "printer_light_id": 
     },
     "display_config": {
         "height": 64,
@@ -42,5 +42,10 @@
     "camera_config": {
         "start_command": "nohup mjpg_streamer -o \"output_http.so -w ./www -p 8000\" -i \"input_uvc.so -r 1280x720 -f 1 -softfps 1\" > /dev/null 2>&1 &",
         "stop_command": "kill $(pidof mjpg_streamer)"
+    },
+    "mqtt_config": {
+        "client_id": "printer",
+        "broker_ip": "192.168.178.150",
+        "broker_port": 1883
     }
 }

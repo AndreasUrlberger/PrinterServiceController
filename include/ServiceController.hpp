@@ -11,6 +11,7 @@
 #include "LightController.hpp"
 #include "PrintConfigs.hpp"
 #include "Timing.hpp"
+#include "MqttClient.hpp"
 
 class ServiceController : private PrinterState::PrinterStateListener
 {
@@ -54,6 +55,13 @@ public:
     {
         const std::string startCommand;
         const std::string stopCommand;
+    };
+
+    struct MqttConfig
+    {
+        const std::string clientId;
+        const std::string brokerIp;
+        const int port;
     };
 
 private:
@@ -102,9 +110,11 @@ private:
         { onActionButtonLongClick(); }};
     LightController lightController;
     FanController fanController;
+    MqttClient mqttClient;
 
 public:
-    ServiceController(const ThermometerConfig &thermoConfig, const GeneralConfig &generalConfig, const CameraConfig &cameraConfig, const LightConfig &lightConfig, const DisplayConfig &displayConfig, const HttpServerConfig &httpServerConfig, const FanController::FanControllerConfig &fanConfig);
+    ServiceController(const ThermometerConfig &thermoConfig, const GeneralConfig &generalConfig, const CameraConfig &cameraConfig, const LightConfig &lightConfig, const DisplayConfig &displayConfig, const HttpServerConfig &httpServerConfig, const FanController::FanControllerConfig &fanConfig, const MqttConfig &mqttConfig);
+    ~ServiceController();
     void onPrinterStateChanged() override;
 
     void run();

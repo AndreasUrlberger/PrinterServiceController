@@ -14,5 +14,6 @@ The project makes use of the following libraries:
 - [uSockets](https://github.com/uNetworking/uSockets/tree/master)
 - [libssd1306](https://github.com/stealthylabs/libssd1306)
 - [pigpio](https://github.com/joan2937/pigpio)
+- [mosquitto](https://mosquitto.org/)
 
 The according licenses can be found in the linked repositories.

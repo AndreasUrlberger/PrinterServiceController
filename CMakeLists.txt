@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
 set(TARGET PrinterServiceController)
 
-project(PrinterServiceController VERSION 0.1.0)
+project(PrinterServiceController VERSION 0.1.1)
 
 include(CTest)
 enable_testing()
@@ -60,6 +60,7 @@ target_sources(${TARGET} PRIVATE
     ./src/HttpProtoServer.cpp
     ./src/LightController.cpp
     ./src/Logger.cpp
+    ./src/MqttClient.cpp
     ./src/PrintConfigs.cpp
     ./src/PrinterState.cpp
     ./src/ServiceController.cpp
@@ -72,6 +73,7 @@ target_sources(${TARGET} PRIVATE
     ./include/HttpProtoServer.hpp
     ./include/LightController.hpp
     ./include/Logger.hpp
+    ./include/MqttClient.hpp
     ./include/PrintConfigs.hpp
     ./include/PrinterState.hpp
     ./include/ServiceController.hpp
@@ -94,13 +96,18 @@ add_library(ssd1306 SHARED IMPORTED)
 add_library(pigpiod_if2 SHARED IMPORTED)
 add_library(pigpio SHARED IMPORTED)
 add_library(libhueplusplusshared SHARED IMPORTED)
+add_library(libmosquitto SHARED IMPORTED)
+add_library(libmosquittopp SHARED IMPORTED)
 
 set_target_properties(ssd1306 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/Libraries/libssd1306_i2c.so)
 set_target_properties(pigpiod_if2 PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/Libraries/libpigpiod_if2.so)
 set_target_properties(pigpio PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/Libraries/libpigpio.so)
 set_target_properties(libhueplusplusshared PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/Libraries/libhueplusplusshared.so)
+set_target_properties(libmosquitto PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/.devcontainer/rootfs/usr/lib/libmosquitto.so)
+set_target_properties(libmosquittopp PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/.devcontainer/rootfs/usr/lib/libmosquittopp.so)
 
-target_link_libraries(${TARGET} PRIVATE ssd1306 pthread z pigpio pigpiod_if2 libhueplusplusshared ${PROTOBUF_LIBRARIES} "${CMAKE_SOURCE_DIR}/Libraries/uSockets.a")
+
+target_link_libraries(${TARGET} PRIVATE ssd1306 pthread z pigpio pigpiod_if2 libhueplusplusshared libmosquitto libmosquittopp ${PROTOBUF_LIBRARIES} "${CMAKE_SOURCE_DIR}/Libraries/uSockets.a")
 
 add_definitions(-Wall -g)
 

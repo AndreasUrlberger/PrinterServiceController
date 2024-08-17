@@ -28,8 +28,10 @@ int main(int argc, char *argv[])
     }
 
     // Print Config
-    std::cout << "Config:\n'"
-              << config.dump(4) << "'\n";
+    std::cout << "Config:\n'" << config.dump(4) << "'\n";
+
+    // Initialize mosquitto library
+    mosqpp::lib_init();
 
     ServiceController *controller = createController(config);
     controller->run();
@@ -90,9 +92,9 @@ ServiceController *createController(nlohmann::json &config)
         lightConfigJson = nlohmann::json::object();
     }
     const ServiceController::LightConfig lightConfig{
-        getOrDefault<std::string>(lightConfigJson, "bridge_ip", "192.168.178.92"),
-        getOrDefault<std::string>(lightConfigJson, "bridge_username", "yXEXyXC5BYDJbmS-6yNdji6qcatY6BedJmRIb4kO"),
-        getOrDefault<uint8_t>(lightConfigJson, "printer_light_id", 9)};
+        getOrDefault<std::string>(lightConfigJson, "bridge_ip", ""),
+        getOrDefault<std::string>(lightConfigJson, "bridge_username", ""),
+        getOrDefault<uint8_t>(lightConfigJson, "printer_light_id", 0)};
 
     nlohmann::json displayConfigJson = config["display_config"];
     if (!isValidSubconfig(displayConfigJson, "display_config"))
@@ -143,5 +145,15 @@ ServiceController *createController(nlohmann::json &config)
         getOrDefault<std::string>(cameraConfigJson, "start_command", "nohup mjpg_streamer -o \"output_http.so -w ./www -p 8000\" -i \"input_uvc.so -r 1280x720 -f 1 -softfps 1\" > /dev/null 2>&1 &"),
         getOrDefault<std::string>(cameraConfigJson, "stop_command", "kill $(pidof mjpg_streamer)")};
 
-    return new ServiceController{thermoConfig, generalConfig, cameraConfig, lightConfig, displayConfig, httpServerConfig, fanConfig};
+    nlohmann::json mqttConfigJson = config["mqtt_config"];
+    if (!isValidSubconfig(mqttConfigJson, "mqtt_config"))
+    {
+        mqttConfigJson = nlohmann::json::object();
+    }
+    ServiceController::MqttConfig mqttConfig{
+        getOrDefault<std::string>(mqttConfigJson, "client_id", "printer"),
+        getOrDefault<std::string>(mqttConfigJson, "broker_ip", "localhost"),
+        getOrDefault<uint16_t>(mqttConfigJson, "broker_port", 1883)};
+
+    return new ServiceController{thermoConfig, generalConfig, cameraConfig, lightConfig, displayConfig, httpServerConfig, fanConfig, mqttConfig};
 }

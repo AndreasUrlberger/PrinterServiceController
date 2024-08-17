@@ -8,8 +8,9 @@
 #include <thread>
 
 #include "Logger.hpp"
+#include <mosquittopp.h>
 
-ServiceController::ServiceController(const ThermometerConfig &thermoConfig, const GeneralConfig &generalConfig, const CameraConfig &cameraConfig, const LightConfig &lightConfig, const DisplayConfig &displayConfig, const HttpServerConfig &httpServerConfig, const FanController::FanControllerConfig &fanConfig)
+ServiceController::ServiceController(const ThermometerConfig &thermoConfig, const GeneralConfig &generalConfig, const CameraConfig &cameraConfig, const LightConfig &lightConfig, const DisplayConfig &displayConfig, const HttpServerConfig &httpServerConfig, const FanController::FanControllerConfig &fanConfig, const MqttConfig &mqttConfig)
     : thermoConfig{thermoConfig},
       generalConfig{generalConfig},
       cameraConfig{cameraConfig},
@@ -21,10 +22,16 @@ ServiceController::ServiceController(const ThermometerConfig &thermoConfig, cons
                     [this]()
                     { onServerActivity(); }},
       lightController{lightConfig.bridgeIp, lightConfig.bridgeUsername, lightConfig.printerLightId},
-      fanController{state, fanConfig}
+      fanController{state, fanConfig},
+      mqttClient{mqttConfig.clientId, mqttConfig.brokerIp, mqttConfig.port, state}
 {
     turnOffTime = Timing::currentTimeMillis() + generalConfig.screenAliveTime;
     state.addListener(this);
+}
+
+ServiceController::~ServiceController()
+{
+    mosqpp::lib_cleanup();
 }
 
 void ServiceController::onPrinterStateChanged()
