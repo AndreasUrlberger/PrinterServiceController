@@ -46,7 +46,7 @@ void MqttClient::on_message(const struct mosquitto_message *message) {
     } else if (message->topic == std::string("printer/toggle_temp_control")) {
         std::cout << "printer/toggle_temp_control received: " << payload << "\n";
         toggleTempControl(payload);
-    else {
+    } else {
         std::cout << "Unknown topic: " << message->topic << "\n";
     }
 }
