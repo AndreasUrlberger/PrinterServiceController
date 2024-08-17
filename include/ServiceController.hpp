@@ -77,7 +77,7 @@ private:
 
     int displayTempLoop();
     void updateDisplay();
-    int32_t readTemp(std::string deviceName);
+    int32_t readTemp(std::string deviceName, int32_t defaultValue);
     void onShutdown();
     bool onProfileUpdate(PrintConfig &profile);
     void onPowerButtonShortClick();

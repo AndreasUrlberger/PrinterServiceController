@@ -77,9 +77,10 @@ int ServiceController::displayTempLoop()
 
     Timing::runEveryNMillis(UINT64_C(1000), [this]()
                             {
-        state.setInnerTopTemp(readTemp(thermoConfig.innerTopThermoName), false);
-        state.setInnerBottomTemp(readTemp(thermoConfig.innerBottomThermoName), false);
-        state.setOuterTemp(readTemp(thermoConfig.outerThermoName), true);
+        // We use the previous measurement as a default value since the measurement might fail.
+        state.setInnerTopTemp(readTemp(thermoConfig.innerTopThermoName, state.getInnerTopTemp()), false);
+        state.setInnerBottomTemp(readTemp(thermoConfig.innerBottomThermoName, state.getInnerBottomTemp()), false);
+        state.setOuterTemp(readTemp(thermoConfig.outerThermoName, state.getOuterTemp()), true);
         updateDisplay();
 
         std::ostringstream ss;
@@ -103,7 +104,7 @@ void ServiceController::updateDisplay()
     }
 }
 
-int32_t ServiceController::readTemp(std::string deviceName)
+int32_t ServiceController::readTemp(std::string deviceName, int32_t defaultValue)
 {
     // read file to string
     const std::string path = "/sys/bus/w1/devices/" + deviceName + "/w1_slave";
@@ -115,7 +116,7 @@ int32_t ServiceController::readTemp(std::string deviceName)
 
     // find temp
     const size_t index = input.find("t=") + 2; // start of temperature
-    return index < input.length() ? stoi(input.substr(index)) : 0;
+    return index < input.length() ? stoi(input.substr(index)) : defaultValue;
 }
 
 void ServiceController::onShutdown()
