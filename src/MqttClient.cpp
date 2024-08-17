@@ -46,7 +46,7 @@ void MqttClient::on_message(const struct mosquitto_message *message) {
     } else if (message->topic == std::string("printer/toggle_temp_control")) {
         std::cout << "printer/toggle_temp_control received: " << payload << "\n";
         toggleTempControl(payload);
-    } else {
+    else {
         std::cout << "Unknown topic: " << message->topic << "\n";
     }
 }
@@ -85,6 +85,9 @@ void MqttClient::publishProfiles() {
     const std::string topic = "printer/profiles";
     publish(nullptr, topic.c_str(), payload.size(), payload.c_str());
     std::cout << "Profiles sent\n";
+
+    // Send it here as well since this is the only topic that is triggered frequently by the client.
+    sendTempControlState();
 }
 
 void MqttClient::toggleTempControl(const std::string &payload) {
@@ -95,4 +98,13 @@ void MqttClient::toggleTempControl(const std::string &payload) {
     } else {
         std::cerr << "Invalid payload for toggleTempControl: " << payload << "\n";
     }
+
+    sendTempControlState();
+}
+
+void MqttClient::sendTempControlState() {
+    const std::string payload = state_.getIsTempControlActive() ? "on" : "off";
+    const std::string topic = "printer/temp_control";
+    publish(nullptr, topic.c_str(), payload.size(), payload.c_str());
+    std::cout << "Temp control state sent\n";
 }

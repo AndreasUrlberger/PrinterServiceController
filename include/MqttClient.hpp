@@ -3,7 +3,7 @@
 #include <mosquittopp.h>
 #include <string>
 #include "PrinterState.hpp"
-
+ 
 class MqttClient : public mosqpp::mosquittopp {
 
 private:
@@ -21,4 +21,5 @@ public:
     void publishCurrentState();
     void publishProfiles();
     void toggleTempControl(const std::string &payload);
+    void sendTempControlState();
 };
